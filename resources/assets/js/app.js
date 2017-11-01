@@ -15,18 +15,12 @@ window.Vue = require('vue');
  * or customize the JavaScript scaffolding to fit your unique needs.
  */
 // Vue.component('example', require('./components/Example.vue'));
-import VueRouter from 'vue-router';
+
 import VueOnsen from 'vue-onsenui'; // This already imports 'onsenui'
-import routes from './routes.js';
 import App from './components/App.vue';
-import leaflet from 'leaflet'
+import components from './components'
+import CircleMenu from 'vue-circle-menu'
+Vue.component('CircleMenu', CircleMenu)
 Vue.use(VueOnsen);
 
-
-const router = new VueRouter({
-    mode: 'history',
-    base: __dirname,
-    linkActiveClass: 'active',
-    routes: routes
-});
-new Vue(Vue.util.extend({router}, App)).$mount('#app');
+new Vue(Vue.util.extend(App)).$mount('#app');

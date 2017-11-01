@@ -18,6 +18,12 @@ class CreatePhotosTable extends Migration
             $table->string('file');
             $table->timestamps();
         });
+        Schema::create('photo_repository', function (Blueprint $table) {
+            $table->integer('photo_id')->unsigned()->index();
+            $table->foreign('photo_id')->references('id')->on('photos')->onDelete('cascade');
+            $table->integer('repository_id')->unsigned()->index();
+            $table->foreign('repository_id')->references('id')->on('repositories')->onDelete('cascade');
+        });
     }
 
     /**
@@ -28,5 +34,6 @@ class CreatePhotosTable extends Migration
     public function down()
     {
         Schema::dropIfExists('photos');
+        Schema::dropIfExists('photo_repository');
     }
 }

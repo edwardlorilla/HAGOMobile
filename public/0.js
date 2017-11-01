@@ -1,14 +1,14 @@
 webpackJsonp([0],{
 
-/***/ 47:
+/***/ 102:
 /***/ (function(module, exports, __webpack_require__) {
 
 var disposed = false
-var normalizeComponent = __webpack_require__(9)
+var normalizeComponent = __webpack_require__(0)
 /* script */
-var __vue_script__ = null
+var __vue_script__ = __webpack_require__(103)
 /* template */
-var __vue_template__ = __webpack_require__(48)
+var __vue_template__ = __webpack_require__(104)
 /* styles */
 var __vue_styles__ = null
 /* scopeId */
@@ -22,9 +22,9 @@ var Component = normalizeComponent(
   __vue_scopeId__,
   __vue_module_identifier__
 )
-Component.options.__file = "resources\\assets\\js\\components\\Repository\\index.vue"
+Component.options.__file = "resources\\assets\\js\\components\\View\\PlantNavigator.vue"
 if (Component.esModule && Object.keys(Component.esModule).some(function (key) {return key !== "default" && key.substr(0, 2) !== "__"})) {console.error("named exports are not supported in *.vue files.")}
-if (Component.options.functional) {console.error("[vue-loader] index.vue: functional components are not supported with templates, they should use render functions.")}
+if (Component.options.functional) {console.error("[vue-loader] PlantNavigator.vue: functional components are not supported with templates, they should use render functions.")}
 
 /* hot reload */
 if (false) {(function () {
@@ -33,9 +33,9 @@ if (false) {(function () {
   if (!hotAPI.compatible) return
   module.hot.accept()
   if (!module.hot.data) {
-    hotAPI.createRecord("data-v-2f72dbc2", Component.options)
+    hotAPI.createRecord("data-v-6bf43d91", Component.options)
   } else {
-    hotAPI.reload("data-v-2f72dbc2", Component.options)
+    hotAPI.reload("data-v-6bf43d91", Component.options)
   }
   module.hot.dispose(function (data) {
     disposed = true
@@ -47,14 +47,46 @@ module.exports = Component.exports
 
 /***/ }),
 
-/***/ 48:
+/***/ 103:
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Ajax_getData__ = __webpack_require__(2);
+//
+//
+//
+//
+//
+//
+
+
+/* harmony default export */ __webpack_exports__["default"] = ({
+    data: function data() {
+        return {
+            stack: __WEBPACK_IMPORTED_MODULE_0__Ajax_getData__["h" /* Stack */]
+        };
+    }
+});
+
+/***/ }),
+
+/***/ 104:
 /***/ (function(module, exports, __webpack_require__) {
 
 var render = function() {
   var _vm = this
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
-  return _c("div")
+  return _vm.stack
+    ? _c("v-ons-navigator", {
+        attrs: {
+          swipeable: "",
+          "options.animation": "slide",
+          "page-stack": _vm.stack.page
+        }
+      })
+    : _vm._e()
 }
 var staticRenderFns = []
 render._withStripped = true
@@ -62,7 +94,7 @@ module.exports = { render: render, staticRenderFns: staticRenderFns }
 if (false) {
   module.hot.accept()
   if (module.hot.data) {
-     require("vue-hot-reload-api").rerender("data-v-2f72dbc2", module.exports)
+     require("vue-hot-reload-api").rerender("data-v-6bf43d91", module.exports)
   }
 }
 
