@@ -1,6 +1,6 @@
 <template id="plant">
     <v-ons-page>
-        <v-ons-progress-bar indeterminate></v-ons-progress-bar>
+        <v-ons-progress-bar v-if="!getFuseList.list" indeterminate></v-ons-progress-bar>
         <custom-toolbar title="Repositories of Plants" :search="searchToggle"></custom-toolbar>
         <search-scope v-show="onSearch.query">
             <v-ons-search-input v-model="searchQuery" placeholder="Search something"

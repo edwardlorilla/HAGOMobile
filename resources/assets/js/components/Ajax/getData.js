@@ -6,7 +6,7 @@ export var currentPage = {
     url: 'plant-navigator',
     name: 'Repositories of Plants'
 }
-export function currentPageSwitcher(url, name){
+export function currentPageSwitcher(url, name) {
     new Promise((resolve, reject) => {
         resolve(
             currentPage.url = url,
@@ -28,9 +28,9 @@ export var StackItem = {
     page: ['plant-item']
 }
 
-export function PlantIndex(id){
-        var plant = _.findIndex(plantItem.all, {id: id});
-       PlantFound.index = plantItem.all[plant];
+export function PlantIndex(id) {
+    var plant = _.findIndex(plantItem.all, {id: id});
+    PlantFound.index = plantItem.all[plant];
 }
 export const PlantFound = {
     index: null
@@ -39,7 +39,7 @@ export function PushItem(page) {
     StackItem.page.push(page)
 }
 
-export function setResults (result) {
+export function setResults(result) {
     return new Promise((resolve, reject) => {
         getResults.all = result
         resolve();
@@ -53,8 +53,8 @@ export var getResults = {
 
 export function get() {
     /*var spreadsheetID = '1Y2UtYW0Wl4QSTW_TYJiYgFIgrltmixecV9en0WhuUSc';
-    var worksheetID = 'od6';
-    var url = 'https://spreadsheets.google.com/feeds/list/' + spreadsheetID + '/' + worksheetID + '/public/values?alt=json';*/
+     var worksheetID = 'od6';
+     var url = 'https://spreadsheets.google.com/feeds/list/' + spreadsheetID + '/' + worksheetID + '/public/values?alt=json';*/
     var url = '/api/repository'
     return axios({
         method: 'GET',
@@ -62,14 +62,14 @@ export function get() {
     })
 }
 
-export function getData(){
+export function getData() {
     var url = '/api/repository'
     return axios({
         method: 'GET',
         url: url
     }).then(function (response) {
-        
-        var data =  response.data
+
+        var data = response.data
         plantItem.all = data
         getResults.all = data
         plantItem.count = data.length
@@ -88,7 +88,7 @@ const ErrorComponent = {
 }
 
 export const SWIPE_SIDE = {
-   side: false 
+    side: false
 }
 
 export function change_view() {
@@ -100,20 +100,23 @@ export function change_view() {
 const LoadingComponent = {
     name: 'loading-component',
     template: `
-        <div class="pulse">
-          
-          <span></span>
-          H
+        <div>
+        <v-ons-progress-bar indeterminate></v-ons-progress-bar>
+                <div class="pulse">
+                  
+                  <span></span>
+                  H
+                </div>
         </div>
     `,
 }
 
-export var userLocation ={
+export var userLocation = {
     lat: null,
     lng: null
 }
 
-export function getUserLocation(position){
+export function getUserLocation(position) {
     userLocation.latitude = position.latitude
     userLocation.longitude = position.longitude
 }
@@ -128,7 +131,6 @@ export const PlantNavigator = () => ({
     error: ErrorComponent,
     delay: 1
 })
-
 
 
 export var searchInput = {
