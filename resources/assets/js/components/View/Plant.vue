@@ -1,13 +1,14 @@
 <template id="plant">
     <v-ons-page>
+        <v-ons-progress-bar indeterminate></v-ons-progress-bar>
         <custom-toolbar title="Repositories of Plants" :search="searchToggle"></custom-toolbar>
-        <search-scope v-show="onSearch">
+        <search-scope v-show="onSearch.query">
             <v-ons-search-input v-model="searchQuery" placeholder="Search something"
                                 style="width: 96%;"></v-ons-search-input>
         </search-scope>
 
 
-        <v-ons-list :style="{  'margin-top': onSearch ? 60 + 'px' : 0 + 'px'}">
+        <v-ons-list style="transition: all .3s ease;" :style="{'margin-top': onSearch.query ? 60 + 'px' : 0 + 'px'}">
             <v-ons-lazy-repeat
                     v-if="getFuseList.list"
                     :render-item="renderItem"
@@ -21,7 +22,7 @@
 </template>
 
 <script>
-    import {getData, plantItem, PlantItem, Push, setResults, getResults} from './../Ajax/getData'
+    import {searchInput,toggleSearch, getData, plantItem, PlantItem, Push, setResults, getResults} from './../Ajax/getData'
 
     export default{
         props: ['toggleMenu', 'pageName'],
@@ -80,7 +81,7 @@
                 results: [],
                 fuse: '',
                 searchQuery: '',
-                onSearch: true
+                onSearch: searchInput
             }
         },
         mounted(){
@@ -122,7 +123,7 @@
                 getData()
             },
             searchToggle(){
-                this.onSearch = !this.onSearch
+                toggleSearch()
             }
         }
     }

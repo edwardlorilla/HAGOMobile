@@ -42,47 +42,33 @@
         </v-ons-popover>
 
         {{watchLocation}}
-        <!--<p >
-            <v-ons-search-input style="width: 90%;" placeholder="Search something"></v-ons-search-input>
-        </p>-->
         <div class="addMarker">
             <div style="display: flex;justify-content: center;">
                 <search-map v-model="searchQuery"></search-map>
-                <search-result-scope v-if="isArray" :style="{'margin-top': $ons.platform.isAndroidPhone() ? 60 + 'px' : 50 + 'px'}">
+                <search-result-scope v-if="isArray"
+                                     :style="{'margin-top': $ons.platform.isAndroidPhone() ? 60 + 'px' : 50 + 'px'}">
                     <v-ons-list-item v-for="(search, index) in result" :key="index" @click="onResult(search)">
                         <div class="left">
                             <img class="list-item__thumbnail" src="http://placekitten.com/g/40/40">
                         </div>
-                        <search-result :search="search" ></search-result>
+                        <search-result :search="search"></search-result>
                     </v-ons-list-item>
                 </search-result-scope>
 
             </div>
         </div>
+
+        <div  class="addMarker" style="bottom: 0">
+            <div style="display: flex;justify-content: center;">
+                <v-ons-button @click="onStart" class="btn"  modifier="large" style="margin: 6px 0;">Start
+                </v-ons-button>
+            </div>
+
+        </div>
         <div id="map"></div>
     </v-ons-page>
 </template>
-<style scoped>
-    .addMarker {
-        position: fixed;
-        z-index: 1000;
 
-        width: 100%;
-        padding-top: 5px;
-        padding-bottom: 5px;
-    }
-
-    .autocomplete-list {
-        position: absolute;
-        z-index: 2;
-        overflow: auto;
-        max-height: 150px;
-        margin: 0;
-
-        padding: 0;
-        border-radius: 4px;
-    }
-</style>
 <script>
     import {tileSet} from './TileSet'
     import {change_view, PlantFound, userLocation, plantItem} from './../Ajax/getData'
@@ -182,8 +168,11 @@
             },
         },
         methods: {
+            onStart(){
+                console.log('onStart')
+            },
             onResult(search){
-                var vm = this,  plant = _.findIndex(vm.markers, {options: {id: search.id}});
+                var vm = this, plant = _.findIndex(vm.markers, {options: {id: search.id}});
                 vm.markerFunction(plant)
             },
             onSuccess (position) {
@@ -299,18 +288,16 @@
             markerFunction(id) {
                 var vm = this
                 var marker = vm.markers[id]
-                console.log(marker)
                 var itemObject = marker.options;
                 var position = marker.getLatLng();
                 var floraLocation = new L.LatLng(position.lat, position.lng);
                 var userDistance = vm.createPolyLine(floraLocation, vm.userLocation);
-                console.log(position)
+                console.log(vm.markers[id])
                 vm.map.setView(position, 15);
+
                 vm.markers[id]._popup._content = userDistance + '<h2>' + itemObject.name + '</h2>' + itemObject.content + '<img width="100%" src="' + itemObject.image + '" />'
                 if (!marker._icon) marker.__parent.spiderfy();
                 marker.openPopup();
-
-
             },
             createPolyLine(floraLocation, userLocation){
                 return 'About ' + (floraLocation.distanceTo(userLocation) / 1000).toFixed(0) + 'km away from you.</p>';

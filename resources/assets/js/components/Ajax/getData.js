@@ -131,9 +131,17 @@ export const PlantNavigator = () => ({
 
 
 
-
+export var searchInput = {
+    query: true
+}
 export var PlantInfo = null
 
 export function PlantItem(plantInfo) {
     PlantInfo = plantInfo
+    searchInput.query = false
+}
+
+export function toggleSearch() {
+    var vm = searchInput
+    vm.query = !vm.query
 }

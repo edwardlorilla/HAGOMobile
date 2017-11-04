@@ -8,6 +8,7 @@ import PlantItemNavigator from  './components/View/PlantItemNavigator.vue'
 import Map from  './components/View/Maps.vue'
 import CapturePhoto from  './components/View/CapturePhoto.vue'
 import SearchScope from  './components/View/SearchScope.vue'
+import SlideFade from  './components/Transition/slide-fade.vue'
 
 import Toolbar from  './components/Toolbar.vue'
 import AutoComplete from  './components/AutoComplete.vue'
@@ -66,6 +67,9 @@ Vue.component('search-result', function (resolve, reject) {
 });
 Vue.component('search-result-scope', function (resolve, reject) {
     resolve(SearchResultMapScope)
+});
+Vue.component('slide-fade', function (resolve, reject) {
+    resolve(SlideFade)
 });
 
 

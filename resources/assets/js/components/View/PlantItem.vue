@@ -16,13 +16,17 @@
 
         <v-ons-list-header>Default</v-ons-list-header>
         <v-ons-list style="display: flex; justify-content: center; border-top: none">
-            <v-ons-button v-if="plantInfo.id" modifier="cta" @click="getMapInfo" style="margin: 6px 0">
-                <v-ons-icon icon="ion-search"></v-ons-icon> Find Location
+            <v-ons-button class="btn" v-if="plantInfo.id" modifier="cta" @click="getMapInfo"
+                          style="margin: 6px 0; text-align: center;">
+                <v-ons-icon icon="ion-search"></v-ons-icon>
+                Find Location
             </v-ons-button>
         </v-ons-list>
 
         <v-ons-list style="border-top: 0;">
-            <v-ons-list-item ><div class="card-name">{{plantInfo.name}}</div></v-ons-list-item>
+            <v-ons-list-item>
+                <div class="card-name">{{plantInfo.name}}</div>
+            </v-ons-list-item>
             <v-ons-list-item>{{plantInfo.description}}</v-ons-list-item>
         </v-ons-list>
 
