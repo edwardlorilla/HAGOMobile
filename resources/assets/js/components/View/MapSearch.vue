@@ -3,11 +3,12 @@
             :value="my_prop"
             @input="send($event.target.value)"
             placeholder="Search something"
-            style="width: 70%;"
+            style="width: 70%; background-color: #ddd;"
     >
     </v-ons-search-input>
 
 </template>
+
 <script>
     export default {
         props: [

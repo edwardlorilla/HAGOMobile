@@ -3,6 +3,7 @@
         <v-ons-splitter-side
                 swipeable collapse="" side="left"
                 :open.sync="openSide.side"
+                animation="reveal"
         >
             <v-ons-page>
                 <v-ons-list>

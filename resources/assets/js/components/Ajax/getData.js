@@ -100,14 +100,10 @@ export function change_view() {
 const LoadingComponent = {
     name: 'loading-component',
     template: `
-        <div>
-        <v-ons-progress-bar indeterminate></v-ons-progress-bar>
                 <div class="pulse">
-                  
                   <span></span>
                   H
                 </div>
-        </div>
     `,
 }
 

@@ -1,5 +1,6 @@
 <template id="home">
     <v-ons-page>
+        <v-ons-progress-bar v-if="!userLocation.lat" indeterminate></v-ons-progress-bar>
         <v-ons-toolbar>
             <div class="left">
                 <v-ons-toolbar-button v-if="pageName" @click="changeView">
@@ -47,7 +48,7 @@
                 <search-map v-model="searchQuery"></search-map>
                 <search-result-scope v-if="isArray"
                                      :style="{'margin-top': $ons.platform.isAndroidPhone() ? 60 + 'px' : 50 + 'px'}">
-                    <v-ons-list-item v-for="(search, index) in result" :key="index" @click="onResult(search)">
+                    <v-ons-list-item v-for="(search, index) in resultItem" :key="index" @click="onResult(search)">
                         <div class="left">
                             <img class="list-item__thumbnail" src="http://placekitten.com/g/40/40">
                         </div>
@@ -57,10 +58,9 @@
 
             </div>
         </div>
-
-        <div  class="addMarker" style="bottom: 0">
+        <div class="addMarker" style="bottom: 0">
             <div style="display: flex;justify-content: center;">
-                <v-ons-button @click="onStart" class="btn"  modifier="large" style="margin: 6px 0;">Start
+                <v-ons-button @click="onStart" class="btn" modifier="large" style="margin: 6px 0;">Start
                 </v-ons-button>
             </div>
 
@@ -81,6 +81,7 @@
         },
         data(){
             return {
+
                 keys: ['name'],
                 fuse: '',
                 searchQuery: '',
@@ -123,6 +124,7 @@
                 iconUrl: 'https://cdn0.iconfinder.com/data/icons/small-n-flat/24/678111-map-marker-64.png',
                 iconSize: [32, 32]
             });
+
             vm.map = L.map('map', {
                 center: [10.0, 5.0],
                 minZoom: 2,
@@ -145,34 +147,33 @@
             vm.setTileSet(vm.selectedTileSet)
             vm.map.on('locationfound', vm.onLocationFound);
         },
-        watch: {
-            searchQuery(){
-                var vm = this
-                if (this.searchQuery.trim() === '')
-                    this.result = null
-                else
-                    this.result = this.fuse.search(this.searchQuery.trim())
-            }
-        },
         computed: {
             isArray(){
-                return _.isArray(this.result)
+                return _.isArray(this.resultItem)
             },
             watchLocation(){
                 var vm = this
                 return vm.markers == [] ? vm.getGoogleData() : null;
             },
-            getLocation(){
-                var vm = this;
-                return ('geolocation' in navigator) ? vm.watchId = navigator.geolocation.watchPosition(vm.onSuccess, vm.onError, vm.positionOptions) : vm.initialize = 'Sorry, geolocation does not appear to be supported in this browser.'
+
+            resultItem(){
+                var vm = this
+                if (this.searchQuery.trim() === '')
+                    return null
+                else
+                    return this.fuse.search(this.searchQuery.trim())
             },
+
         },
         methods: {
             onStart(){
-                console.log('onStart')
+                var vm = this;
+                ('geolocation' in navigator) ? vm.watchId = navigator.geolocation.watchPosition(vm.onSuccess, vm.onError, vm.positionOptions) : vm.initialize = 'Sorry, geolocation does not appear to be supported in this browser.'
             },
             onResult(search){
                 var vm = this, plant = _.findIndex(vm.markers, {options: {id: search.id}});
+//                vm.$set(vm.$data, 'searchQuery', '')
+                vm.searchQuery = ''
                 vm.markerFunction(plant)
             },
             onSuccess (position) {
@@ -294,8 +295,7 @@
                 var userDistance = vm.createPolyLine(floraLocation, vm.userLocation);
                 console.log(vm.markers[id])
                 vm.map.setView(position, 15);
-
-                vm.markers[id]._popup._content = userDistance + '<h2>' + itemObject.name + '</h2>' + itemObject.content + '<img width="100%" src="' + itemObject.image + '" />'
+                vm.markers[id]._popup._content = `<div style="z-index: 402; max-width: 80vw ">` + userDistance + '<h2>' + itemObject.name + '</h2>' + itemObject.content + '<img style="width: 100%;" src="' + itemObject.image + '" /> ' + '</div>'
                 if (!marker._icon) marker.__parent.spiderfy();
                 marker.openPopup();
             },
@@ -315,9 +315,12 @@
                         title: "marker_" + i,
                         name: val.name,
                         content: val.description,
-                        image: photo
+                        image: photo,
+                        closeOnClick: true
                     })
-                            .bindPopup(userDistance + '<h2>' + val.name + '</h2>' + val.description + '<img width="100%" src="' + photo + '" />');
+
+                            .bindPopup('<div style="z-index: 402; max-width: 80vw ">' + userDistance + '<h2>' + val.name + '</h2>' + val.description + '<img style="width: 100%;" src="' + photo + '"/>' + "</div>");
+                    vm.map.flyTo(vm.userLocation, 15);
                     vm.markerClusters.addLayer(markerX);
                     vm.markers.push(markerX);
                     vm.map.addLayer(vm.markerClusters)

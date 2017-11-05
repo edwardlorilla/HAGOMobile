@@ -32,8 +32,11 @@
     <title>HAGO</title>
     <style>
         html, body, #map {
-            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
             width: 100%;
+            height: 100%;
             font-family: 'Open Sans Condensed', sans-serif;
         }
 

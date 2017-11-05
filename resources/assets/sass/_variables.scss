@@ -43,7 +43,7 @@ v-ons-toolbar ~ #map{
 
 .addMarker {
   position: fixed;
-  z-index: 1000;
+  z-index: 401;
 
   width: 100%;
   padding-top: 5px;
@@ -58,7 +58,7 @@ v-ons-toolbar ~ #map{
   position: absolute;
   z-index: 2;
   overflow: auto;
-  max-height: 150px;
+  max-height: 50vh;
   margin: 0;
 
   padding: 0;
@@ -70,4 +70,8 @@ v-ons-toolbar ~ #map{
   background: linear-gradient(to right, #A2DB95, #24CCAA);
   width: 60%;
 
+}
+
+ons-search-input .search-input{
+  background-color: rgb(199, 196, 196);
 }
