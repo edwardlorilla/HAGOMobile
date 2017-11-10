@@ -4,6 +4,7 @@
 window.Vue = require('vue');
 import Plant from  './components/View/Plant.vue'
 import PlantItem from  './components/View/PlantItem.vue'
+import PlantItemMapView from  './components/View/PlantMapView.vue'
 import PlantItemNavigator from  './components/View/PlantItemNavigator.vue'
 import Map from  './components/View/Maps.vue'
 import CapturePhoto from  './components/View/CapturePhoto.vue'
@@ -17,6 +18,9 @@ import SearchResult from  './components/View/SearchResult.vue'
 import SearchResultMapScope from  './components/View/SearchResultMapScope.vue'
 import FloatingAction from  './components/FloatingActionBar.vue'
 import staggeredFade from  './components/Transition/staggered-fade.vue'
+Vue.component('plant-item-map-view', function (resolve, reject) {
+        resolve(PlantItemMapView)
+});
 Vue.component('view-plant', function (resolve, reject) {
     setTimeout(function () {
         resolve(Plant)

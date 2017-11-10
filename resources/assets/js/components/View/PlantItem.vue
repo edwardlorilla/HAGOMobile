@@ -34,7 +34,7 @@
 </template>
 
 <script>
-    import {PlantInfo, Push, PlantIndex} from './../Ajax/getData'
+    import {PlantInfo, Push, PlantIndex, currentPageSwitcher} from './../Ajax/getData'
     export default {
         data(){
             return {
@@ -51,7 +51,10 @@
         },
         methods: {
             getMapInfo(){
-                Push('view-map');
+                currentPageSwitcher('view-map', 'View Plant Location')
+                //Push('view-map');
+                //Push('plant-item-map-view');
+
             },
             foundIndex(id){
                 PlantIndex(id)

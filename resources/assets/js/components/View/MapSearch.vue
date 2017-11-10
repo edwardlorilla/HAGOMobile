@@ -2,8 +2,8 @@
     <v-ons-search-input
             :value="my_prop"
             @input="send($event.target.value)"
-            placeholder="Search something"
-            style="width: 70%; background-color: #ddd;"
+            placeholder="Search..."
+            :style="{'margin-top': $ons.platform.isAndroid() ?  4 + 'px' : 8 + 'px'}"
     >
     </v-ons-search-input>
 

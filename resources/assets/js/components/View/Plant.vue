@@ -12,7 +12,7 @@
             <v-ons-lazy-repeat
                     v-if="getFuseList.list"
                     :render-item="renderItem"
-                    :key="1 "
+                    :key="1"
                     :length="getSearchQuery.length">
             </v-ons-lazy-repeat>
 

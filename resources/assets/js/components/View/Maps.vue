@@ -1,6 +1,7 @@
 <template id="home">
     <v-ons-page>
-        <v-ons-progress-bar v-if="!userLocation.lat" indeterminate></v-ons-progress-bar>
+
+        <!--<v-ons-progress-bar v-if="!userLocation.lat" indeterminate></v-ons-progress-bar>-->
         <v-ons-toolbar>
             <div class="left">
                 <v-ons-toolbar-button v-if="pageName" @click="changeView">
@@ -14,8 +15,11 @@
                     <v-ons-icon v-else icon="ion-gear-b, material:md-settings"></v-ons-icon>
                 </v-ons-toolbar-button>
             </div>
-            <div class="center">{{ pageName }}</div>
+            <div class="center">
 
+                <search-map class="center-textbox" v-model="searchQuery"></search-map>
+
+            </div>
         </v-ons-toolbar>
 
         <v-ons-popover cancelable
@@ -43,11 +47,11 @@
         </v-ons-popover>
 
         {{watchLocation}}
+        {{totalDistance}}
         <div class="addMarker">
-            <div style="display: flex;justify-content: center;">
-                <search-map v-model="searchQuery"></search-map>
+            <div class="center-textbox">
                 <search-result-scope v-if="isArray"
-                                     :style="{'margin-top': $ons.platform.isAndroidPhone() ? 60 + 'px' : 50 + 'px'}">
+                                     :style="{'margin-top': $ons.platform.isAndroidPhone() ? 5 + 'px' : 50 + 'px'}">
                     <v-ons-list-item v-for="(search, index) in resultItem" :key="index" @click="onResult(search)">
                         <div class="left">
                             <img class="list-item__thumbnail" src="http://placekitten.com/g/40/40">
@@ -55,23 +59,36 @@
                         <search-result :search="search"></search-result>
                     </v-ons-list-item>
                 </search-result-scope>
-
             </div>
         </div>
+
         <div class="addMarker" style="bottom: 0">
-            <div style="display: flex;justify-content: center;">
-                <v-ons-button @click="onStart" class="btn" modifier="large" style="margin: 6px 0;">Start
-                </v-ons-button>
+            <div style="display: flex;justify-content: center; ">
+
+                <v-ons-fab
+
+                        position="bottom center"
+                        :class=" isWatch ?  'btn-stop' : 'btn'"
+                        :visible="true"
+                        @click="onStart"
+                >
+                    <v-ons-icon icon="md-gps-dot"></v-ons-icon>
+                </v-ons-fab>
+
             </div>
 
         </div>
         <div id="map"></div>
     </v-ons-page>
 </template>
+<style>
+    .leaflet-popup-content {
 
+    }
+</style>
 <script>
     import {tileSet} from './TileSet'
-    import {change_view, PlantFound, userLocation, plantItem} from './../Ajax/getData'
+    import {change_view, PlantFound, userLocation, plantItem, gps_distance} from './../Ajax/getData'
     export default{
         props: {
             pageName: {
@@ -87,6 +104,7 @@
                 searchQuery: '',
 
                 plantFound: PlantFound,
+
                 popoverVisible: false,
                 popoverTarget: null,
                 popoverDirection: 'up',
@@ -100,8 +118,21 @@
                 markers: [],
                 markerClusters: null,
                 selectedTileSet: 3,
-                tileSets: tileSet,
                 userLocation: userLocation,
+
+                userMarker: null,
+                coords: [],
+                trackId: '',
+                trackingData: [],
+                trackInfo: {
+                    totalDistance: null,
+                    totalMinute: null,
+                    totalMilliseconds: null,
+                    totalSecond: null
+                },
+                tileSets: tileSet,
+
+
                 initialize: null,
                 accuracy: null,
                 altitude: null,
@@ -109,43 +140,20 @@
                 speed: null,
                 positionOptions: {
                     enableHighAccuracy: true,
-                    timeout: 10000,
-                    maximumAge: 10000
+                    timeout: 20000,
+                    maximumAge: 0,
+                    distanceFilter: 1
                 },
                 watchId: null,
                 resultFuse: [],
-                result: null
+                result: null,
+                isWatch: false,
+                isOpen: false
             }
         },
         mounted(){
             var vm = this
-            vm.markerClusters = L.markerClusterGroup();
-            var userIcon = L.icon({
-                iconUrl: 'https://cdn0.iconfinder.com/data/icons/small-n-flat/24/678111-map-marker-64.png',
-                iconSize: [32, 32]
-            });
-
-            vm.map = L.map('map', {
-                center: [10.0, 5.0],
-                minZoom: 2,
-                zoom: 2,
-                zoomControl: true
-            })
-            vm.map.zoomControl.setPosition('bottomleft');
-            var options = {
-                shouldSort: true,
-                threshold: 0.6,
-                location: 0,
-                distance: 100,
-                maxPatternLength: 32,
-                minMatchCharLength: 1,
-                keys: vm.keys
-            };
-
-            vm.fuse = new Fuse(vm.resultFuse, options);
-            vm.map.locate({setView: true, maxZoom: 15});
-            vm.setTileSet(vm.selectedTileSet)
-            vm.map.on('locationfound', vm.onLocationFound);
+            this.onMounted()
         },
         computed: {
             isArray(){
@@ -155,29 +163,125 @@
                 var vm = this
                 return vm.markers == [] ? vm.getGoogleData() : null;
             },
+            watchPlantFound(){
 
+            },
             resultItem(){
                 var vm = this
                 if (this.searchQuery.trim() === '')
                     return null
                 else
-                    return this.fuse.search(this.searchQuery.trim())
+                    return this.fuse.search(this.searchQuery.trim()).splice(0, 3)
             },
+
+            getLocation(){
+                return _.uniqWith(this.coords, _.isEqual)
+            },
+            totalDistance(){
+                var vm = this,
+                        coord = vm.getLocation,
+                        currentLocation = coord[coord.length - 1],
+                        previousLocation = coord[coord.length - 2]
+                return previousLocation && currentLocation ? vm.trackInfo.totalDistance += gps_distance(previousLocation.lat, previousLocation.lng, currentLocation.lat, currentLocation.lng) : null
+            }
 
         },
         methods: {
+            onMounted(){
+                var vm = this
+                vm.markerClusters = L.markerClusterGroup();
+                var userIcon = L.icon({
+                    iconUrl: 'https://cdn0.iconfinder.com/data/icons/small-n-flat/24/678111-map-marker-64.png',
+                    iconSize: [32, 32]
+                });
+
+                vm.map = L.map('map', {
+                    center: [10.0, 5.0],
+                    minZoom: 2,
+                    zoom: 2,
+                    zoomControl: true
+                })
+                vm.map.zoomControl.setPosition('bottomleft');
+                var options = {
+                    shouldSort: true,
+                    threshold: 0.6,
+                    location: 0,
+                    distance: 100,
+                    maxPatternLength: 32,
+                    minMatchCharLength: 1,
+                    keys: vm.keys
+                };
+
+                vm.fuse = new Fuse(vm.resultFuse, options);
+                vm.map.locate({setView: true, maxZoom: 15});
+                vm.setTileSet(vm.selectedTileSet)
+                vm.map.on('locationfound', vm.onLocationFound);
+                vm.map.on('popupopen', function(e) {
+                    if(vm.isWatch){
+                        vm.onStart()
+                    }
+                    var px = vm.map.project(e.popup._latlng);
+                    px.y -= e.popup._container.clientHeight/2
+                    vm.map.panTo(vm.map.unproject(px),{animate: true});
+
+                    vm.$set(vm.$data, 'isOpen', true)
+
+                });
+                vm.map.on('popupclose', function(e) {
+                    vm.$set(vm.$data, 'isOpen', false)
+
+                });
+            },
             onStart(){
                 var vm = this;
-                ('geolocation' in navigator) ? vm.watchId = navigator.geolocation.watchPosition(vm.onSuccess, vm.onError, vm.positionOptions) : vm.initialize = 'Sorry, geolocation does not appear to be supported in this browser.'
+                vm.isWatch = !vm.isWatch
+                if (vm.isWatch) {
+                    vm.onWatch()
+                } else {
+                    vm.offWatch()
+                }
+            },
+            offWatch(){
+                navigator.geolocation.clearWatch(this.watchId);
+            },
+            onWatch(){
+                var vm = this
+                if (vm.isWatch) {
+                    ('geolocation' in navigator) ?
+                            vm.watchId =
+                                    navigator.geolocation.watchPosition
+                                    (
+                                            vm.onSuccess,
+                                            vm.onError,
+                                            vm.positionOptions
+                                    ) :
+                            vm.initialize = 'Sorry, geolocation does not appear to be supported in this browser.'
+
+                }
+            },
+            addMarker(lat, lng){
+                var vm = this
+                if (vm.userMarker) {
+                    vm.map.removeLayer(vm.userMarker);
+                }
+                vm.coords.push(L.latLng(lat, lng));
+                vm.userMarker = L.marker(L.latLng(lat, lng)).addTo(vm.map);
+                var line = L.polyline(vm.coords);
+                vm.map.fitBounds(line.getBounds());
+                vm.map.addLayer(line);
+                vm.map.panTo([lat, lng], 20)
             },
             onResult(search){
-                var vm = this, plant = _.findIndex(vm.markers, {options: {id: search.id}});
-//                vm.$set(vm.$data, 'searchQuery', '')
+
+                var vm = this, plant = _.findIndex(this.markers, {options: {id: search.id}});
                 vm.searchQuery = ''
-                vm.markerFunction(plant)
+               vm.markerFunction(plant)
+
             },
             onSuccess (position) {
-                var vm = this
+                var vm = this,
+                        lat = position.coords.latitude,
+                        lng = position.coords.longitude
                 vm.numAttempts++
                 vm.initialize = 'Success! Attempt ' + vm.numAttempts + ' results:'
                 vm.userLocation.lat = position.coords.latitude
@@ -192,6 +296,9 @@
                 setTimeout(function () {
                     vm.initialize = "Success!"
                 }, 1000)
+
+                new google.maps.LatLng(lat, lng);
+                vm.addMarker(lat, lng);
             },
             onError: function (error) {
                 var msg = 'An unknown error occurred while requesting your location.'
@@ -225,13 +332,16 @@
                     content: 'you are here',
                     image: 'https://cdn0.iconfinder.com/data/icons/small-n-flat/24/678111-map-marker-64.png'
                 }).bindPopup("You are within " + radius + " meters from this point").openPopup();
+
                 vm.map.initlat = e.latlng.lat;
                 vm.map.initlng = e.latlng.lng
                 vm.markerClusters.addLayer(userLocation);
                 vm.markers.push(userLocation);
                 vm.map.addLayer(vm.markerClusters)
+                vm.userMarker = userLocation
                 vm.userLocation = new L.LatLng(e.latlng.lat, e.latlng.lng);
                 vm.getGoogleData()
+
             },
             changeView(){
                 change_view()
@@ -263,7 +373,6 @@
 
             },
             setTileSet(selectedTileLayer){
-                console.log(selectedTileLayer)
                 var vm = this;
                 var basemap = null
                 var tile = this.tileSets.all[selectedTileLayer]
@@ -288,15 +397,20 @@
             },
             markerFunction(id) {
                 var vm = this
+                vm.offWatch()
                 var marker = vm.markers[id]
                 var itemObject = marker.options;
                 var position = marker.getLatLng();
-                var floraLocation = new L.LatLng(position.lat, position.lng);
-                var userDistance = vm.createPolyLine(floraLocation, vm.userLocation);
+                var floraLocation = new L.LatLng(position.lat, position.lng) || null;
+                var userDistance = floraLocation ? vm.createPolyLine(floraLocation, vm.userLocation) : null;
                 console.log(vm.markers[id])
                 vm.map.setView(position, 15);
-                vm.markers[id]._popup._content = `<div style="z-index: 402; max-width: 80vw ">` + userDistance + '<h2>' + itemObject.name + '</h2>' + itemObject.content + '<img style="width: 100%;" src="' + itemObject.image + '" /> ' + '</div>'
+                vm.markers[id]._popup._content = `<div style="z-index: 402; max-width: 80vw;">` + userDistance + '<h2>' + itemObject.name + '</h2>' + itemObject.content + '<img style="width: 100%;" src="' + itemObject.image + '" /> ' + '</div>' || null
+
+
+
                 if (!marker._icon) marker.__parent.spiderfy();
+
                 marker.openPopup();
             },
             createPolyLine(floraLocation, userLocation){
@@ -317,22 +431,25 @@
                         content: val.description,
                         image: photo,
                         closeOnClick: true
-                    })
+                    }).bindPopup('<div style="z-index: 402; max-width: 80vw; ">' + userDistance + '<h2>' + val.name + '</h2>' + val.description + '<img style="width: 100%;" src="' + photo + '"/>' + "</div>");
 
-                            .bindPopup('<div style="z-index: 402; max-width: 80vw ">' + userDistance + '<h2>' + val.name + '</h2>' + val.description + '<img style="width: 100%;" src="' + photo + '"/>' + "</div>");
-                    vm.map.flyTo(vm.userLocation, 15);
                     vm.markerClusters.addLayer(markerX);
                     vm.markers.push(markerX);
+                    vm.map.setView(floralocation, 15);
                     vm.map.addLayer(vm.markerClusters)
 
                 });
-                if (vm.plantFound.index) {
-                    var plant = _.findIndex(vm.markers, {options: {id: vm.plantFound.index.id}});
-                    vm.markerFunction(plant)
+                if (vm.plantFound.index){
+                    vm.onResult(vm.plantFound.index)
                 }
-
-
+                if(!vm.isOpen){
+                    vm.map.flyTo(vm.userLocation, 15);
+                }
+                if(vm.fuse){
+                    vm.resultFuse = null
+                }
             },
-        }
+        },
+
     }
 </script>

@@ -57,7 +57,6 @@ v-ons-toolbar ~ #map{
 .autocomplete-list {
   position: absolute;
   z-index: 2;
-  overflow: auto;
   max-height: 50vh;
   margin: 0;
 
@@ -66,12 +65,14 @@ v-ons-toolbar ~ #map{
 }
 
 .btn {
-  position: relative;
   background: linear-gradient(to right, #A2DB95, #24CCAA);
-  width: 60%;
 
 }
+.btn-stop {
 
-ons-search-input .search-input{
-  background-color: rgb(199, 196, 196);
+  background: linear-gradient(to right, #ee0979, #ff6a00);
+}
+
+.center-textbox{
+  display: flex;justify-content: center;
 }

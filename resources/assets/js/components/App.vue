@@ -1,7 +1,9 @@
 <template>
     <v-ons-splitter>
         <v-ons-splitter-side
-                swipeable collapse="" side="left"
+                swipeable
+                collapse=""
+                side="left"
                 :open.sync="openSide.side"
                 animation="reveal"
         >
@@ -19,11 +21,9 @@
             </v-ons-page>
         </v-ons-splitter-side>
         <v-ons-splitter-content>
-            <keep-alive>
+            <keep-alive :exclude="['plant-item-map-view']">
                 <component :is="currentPage.url" :page-name="currentPage.name"></component>
             </keep-alive>
-
-
         </v-ons-splitter-content>
 
     </v-ons-splitter>

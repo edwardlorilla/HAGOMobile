@@ -6,7 +6,7 @@
             </v-ons-toolbar-button>
         </div>
         <div class="center">{{ title }}</div>
-        <div class="right">
+        <div class="right" v-if="search">
             <v-ons-toolbar-button @click="search()">
                 <v-ons-icon icon="ion-search, material: md-search"></v-ons-icon>
             </v-ons-toolbar-button>
