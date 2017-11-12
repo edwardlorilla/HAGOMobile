@@ -1,6 +1,6 @@
 <template>
     <v-ons-page>
-        <custom-toolbar v-if="currentPage.name" :title="currentPage.name"></custom-toolbar>
+        <custom-toolbar v-if="currentPage.name" :title="currentPage.name" :search="isSearch"></custom-toolbar>
         <div style="height: 100%;" class="mainbox">
             <div class="insidebox">
 
@@ -230,7 +230,8 @@
     export default{
         data(){
             return {
-                currentPage: currentPage
+                currentPage: currentPage,
+                isSearch: false
             }
         },
         computed: {

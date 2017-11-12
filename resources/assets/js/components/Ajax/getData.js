@@ -188,11 +188,14 @@ export const PlantFound = {
 export function PushItem(page) {
     StackItem.page.push(page)
 }
-
+export var listView = true
+export function toggleView(){
+    listView = !listView
+}
 export function setResults(result) {
     return new Promise((resolve, reject) => {
-        getResults.all = result
-        resolve();
+        
+        resolve( getResults.all = result);
     })
 }
 
@@ -303,3 +306,4 @@ export function gps_distance(lat1, lon1, lat2, lon2) {
     var d = R * c;
     return d;
 }
+

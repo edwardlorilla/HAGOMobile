@@ -1,18 +1,12 @@
 <template id="plant">
     <v-ons-page>
-        <v-ons-progress-bar v-if="!getFuseList.list" indeterminate></v-ons-progress-bar>
-        <custom-toolbar title="Repositories of Plants" :search="searchToggle"></custom-toolbar>
-        <search-scope v-show="onSearch.query">
-            <v-ons-search-input v-model="searchQuery" placeholder="Search something"
-                                style="width: 96%;"></v-ons-search-input>
-        </search-scope>
+        <custom-toolbar title="Repositories of Plants" v-model="searchQuery" :search="isSearch"></custom-toolbar>
 
 
-        <v-ons-list style="transition: all .3s ease;" :style="{'margin-top': onSearch.query ? 60 + 'px' : 0 + 'px'}">
+        <v-ons-list>
             <v-ons-lazy-repeat
                     v-if="getFuseList.list"
                     :render-item="renderItem"
-                    :key="1"
                     :length="getSearchQuery.length">
             </v-ons-lazy-repeat>
 
@@ -22,7 +16,7 @@
 </template>
 
 <script>
-    import {searchInput,toggleSearch, getData, plantItem, PlantItem, Push, setResults, getResults} from './../Ajax/getData'
+    import {getData, plantItem, PlantItem, Push, setResults, getResults, toggleView, listView} from './../Ajax/getData'
 
     export default{
         props: ['toggleMenu', 'pageName'],
@@ -33,6 +27,7 @@
                 renderItem(i) {
                     return new Vue({
                         template: `
+                            <div>
                             <v-ons-list-item v-if="plant.all[index]" :key="index" @click="getMapInfo(plant.all[index])" class="list-item-container">
                               <staggered-fade>
                               <v-ons-row>
@@ -46,13 +41,14 @@
                                   </div>
                                   <div class="location">
                                     <i class="fa fa-map-marker"></i>
-                                    {{plant.all[index].description}}
+                                    {{plant.all[index].description.slice(0, 20)}} ...
                                   </div>
                                 </v-ons-col>
                                 <v-ons-col width="40px"></v-ons-col>
                               </v-ons-row>
                               </staggered-fade>
                             </v-ons-list-item>
+                            </div>
                         `,
                         data() {
                             return {
@@ -77,11 +73,11 @@
                     });
                 },
                 keys: ['name'],
+                isSearch: true,
                 isSearching: false,
                 results: [],
                 fuse: '',
                 searchQuery: '',
-                onSearch: searchInput
             }
         },
         mounted(){
@@ -121,9 +117,6 @@
         methods: {
             getPlantRepository(){
                 getData()
-            },
-            searchToggle(){
-                toggleSearch()
             }
         }
     }

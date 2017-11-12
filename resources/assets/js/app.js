@@ -19,8 +19,8 @@ window.Vue = require('vue');
 import VueOnsen from 'vue-onsenui'; // This already imports 'onsenui'
 import App from './components/App.vue';
 import components from './components'
-import CircleMenu from 'vue-circle-menu'
-Vue.component('CircleMenu', CircleMenu)
+import VueRecyclerviewNew from 'vue-recyclerview'
+Vue.use(VueRecyclerviewNew)
 Vue.use(VueOnsen);
 
 new Vue(Vue.util.extend(App)).$mount('#app');
