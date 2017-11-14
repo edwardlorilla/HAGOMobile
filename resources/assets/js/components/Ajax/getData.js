@@ -188,16 +188,19 @@ export const PlantFound = {
 export function PushItem(page) {
     StackItem.page.push(page)
 }
-export var listView = true
+export var listView = { 
+    view: true
+}
 export function toggleView(){
-    listView = !listView
+    listView.view = !listView.view
 }
 export function setResults(result) {
     return new Promise((resolve, reject) => {
-        
         resolve( getResults.all = result);
     })
 }
+
+
 
 export var getResults = {
     all: null

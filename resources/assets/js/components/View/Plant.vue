@@ -1,6 +1,7 @@
 <template id="plant">
     <v-ons-page>
-        <custom-toolbar title="Repositories of Plants" v-model="searchQuery" :search="isSearch"></custom-toolbar>
+        <custom-toolbar title="Repositories of Plants" v-model="searchQuery" :grid="isGrid"
+                        :search="isSearch"></custom-toolbar>
 
 
         <v-ons-list>
@@ -27,40 +28,53 @@
                 renderItem(i) {
                     return new Vue({
                         template: `
-                            <div>
-                            <v-ons-list-item v-if="plant.all[index]" :key="index" @click="getMapInfo(plant.all[index])" class="list-item-container">
-                              <staggered-fade>
-                              <v-ons-row>
-                                <v-ons-col width="95px">
-                                  <img class="thumbnail"
-                                         :src="getPhoto">
+                            <div v-if="plant.all[index]" :key="index" @click="getMapInfo(plant.all[index])">
+                            <v-ons-list-item v-if="listView.view">
+                                <v-ons-row >
+                                    <v-ons-col width="95px">
+                                      <img class="thumbnail"
+                                             :src="getPhoto">
+                                    </v-ons-col>
+                                    <v-ons-col>
+                                      <div class="name">
+                                       {{plant.all[index].name}}
+                                      </div>
+                                      <div class="location">
+                                        <i class="fa fa-map-marker"></i>
+                                        {{plant.all[index].description.slice(0, 20)}}
+                                      </div>
+                                    </v-ons-col>
+                                    <v-ons-col width="40px"></v-ons-col>
+                                  </v-ons-row>
+                              </v-ons-list-item>
+                            <v-ons-row v-else>
+                                <v-ons-col v-for="row in getItem[index]" :key="index">
+                                  <v-ons-card :key="index"><img class="thumbnail" style="width: 60px; height:60px;" :src="row.photos | getGridPhoto"/></v-ons-card>
                                 </v-ons-col>
-                                <v-ons-col>
-                                  <div class="name">
-                                   {{plant.all[index].name}}
-                                  </div>
-                                  <div class="location">
-                                    <i class="fa fa-map-marker"></i>
-                                    {{plant.all[index].description.slice(0, 20)}} ...
-                                  </div>
-                                </v-ons-col>
-                                <v-ons-col width="40px"></v-ons-col>
-                              </v-ons-row>
-                              </staggered-fade>
-                            </v-ons-list-item>
+                             </v-ons-row>
                             </div>
                         `,
                         data() {
                             return {
                                 index: i,
-                                plant: getResults
+                                plant: getResults,
+                                listView: listView
                             };
+                        },
+                        filters: {
+                            getGridPhoto(photo){
+                                return !_.isEmpty(photo[0]) ? photo[0].file : 'http://placekitten.com/g/40/40'
+                            }
                         },
                         computed: {
                             getPhoto(){
                                 var vm = this
-                                var plant = vm.plant.all[vm.index];
+                                var plant = vm.getItem[vm.index];
                                 return !_.isEmpty(plant.photos) ? plant.photos[0].file : 'http://placekitten.com/g/40/40'
+                            },
+                            getItem() {
+                                var vm = this
+                                return vm.listView.view ? vm.plant.all : _.chunk(vm.plant.all, 3)
                             }
                         },
                         methods: {
@@ -78,6 +92,7 @@
                 results: [],
                 fuse: '',
                 searchQuery: '',
+                listView: listView
             }
         },
         mounted(){
@@ -93,7 +108,9 @@
                 else {
                     setResults(vm.getFuseList.search(vm.searchQuery.trim()))
                 }
-                return getResults.all
+
+
+                return listView.view ? getResults.all :  _.chunk(getResults.all, 3)
             },
             getFuseList(){
                 var vm = this
@@ -117,6 +134,9 @@
         methods: {
             getPlantRepository(){
                 getData()
+            },
+            isGrid(){
+                toggleView()
             }
         }
     }

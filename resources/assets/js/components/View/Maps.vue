@@ -1,6 +1,5 @@
 <template id="home">
     <v-ons-page>
-
         <!--<v-ons-progress-bar v-if="!userLocation.lat" indeterminate></v-ons-progress-bar>-->
         <v-ons-toolbar>
             <div class="left">
@@ -155,16 +154,20 @@
             var vm = this
             this.onMounted()
         },
+        activated (){
+            var vm = this
+            if (vm.plantFound.index && vm.markers) {
+                vm.onResult(vm.plantFound.index)
+            }
+        },
         computed: {
+
             isArray(){
                 return _.isArray(this.resultItem)
             },
             watchLocation(){
                 var vm = this
                 return vm.markers == [] ? vm.getGoogleData() : null;
-            },
-            watchPlantFound(){
-
             },
             resultItem(){
                 var vm = this
@@ -216,20 +219,19 @@
                 vm.map.locate({setView: true, maxZoom: 15});
                 vm.setTileSet(vm.selectedTileSet)
                 vm.map.on('locationfound', vm.onLocationFound);
-                vm.map.on('popupopen', function(e) {
-                    if(vm.isWatch){
+                vm.map.on('popupopen', function (e) {
+                    if (vm.isWatch) {
                         vm.onStart()
                     }
                     var px = vm.map.project(e.popup._latlng);
-                    px.y -= e.popup._container.clientHeight/2
-                    vm.map.panTo(vm.map.unproject(px),{animate: true});
+                    px.y -= e.popup._container.clientHeight / 2
+                    vm.map.panTo(vm.map.unproject(px), {animate: true});
 
                     vm.$set(vm.$data, 'isOpen', true)
 
                 });
-                vm.map.on('popupclose', function(e) {
+                vm.map.on('popupclose', function (e) {
                     vm.$set(vm.$data, 'isOpen', false)
-
                 });
             },
             onStart(){
@@ -272,10 +274,10 @@
                 vm.map.panTo([lat, lng], 20)
             },
             onResult(search){
+                    var vm = this, plant = _.findIndex(this.markers, {options: {id: search.id}});
+                    vm.searchQuery = ''
+                    vm.markerFunction(plant)
 
-                var vm = this, plant = _.findIndex(this.markers, {options: {id: search.id}});
-                vm.searchQuery = ''
-               vm.markerFunction(plant)
 
             },
             onSuccess (position) {
@@ -396,22 +398,24 @@
                 }
             },
             markerFunction(id) {
-                var vm = this
-                vm.offWatch()
-                var marker = vm.markers[id]
-                var itemObject = marker.options;
-                var position = marker.getLatLng();
-                var floraLocation = new L.LatLng(position.lat, position.lng) || null;
-                var userDistance = floraLocation ? vm.createPolyLine(floraLocation, vm.userLocation) : null;
-                console.log(vm.markers[id])
-                vm.map.setView(position, 15);
-                vm.markers[id]._popup._content = `<div style="z-index: 402; max-width: 80vw;">` + userDistance + '<h2>' + itemObject.name + '</h2>' + itemObject.content + '<img style="width: 100%;" src="' + itemObject.image + '" /> ' + '</div>' || null
+                if(id != -1){
+                    var vm = this
+                    vm.offWatch()
+                    var marker = vm.markers[id]
+                    var itemObject = marker.options;
+                    var position = marker.getLatLng();
+                    var floraLocation = new L.LatLng(position.lat, position.lng) || null;
+                    var userDistance = floraLocation ? vm.createPolyLine(floraLocation, vm.userLocation) : null;
+                    console.log(vm.markers[id])
+                    vm.map.setView(position, 15);
+                    vm.markers[id]._popup._content = `<div style="z-index: 402; max-width: 80vw;">` + userDistance + '<h2>' + itemObject.name + '</h2>' + itemObject.content + '<img style="width: 100%;" src="' + itemObject.image + '" /> ' + '</div>' || null
 
 
+                    if (!marker._icon) marker.__parent.spiderfy();
 
-                if (!marker._icon) marker.__parent.spiderfy();
+                    marker.openPopup();
+                }
 
-                marker.openPopup();
             },
             createPolyLine(floraLocation, userLocation){
                 return 'About ' + (floraLocation.distanceTo(userLocation) / 1000).toFixed(0) + 'km away from you.</p>';
@@ -439,13 +443,13 @@
                     vm.map.addLayer(vm.markerClusters)
 
                 });
-                if (vm.plantFound.index){
+                if (vm.plantFound.index) {
                     vm.onResult(vm.plantFound.index)
                 }
-                if(!vm.isOpen){
+                if (!vm.isOpen) {
                     vm.map.flyTo(vm.userLocation, 15);
                 }
-                if(vm.fuse){
+                if (vm.fuse) {
                     vm.resultFuse = null
                 }
             },

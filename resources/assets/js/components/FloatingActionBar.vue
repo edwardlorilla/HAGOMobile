@@ -10,7 +10,7 @@
     </v-ons-fab>
 </template>
 <script>
-    import {currentPageSwitcher} from './Ajax/getData'
+    import {Push} from './Ajax/getData'
     export default {
         data(){
             return{
@@ -19,7 +19,7 @@
         },
         methods:{
             capturePhoto(){
-                currentPageSwitcher('capture-photo','Capture')
+                Push('capture-photo')
             }
         }
     }

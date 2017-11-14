@@ -1,11 +1,16 @@
 <template>
     <v-ons-page>
-        <custom-toolbar v-if="currentPage.name" :title="currentPage.name" :search="isSearch"></custom-toolbar>
         <div style="height: 100%;" class="mainbox">
             <div class="insidebox">
+                <v-ons-toolbar  modifier="transparent cover-content">
+                    <div class="left">
+                        <v-ons-back-button></v-ons-back-button>
+                    </div>
+                </v-ons-toolbar>
+
 
                 <div class="mainimagecapture">
-                    <video  id="player" ref="videoPlayer" autoplay :style="imageStyle"></video>
+                    <video id="player" ref="videoPlayer" autoplay :style="imageStyle"></video>
                     <canvas ref="canvasElement" id="canvas" :style="imageStyle"></canvas>
                     <a href="#" title="Change camera">
                         <div class="changecameraholder">
@@ -231,7 +236,151 @@
         data(){
             return {
                 currentPage: currentPage,
-                isSearch: false
+                isSearch: false,
+                position: {
+                    latitude: null,
+                    longitude: null
+                },
+                hexColor: [],
+                image: '',
+                palletes: null,
+                baseColor: [
+                    {
+                        "name": "burgundy",
+                        "number": "17A",
+                        "hexvalue": ["660000", "990000", "cc0000"]
+                    },
+                    {
+                        "name": "blue",
+                        "number": "18B ",
+                        "hexvalue": ["cc3333", "ea4c88", "993399"]
+                    },
+                    {
+                        "name": "orange",
+                        "number": "19C",
+                        "hexvalue": ["663399", "333399", "0066cc"]
+                    }
+                ]
+            }
+        },
+        methods: {
+            showPosition(position){
+                var vm = this
+                vm.position.latitude = position.coords.latitude
+                vm.position.longitude = position.coords.longitude
+            },
+            captureImage(){
+                var vm = this
+                vm.$refs.canvasElement.style.display = 'block';
+                vm.$refs.videoPlayer.style.display = 'none';
+                //vm.$refs.captureButton.style.display = 'none';
+                var context = vm.$refs.canvasElement.getContext('2d');
+                context.drawImage(vm.$refs.videoPlayer, 0, 0, canvas.width, vm.$refs.videoPlayer.videoHeight / (vm.$refs.videoPlayer.videoWidth / canvas.width));
+                vm.$refs.videoPlayer.srcObject.getVideoTracks().forEach(function (track) {
+                    track.stop();
+                });
+                var image = vm.$refs.canvasElement.toDataURL();
+                vm.image = image
+                var img = this.$refs.imag
+                if (img.naturalWidth) {
+                    vm.onImageLoad(img);
+                } else {
+                    img.onload = function () {
+                        vm.onImageLoad(img);
+                    };
+                }
+            },
+            hexColorDelta(hex1, hex2) {
+                var r1 = parseInt(hex1.substring(0, 2), 16);
+                var g1 = parseInt(hex1.substring(2, 4), 16);
+                var b1 = parseInt(hex1.substring(4, 6), 16);
+                // get red/green/blue int values of hex2
+                var r2 = parseInt(hex2.substring(0, 2), 16);
+                var g2 = parseInt(hex2.substring(2, 4), 16);
+                var b2 = parseInt(hex2.substring(4, 6), 16);
+                // calculate differences between reds, greens and blues
+                var r = 255 - Math.abs(r1 - r2);
+                var g = 255 - Math.abs(g1 - g2);
+                var b = 255 - Math.abs(b1 - b2);
+                // limit differences between 0 and 1
+                r /= 255;
+                g /= 255;
+                b /= 255;
+                // 0 means opposit colors, 1 means same colors
+                return (r + g + b) / 3;
+            },
+            onFileChange(e) {
+                var files = e.target.files || e.dataTransfer.files;
+                if (!files.length)
+                    return;
+                this.createImage(files[0]);
+            },
+            createImage(file) {
+                var image = new Image();
+                var reader = new FileReader();
+                var vm = this;
+
+                reader.onload = function (e) {
+                    vm.image = e.target.result;
+                };
+                reader.readAsDataURL(file);
+                var img = this.$refs.imag
+                if (img.naturalWidth) {
+                    vm.onImageLoad(img);
+                } else {
+                    img.onload = function () {
+                        vm.onImageLoad(img);
+                    };
+                }
+            },
+            removeImage: function (e) {
+                this.image = '';
+            },
+            onImageLoad(img){
+                var vm = this
+                var colorThief = new ColorThief();
+                var rgb = colorThief.getPalette(img, 10);
+                this.palletes = rgb
+                for (var j = 0; j < rgb.length; j++) {
+                    vm.hexColor.push(vm.cnvrtRGBClrToHex(rgb[j].join(', ')))
+                }
+            },
+            cnvrtRGBClrToHex(rgbClr){
+                var rgbClr = rgbClr.split(',');
+                var r = rgbClr[0];
+                var g = rgbClr[1];
+                var b = rgbClr[2];
+                return (r << 16 | g << 8 | b).toString(16).toUpperCase()
+            }
+        },
+        mounted(){
+            var vm = this
+            if (!('mediaDevices' in navigator)) {
+                navigator.mediaDevices = {};
+            }
+            if (!('getUserMedia' in navigator.mediaDevices)) {
+                navigator.mediaDevices.getUserMedia = function (constraints) {
+                    var getUserMedia = navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
+
+                    if (!getUserMedia) {
+                        return Promise.reject(new Error('getUserMedia is not implemented!'));
+                    }
+
+                    return new Promise(function (resolve, reject) {
+                        getUserMedia.call(navigator, constraints, resolve, reject);
+                    });
+                }
+            }
+            navigator.mediaDevices.getUserMedia({video: true})
+                    .then(function (stream) {
+                        vm.$refs.videoPlayer.srcObject = stream;
+                        vm.$refs.style.display = 'block';
+                    })
+                    .catch(function (err) {
+                        //vm.$refs.imagePickerArea.style.display = 'block';
+                    });
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(vm.showPosition);
             }
         },
         computed: {
@@ -241,6 +390,51 @@
                     'height': window.innerHeight + 'px',
                     'position': 'absolute'
                 }
+            },
+            getNearestColor(){
+                var vm = this,
+                        objectValue = [],
+                        hexValue = vm.hexColor,
+                        hexColor = [],
+                        hexColorArray = [],
+                        hexArray = [],
+                        hexColorItem = [],
+                        nearestColor = _.map(vm.baseColor, function (o) {
+                            for (var j = 0; j < hexValue.length; j++) {
+                                for (var i = 0; i < o.hexvalue.length; i++) {
+                                    hexColor = vm.hexColorDelta(hexValue[j], o.hexvalue[i]);
+                                    if (hexColor > 0.8) {
+                                        hexArray.push({
+                                            hexColor: '#' + o.hexvalue[i],
+                                            resultPercentage: hexColor,
+                                            hexCompareTo: hexValue[j],
+                                            hexValue: o.name
+                                        })
+                                        hexColorItem.push(hexValue[j], hexColor)
+                                    }
+                                }
+                            }
+                            var hexArrays = _.chain(hexArray)
+                                    .uniqBy('hexColor')
+                                    .sortBy('resultPercentage')
+                                    .reverse()
+                                    .groupBy('hexValue')
+                                    .toPairs()
+                                    .map(function (currentData) {
+                                        currentData.push(currentData[1].length), currentData
+                                        return _.zipObject(["hexValue", "property", "countHex"], currentData);
+                                    })
+                                    .value();
+                            objectValue.push(hexArrays)
+                            hexArray = []
+                        });
+
+                // return  objectValue
+                return _.sortBy(objectValue, [function (o, value) {
+                    return _.map(objectValue[value], function (o) {
+                        return o.countHex
+                    });
+                }]).reverse();
             }
         }
     }

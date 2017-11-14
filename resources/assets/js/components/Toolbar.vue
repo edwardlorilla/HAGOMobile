@@ -1,5 +1,5 @@
 <template>
-    <v-ons-toolbar>
+    <v-ons-toolbar  :modifier="modifier">
         <div class="left">
             <v-ons-toolbar-button @click="changeView">
                 <v-ons-icon icon="ion-navicon, material:md-menu"></v-ons-icon>
@@ -10,43 +10,53 @@
             <v-ons-search-input style="margin-top: 4px; width: 100%;" v-else :value="my_prop" @input="send($event.target.value)" placeholder="Search something"
                                 ></v-ons-search-input>
         </div>
-        <div class="right" v-if="search" >
-            <v-ons-toolbar-button @click="searchLocal">
+        <div class="right"  >
+            <v-ons-toolbar-button v-if="search" @click="searchLocal">
                 <v-ons-icon icon="ion-search, material: md-search"></v-ons-icon>
+            </v-ons-toolbar-button>
+            <v-ons-toolbar-button @click="grid" v-if="grid" >
+                <v-ons-icon :icon="isGrid.view ? 'ion-grid, material: md-apps' : 'ion-ios-list-outline, material: md-format-list-bulleted'"></v-ons-icon>
             </v-ons-toolbar-button>
         </div>
     </v-ons-toolbar>
 </template>
 <script>
-    import {change_view} from './Ajax/getData'
+    import {change_view, listView} from './Ajax/getData'
     export default {
         model: {
             prop: 'my_prop',
             event: 'my_event'
         },
         props: {
+            modifier:{
+                default: true
+            },
             my_prop: {
 
             },
             title: {
                 type: String
             },
-            search: Boolean
+            search: Boolean,
+            grid: Function
         },
         data(){
             return{
-                isSearch: false
+                isSearch: false,
+                isGrid: listView
             }
         },
         methods: {
             searchLocal(){
                 var vm = this
+
                 vm.isSearch = !vm.isSearch
             },
             changeView(){
                 change_view()
             },
             send: function (v) {
+
                 this.$emit('my_event', v)
             }
         }
