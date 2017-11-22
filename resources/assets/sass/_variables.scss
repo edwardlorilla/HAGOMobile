@@ -74,5 +74,28 @@ v-ons-toolbar ~ #map{
 }
 
 .center-textbox{
-  display: flex;justify-content: center;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: justify;
+  -ms-flex-pack: justify;
+  justify-content: center;
+}
+
+.toolbar--material {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-wrap: nowrap;
+  flex-wrap: nowrap;
+  -webkit-box-pack: justify;
+  -ms-flex-pack: justify;
+  justify-content: space-between;
+  height: 56px;
+  border-bottom: 0;
+  -webkit-box-shadow: 0 1px 5px rgba(0, 0, 0, .3);
+  box-shadow: 0 1px 5px rgba(0, 0, 0, .3);
+  padding: 0;
+  background: linear-gradient(141deg, #0fb8ad 0%, #1fc8db 51%, #2cb5e8 75%);
+  /* background-size: 0; */
 }

@@ -181,6 +181,7 @@ export var StackItem = {
 export function PlantIndex(id) {
     var plant = _.findIndex(plantItem.all, {id: id});
     PlantFound.index = plantItem.all[plant];
+    PlantInfo=plantItem.all[plant];
 }
 export const PlantFound = {
     index: null
@@ -188,7 +189,14 @@ export const PlantFound = {
 export function PushItem(page) {
     StackItem.page.push(page)
 }
-export var listView = { 
+export function popItem() {
+    Stack.page.pop()
+}
+export function moreDetail() {
+    currentPageSwitcher('plant-navigator', 'View Plant Repository')
+    Stack.page.push("plant-item")
+}
+export var listView = {
     view: true
 }
 export function toggleView(){
@@ -200,12 +208,43 @@ export function setResults(result) {
     })
 }
 
-
-
+export function cameraInfo(event){
+    if(event.type == 'change'){
+        return capturePhoto = event
+    }else{
+        event.target.value = null
+    }
+}
+export var capturePhoto = null
 export var getResults = {
     all: null
 }
-
+export function cnvrtRGBClrToHex(rgbClr){
+    var rgbClr = rgbClr.split(',');
+    var r = rgbClr[0];
+    var g = rgbClr[1];
+    var b = rgbClr[2];
+    return (r << 16 | g << 8 | b).toString(16).toUpperCase()
+}
+export function hexColorDelta(hex1, hex2){
+    var r1 = parseInt(hex1.substring(0, 2), 16);
+    var g1 = parseInt(hex1.substring(2, 4), 16);
+    var b1 = parseInt(hex1.substring(4, 6), 16);
+    // get red/green/blue int values of hex2
+    var r2 = parseInt(hex2.substring(0, 2), 16);
+    var g2 = parseInt(hex2.substring(2, 4), 16);
+    var b2 = parseInt(hex2.substring(4, 6), 16);
+    // calculate differences between reds, greens and blues
+    var r = 255 - Math.abs(r1 - r2);
+    var g = 255 - Math.abs(g1 - g2);
+    var b = 255 - Math.abs(b1 - b2);
+    // limit differences between 0 and 1
+    r /= 255;
+    g /= 255;
+    b /= 255;
+    // 0 means opposit colors, 1 means same colors
+    return (r + g + b) / 3;
+}
 export function get() {
     /*var spreadsheetID = '1Y2UtYW0Wl4QSTW_TYJiYgFIgrltmixecV9en0WhuUSc';
      var worksheetID = 'od6';
@@ -293,6 +332,13 @@ export function PlantItem(plantInfo) {
     PlantInfo = plantInfo
     searchInput.query = false
 }
+
+
+export function MapPlantItem(plantInfo) {
+    PlantInfo = plantInfo
+    searchInput.query = false
+}
+
 export function toggleSearch() {
     var vm = searchInput
     vm.query = !vm.query

@@ -10,7 +10,6 @@ import Map from  './components/View/Maps.vue'
 import CapturePhoto from  './components/View/CapturePhoto.vue'
 import SearchScope from  './components/View/SearchScope.vue'
 import SlideFade from  './components/Transition/slide-fade.vue'
-
 import Toolbar from  './components/Toolbar.vue'
 import AutoComplete from  './components/AutoComplete.vue'
 import MapSearch from  './components/View/MapSearch.vue'
@@ -18,8 +17,12 @@ import SearchResult from  './components/View/SearchResult.vue'
 import SearchResultMapScope from  './components/View/SearchResultMapScope.vue'
 import FloatingAction from  './components/FloatingActionBar.vue'
 import staggeredFade from  './components/Transition/staggered-fade.vue'
+import App from './components/App.vue'
 Vue.component('plant-item-map-view', function (resolve, reject) {
         resolve(PlantItemMapView)
+});
+Vue.component('splitter-content', function (resolve, reject) {
+        resolve(App)
 });
 Vue.component('view-plant', function (resolve, reject) {
     setTimeout(function () {
@@ -41,13 +44,11 @@ Vue.component('plant-item-navigator', function (resolve, reject) {
         resolve(PlantItemNavigator)
     }, 100)
 });
-
 Vue.component('staggered-fade', function (resolve, reject) {
     setTimeout(function () {
         resolve(staggeredFade)
     }, 100)
 });
-
 Vue.component('custom-toolbar', function (resolve, reject) {
     resolve(Toolbar)
 });

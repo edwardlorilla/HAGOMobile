@@ -23,6 +23,7 @@
   "dependencies": {
     "fuse.js": "^3.2.0",
     "leaflet": "^1.2.0",
+    "node-sass": "^4.7.1",
     "velocity": "^0.7.2",
     "velocity-animate": "^1.5.0",
     "vue-autosuggest": "0.0.2-beta.4",

@@ -31,6 +31,7 @@
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB3ki29AJHS78LOsuUmYxBGm_IlXSnL1ow"></script>
     <script src="http://adoroszlai.github.io/leaflet-distance-markers/lib/leaflet.geometryutil.js"></script>
     <script src="http://adoroszlai.github.io/leaflet-distance-markers/leaflet-distance-marker.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/color-thief/2.0.1/color-thief.min.js"></script>
     {{--<script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/2.6.1/fuse.min.js"></script>--}}
     <title>HAGO</title>
     <style>

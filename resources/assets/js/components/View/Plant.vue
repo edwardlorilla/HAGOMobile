@@ -1,21 +1,18 @@
 <template id="plant">
     <v-ons-page>
-        <custom-toolbar title="Repositories of Plants" v-model="searchQuery" :grid="isGrid"
+        <custom-toolbar  title="Repositories of Plants" v-model="searchQuery" :grid="isGrid"
                         :search="isSearch"></custom-toolbar>
-
-
+        <v-ons-progress-bar v-if="!getFuseList.list" indeterminate></v-ons-progress-bar>
         <v-ons-list>
             <v-ons-lazy-repeat
                     v-if="getFuseList.list"
                     :render-item="renderItem"
                     :length="getSearchQuery.length">
             </v-ons-lazy-repeat>
-
         </v-ons-list>
         <floating-action></floating-action>
     </v-ons-page>
 </template>
-
 <script>
     import {getData, plantItem, PlantItem, Push, setResults, getResults, toggleView, listView} from './../Ajax/getData'
 
@@ -28,11 +25,13 @@
                 renderItem(i) {
                     return new Vue({
                         template: `
-                            <div v-if="plant.all[index]" :key="index" @click="getMapInfo(plant.all[index])">
-                            <v-ons-list-item v-if="listView.view">
-                                <v-ons-row >
-                                    <v-ons-col width="95px">
+                            <div v-if="plant.all[index]"  :key="index" >
+
+                            <v-ons-list-item @click="getMapInfo(plant.all[index])"  v-if="listView.view">
+                                <v-ons-row  >
+                                    <v-ons-col  width="95px">
                                       <img class="thumbnail"
+                                            style="object-fit: cover;width: 60px; height:60px;"
                                              :src="getPhoto">
                                     </v-ons-col>
                                     <v-ons-col>
@@ -47,9 +46,9 @@
                                     <v-ons-col width="40px"></v-ons-col>
                                   </v-ons-row>
                               </v-ons-list-item>
-                            <v-ons-row v-else>
-                                <v-ons-col v-for="row in getItem[index]" :key="index">
-                                  <v-ons-card :key="index"><img class="thumbnail" style="width: 60px; height:60px;" :src="row.photos | getGridPhoto"/></v-ons-card>
+                            <v-ons-row  v-else>
+                                <v-ons-col  style="width: 60px;"  v-for="row in getItem[index]" :key="index">
+                                  <v-ons-card @click="getMapInfo(row)"   :key="index"><img class="thumbnail" style="object-fit: cover;width: 60px; height:60px;" :src="row.photos | getGridPhoto"/></v-ons-card>
                                 </v-ons-col>
                              </v-ons-row>
                             </div>
@@ -58,8 +57,15 @@
                             return {
                                 index: i,
                                 plant: getResults,
-                                listView: listView
+                                listView: listView,
+                                windowWidth:  window.innerWidth
                             };
+                        },
+                        mounted(){
+                            window.addEventListener('resize', this.handleWindowResize);
+                        },
+                        beforeDestroy: function () {
+                            window.removeEventListener('resize', this. handleWindowResize)
                         },
                         filters: {
                             getGridPhoto(photo){
@@ -67,6 +73,9 @@
                             }
                         },
                         computed: {
+                            onOrientation(){
+                                return parseInt(this.windowWidth / 100)
+                            },
                             getPhoto(){
                                 var vm = this
                                 var plant = vm.getItem[vm.index];
@@ -74,10 +83,14 @@
                             },
                             getItem() {
                                 var vm = this
-                                return vm.listView.view ? vm.plant.all : _.chunk(vm.plant.all, 3)
+                                return vm.listView.view ? vm.plant.all :  _.chunk(getResults.all, vm.onOrientation)
                             }
                         },
                         methods: {
+                            handleWindowResize(event)
+                            {
+                                this.windowWidth = event.currentTarget.innerWidth;
+                            },
                             getMapInfo(plantInfo){
                                 var vm = this
                                 PlantItem(plantInfo)
@@ -92,14 +105,22 @@
                 results: [],
                 fuse: '',
                 searchQuery: '',
-                listView: listView
+                listView: listView,
+                windowWidth:  window.innerWidth
             }
         },
         mounted(){
             var vm = this
+            window.addEventListener('resize', this.handleWindowResize);
             vm.getPlantRepository()
         },
+        beforeDestroy: function () {
+            window.removeEventListener('resize', this. handleWindowResize)
+        },
         computed: {
+            onOrientation(){
+                return parseInt(this.windowWidth / 100)
+            },
             getSearchQuery() {
                 var vm = this
                 if (vm.searchQuery.trim() === '') {
@@ -108,9 +129,7 @@
                 else {
                     setResults(vm.getFuseList.search(vm.searchQuery.trim()))
                 }
-
-
-                return listView.view ? getResults.all :  _.chunk(getResults.all, 3)
+                return listView.view ? getResults.all :  _.chunk(getResults.all, vm.onOrientation)
             },
             getFuseList(){
                 var vm = this
@@ -125,13 +144,16 @@
                 };
 
                 vm.fuse = new Fuse(vm.plant.all, options);
-
                 return vm.fuse
             },
 
         },
         watch: {},
         methods: {
+            handleWindowResize(event)
+            {
+                this.windowWidth = event.currentTarget.innerWidth;
+            },
             getPlantRepository(){
                 getData()
             },

@@ -1,6 +1,6 @@
 <template>
     <v-ons-navigator swipeable
-                     :page-stack="stack.page"
+                     :page-stack="StackItem.page"
     ></v-ons-navigator>
 </template>
 <script>
@@ -8,7 +8,7 @@
     export default{
         data(){
             return {
-                stack: StackItem
+                StackItem
             }
         }
     }

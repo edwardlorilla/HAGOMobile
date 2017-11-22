@@ -1,6 +1,6 @@
 <template id="home">
     <v-ons-page>
-        <!--<v-ons-progress-bar v-if="!userLocation.lat" indeterminate></v-ons-progress-bar>-->
+        <v-ons-progress-bar v-if="!userLocation.lat" indeterminate></v-ons-progress-bar>
         <v-ons-toolbar>
             <div class="left">
                 <v-ons-toolbar-button v-if="pageName" @click="changeView">
@@ -53,7 +53,7 @@
                                      :style="{'margin-top': $ons.platform.isAndroidPhone() ? 5 + 'px' : 50 + 'px'}">
                     <v-ons-list-item v-for="(search, index) in resultItem" :key="index" @click="onResult(search)">
                         <div class="left">
-                            <img class="list-item__thumbnail" src="http://placekitten.com/g/40/40">
+                            <img style="object-fit: cover;" class="list-item__thumbnail" :src="search.photos | getPhoto">
                         </div>
                         <search-result :search="search"></search-result>
                     </v-ons-list-item>
@@ -61,17 +61,35 @@
             </div>
         </div>
 
-        <div class="addMarker" style="bottom: 0">
+        <div class="addMarker"  style="bottom: 0">
             <div style="display: flex;justify-content: center; ">
-
                 <v-ons-fab
-
+                        v-show="isWatch"
                         position="bottom center"
-                        :class=" isWatch ?  'btn-stop' : 'btn'"
-                        :visible="true"
+                        class="btn-stop"
+                        :visible="isWatch"
                         @click="onStart"
                 >
                     <v-ons-icon icon="md-gps-dot"></v-ons-icon>
+                </v-ons-fab>
+                <v-ons-fab
+                            v-show="!isWatch"
+                           position="bottom center"
+                           class="btn"
+                           :visible="!isWatch"
+                           @click="onStart"
+                >
+                    <v-ons-icon icon="md-gps-dot"></v-ons-icon>
+                </v-ons-fab>
+                <v-ons-fab
+                        v-show="openFabInfo"
+                        position="bottom right"
+                        class="btn"
+                        :visible="openFabInfo"
+                        @click="moreDetail"
+
+                >
+                    <v-ons-icon icon="fa-bars"></v-ons-icon>
                 </v-ons-fab>
 
             </div>
@@ -87,8 +105,13 @@
 </style>
 <script>
     import {tileSet} from './TileSet'
-    import {change_view, PlantFound, userLocation, plantItem, gps_distance} from './../Ajax/getData'
+    import {moreDetail, change_view, PlantFound, userLocation, plantItem, gps_distance, PlantIndex} from './../Ajax/getData'
     export default{
+        filters:{
+            getPhoto(photo){
+                return !_.isEmpty(photo) ? photo[0].file : 'http://placekitten.com/g/40/40'
+            }
+        },
         props: {
             pageName: {
                 type: String,
@@ -97,7 +120,8 @@
         },
         data(){
             return {
-
+                openFabInfo: false,
+                visible: true,
                 keys: ['name'],
                 fuse: '',
                 searchQuery: '',
@@ -176,7 +200,6 @@
                 else
                     return this.fuse.search(this.searchQuery.trim()).splice(0, 3)
             },
-
             getLocation(){
                 return _.uniqWith(this.coords, _.isEqual)
             },
@@ -190,6 +213,9 @@
 
         },
         methods: {
+            moreDetail(){
+                moreDetail()
+            },
             onMounted(){
                 var vm = this
                 vm.markerClusters = L.markerClusterGroup();
@@ -220,18 +246,21 @@
                 vm.setTileSet(vm.selectedTileSet)
                 vm.map.on('locationfound', vm.onLocationFound);
                 vm.map.on('popupopen', function (e) {
+                    PlantIndex(e.popup._source._id);
+
                     if (vm.isWatch) {
                         vm.onStart()
                     }
                     var px = vm.map.project(e.popup._latlng);
                     px.y -= e.popup._container.clientHeight / 2
                     vm.map.panTo(vm.map.unproject(px), {animate: true});
-
                     vm.$set(vm.$data, 'isOpen', true)
 
+                    vm.openFabInfo = true
                 });
                 vm.map.on('popupclose', function (e) {
                     vm.$set(vm.$data, 'isOpen', false)
+                    vm.openFabInfo = false
                 });
             },
             onStart(){
@@ -403,12 +432,13 @@
                     vm.offWatch()
                     var marker = vm.markers[id]
                     var itemObject = marker.options;
+                    PlantIndex(itemObject.id)
+//                    currentPageSwitcher('plant-navigator', 'View Plant Repository')
                     var position = marker.getLatLng();
                     var floraLocation = new L.LatLng(position.lat, position.lng) || null;
                     var userDistance = floraLocation ? vm.createPolyLine(floraLocation, vm.userLocation) : null;
-                    console.log(vm.markers[id])
                     vm.map.setView(position, 15);
-                    vm.markers[id]._popup._content = `<div style="z-index: 402; max-width: 80vw;">` + userDistance + '<h2>' + itemObject.name + '</h2>' + itemObject.content + '<img style="width: 100%;" src="' + itemObject.image + '" /> ' + '</div>' || null
+                    vm.markers[id]._popup._content = '<div style="z-index: 402; max-width: 80vw;"><h2>' + itemObject.name + '</h2>' + userDistance + itemObject.content + '<img style="width: 100%;" src="' + itemObject.image + '" /> ' + '</div>' || null
 
 
                     if (!marker._icon) marker.__parent.spiderfy();
@@ -435,8 +465,8 @@
                         content: val.description,
                         image: photo,
                         closeOnClick: true
-                    }).bindPopup('<div style="z-index: 402; max-width: 80vw; ">' + userDistance + '<h2>' + val.name + '</h2>' + val.description + '<img style="width: 100%;" src="' + photo + '"/>' + "</div>");
-
+                    }).bindPopup('<div style="z-index: 402; max-width: 80vw; "><h2>' + val.name  + '</h2>' + userDistance  + val.description + '<img style="width: 100%;" src="' + photo + '"/>' + "</div>");
+                    markerX._id = val.id
                     vm.markerClusters.addLayer(markerX);
                     vm.markers.push(markerX);
                     vm.map.setView(floralocation, 15);
@@ -447,6 +477,7 @@
                     vm.onResult(vm.plantFound.index)
                 }
                 if (!vm.isOpen) {
+                    vm.openFabInfo = false
                     vm.map.flyTo(vm.userLocation, 15);
                 }
                 if (vm.fuse) {
