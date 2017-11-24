@@ -27,8 +27,8 @@ class Repository extends Model
     /*
      * color assiciated with the repository
      */
-    public function colors()
+    public function color()
     {
-        return $this->belongsToMany(Color::class);
+        return $this->belongsTo(Color::class);
     }
 }

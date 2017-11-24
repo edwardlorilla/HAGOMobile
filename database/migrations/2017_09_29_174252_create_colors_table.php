@@ -18,12 +18,6 @@ class CreateColorsTable extends Migration
             $table->string('color')->nullable();
             $table->timestamps();
         });
-        Schema::create('color_repository', function (Blueprint $table) {
-            $table->integer('color_id')->unsigned()->index();
-            $table->foreign('color_id')->references('id')->on('colors')->onDelete('cascade');
-            $table->integer('repository_id')->unsigned()->index();
-            $table->foreign('repository_id')->references('id')->on('repositories')->onDelete('cascade');
-        });
     }
 
     /**
@@ -34,6 +28,5 @@ class CreateColorsTable extends Migration
     public function down()
     {
         Schema::dropIfExists('colors');
-        Schema::dropIfExists('color_repository');
     }
 }
