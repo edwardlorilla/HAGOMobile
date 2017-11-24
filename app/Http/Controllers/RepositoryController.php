@@ -16,7 +16,7 @@ class RepositoryController extends Controller
     public function index()
     {
         $repository = Cache::rememberForever('repositories:all', function () {
-            return Repository::with('photos', 'color')
+            return Repository::with('photos', 'colors')
                 ->orderBy('updated_at', 'desc')
                 ->get();
         });
