@@ -210,7 +210,9 @@ export function setResults(result) {
 
 export function cameraInfo(event){
     if(event.type == 'change'){
-        return capturePhoto = event
+        return new Promise((resolve, reject) => {
+            resolve( capturePhoto = event);
+    })
     }else{
         event.target.value = null
     }
@@ -270,9 +272,23 @@ export function getData() {
     })
 }
 
+
+export function post(payload) {
+    var url = '/api/repository'
+    return axios({
+        method: 'POST',
+        url: url,
+        data: payload
+    }).then(function (response) {
+        console.log(response)
+    })
+}
+
+
+
 export var plantItem = {
-    all: null,
-    count: null
+    all: [],
+    count: 0
 }
 
 

@@ -17,4 +17,18 @@ class Repository extends Model
     {
         return $this->belongsToMany(Photo::class);
     }
+    /*
+     * admin/user capture associated with
+     */
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+    /*
+     * color assiciated with the repository
+     */
+    public function color()
+    {
+        return $this->belongsTo(Color::class);
+    }
 }

@@ -3,9 +3,9 @@
         <custom-toolbar  title="Repositories of Plants" v-model="searchQuery" :grid="isGrid"
                         :search="isSearch"></custom-toolbar>
         <v-ons-progress-bar v-if="!getFuseList.list" indeterminate></v-ons-progress-bar>
-        <v-ons-list>
+        <v-ons-list v-if="plant.count > 0">
             <v-ons-lazy-repeat
-                    v-if="getFuseList.list"
+                    v-if="plant.count > 0"
                     :render-item="renderItem"
                     :length="getSearchQuery.length">
             </v-ons-lazy-repeat>
@@ -73,6 +73,7 @@
                             }
                         },
                         computed: {
+
                             onOrientation(){
                                 return parseInt(this.windowWidth / 100)
                             },
@@ -109,10 +110,13 @@
                 windowWidth:  window.innerWidth
             }
         },
+        beforeMount(){
+
+        },
         mounted(){
             var vm = this
+             getData()
             window.addEventListener('resize', this.handleWindowResize);
-            vm.getPlantRepository()
         },
         beforeDestroy: function () {
             window.removeEventListener('resize', this. handleWindowResize)
@@ -153,9 +157,6 @@
             handleWindowResize(event)
             {
                 this.windowWidth = event.currentTarget.innerWidth;
-            },
-            getPlantRepository(){
-                getData()
             },
             isGrid(){
                 toggleView()

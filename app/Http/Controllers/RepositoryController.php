@@ -16,7 +16,7 @@ class RepositoryController extends Controller
     public function index()
     {
         $repository = Cache::rememberForever('repositories:all', function () {
-            return Repository::with('photos')
+            return Repository::with('photos', 'color')
                 ->orderBy('updated_at', 'desc')
                 ->get();
         });
@@ -41,7 +41,17 @@ class RepositoryController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        dd($request);
+       /* $this->validate($request, [
+            'title' => 'required|max:100',
+            'body' => 'required'
+        ]);
+        $article = new Article;
+        $article->title = $request->title;
+        $article->body = $request->body;
+        $article->save();
+        Cache::forget('article:all');
+        return response()->json($repository);*/
     }
 
     /**
