@@ -3,9 +3,9 @@
         <custom-toolbar  title="Repositories of Plants" v-model="searchQuery" :grid="isGrid"
                         :search="isSearch"></custom-toolbar>
         <v-ons-progress-bar v-if="!getFuseList.list" indeterminate></v-ons-progress-bar>
-        <v-ons-list v-if="getFuseList.list.length > 0 && plant.count > 0">
+        <v-ons-list v-show="plantItem.count > 0">
             <v-ons-lazy-repeat
-                    v-if="getFuseList.list.length > 0 && plant.count > 0"
+                    v-if="plantItem.count > 0"
                     :render-item="renderItem"
                     :length="getSearchQuery.length">
             </v-ons-lazy-repeat>
@@ -21,7 +21,7 @@
         name: 'viewPlant',
         data(){
             return {
-                plant: plantItem,
+                plantItem,
                 renderItem(i) {
                     return new Vue({
                         template: `
@@ -111,11 +111,11 @@
             }
         },
         beforeMount(){
-
+            plantItem
         },
         mounted(){
             var vm = this
-             getData()
+            getData()
             window.addEventListener('resize', this.handleWindowResize);
         },
         beforeDestroy: function () {
@@ -128,7 +128,7 @@
             getSearchQuery() {
                 var vm = this
                 if (vm.searchQuery.trim() === '') {
-                    setResults(vm.plant.all)
+                    setResults(vm.plantItem.all)
                 }
                 else {
                     setResults(vm.getFuseList.search(vm.searchQuery.trim()))
@@ -147,7 +147,7 @@
                     keys: vm.keys
                 };
 
-                vm.fuse = new Fuse(vm.plant.all, options);
+                vm.fuse = new Fuse(vm.plantItem.all, options);
                 return vm.fuse
             },
 
