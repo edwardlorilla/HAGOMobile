@@ -66,5 +66,8 @@
     (function () {
     })();
 </script>
+<script nomodule>
+    document.getElementById("app").innerHTML = "Your browser doesn't support JavaScript modules :(";
+</script>
 
 </html>

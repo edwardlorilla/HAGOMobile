@@ -41,7 +41,13 @@ class RepositoryController extends Controller
      */
     public function store(Request $request)
     {
-        dd($request);
+        if ($request->photos){
+            $photos = $this->getPhoto($request);
+        }
+
+        dd($request->all());
+//        die(var_dump($request->name));
+
        /* $this->validate($request, [
             'title' => 'required|max:100',
             'body' => 'required'
@@ -97,5 +103,24 @@ class RepositoryController extends Controller
     public function destroy(Repository $repository)
     {
         //
+    }
+
+    public function getPhoto(Request $request)
+    {
+        $photo = new \App\Photo();
+        if ($file = $request->photos) {
+            list($type, $imageData) = explode(';', $request->photos);
+            list(, $extension) = explode('/', $type);
+            list(, $imageData) = explode(',', $imageData);
+            $fileName = uniqid() . '.' . $extension;
+            $source = fopen($request->photos, 'r');
+            $destination = fopen('images/' . $fileName, 'w');
+            stream_copy_to_stream($source, $destination);
+            fclose($source);
+            fclose($destination);
+            $photo = \App\Photo::create(['file' => $fileName]);
+            return $photo;
+        }
+        return $photo;
     }
 }

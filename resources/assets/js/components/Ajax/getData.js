@@ -272,18 +272,28 @@ export function getData() {
     })
 }
 
-
-export function post(payload) {
+export function FormDataPost(file, payload, latitude, longitude,altitude, title, description) {
     var url = '/api/repository'
-    return axios({
-        method: 'POST',
-        url: url,
-        data: payload
-    }).then(function (response) {
-        console.log(response)
-    })
-}
+    if (typeof url !== 'string') {
+        throw new TypeError(`Expected a string, got ${typeof url}`);
+    }
 
+    // You can add checks to ensure the url is valid, if you wish
+
+    const formData = new FormData();
+    formData.append('photos', file);
+    formData.append('latitude', latitude);
+    formData.append('longitude', longitude);
+    formData.append('altitude', altitude);
+    formData.append('title', title);
+    formData.append('description', description);
+    const config = {
+        headers: {
+            'content-type': 'multipart/form-data'
+        }
+    };
+    return axios.post(url, formData, config);
+};
 
 
 export var plantItem = {

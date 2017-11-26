@@ -113,6 +113,9 @@
         beforeMount(){
             plantItem
         },
+        deactivated(){
+
+        },
         mounted(){
             var vm = this
             getData()

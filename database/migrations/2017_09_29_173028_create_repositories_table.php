@@ -16,14 +16,15 @@ class CreateRepositoriesTable extends Migration
         Schema::create('repositories', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('user_id')->unsigned()->index()->nullable();
-
             $table->string('name')->nullable();
             $table->text('description')->nullable();
             $table->string('scientificName')->nullable();
-            $table->float('latitude');
-            $table->float('longitude');
+            $table->float('latitude')->nullable();
+            $table->float('altitude')->nullable();
+            $table->float('longitude')->nullable();
             $table->timestamps();
         });
+
     }
 
     /**
