@@ -29,6 +29,12 @@ class CreateDiscoveriesTable extends Migration
             $table->integer('repository_id')->unsigned()->index();
             $table->foreign('repository_id')->references('id')->on('repositories')->onDelete('cascade');
         });
+        Schema::create('discovery_photo', function (Blueprint $table) {
+            $table->integer('discovery_id')->unsigned()->index();
+            $table->foreign('discovery_id')->references('id')->on('discoveries')->onDelete('cascade');;
+            $table->integer('photo_id')->unsigned()->index();
+            $table->foreign('photo_id')->references('id')->on('photos')->onDelete('cascade');
+        });
     }
 
     /**
@@ -40,5 +46,6 @@ class CreateDiscoveriesTable extends Migration
     {
         Schema::dropIfExists('discoveries');
         Schema::dropIfExists('discovery_repository');
+        Schema::dropIfExists('discovery_photo');
     }
 }

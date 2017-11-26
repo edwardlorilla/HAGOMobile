@@ -13,4 +13,8 @@ class Photo extends Model
     {
         return $this->belongsToMany(Repository::class);
     }
+    public function discoveries()
+    {
+        return $this->belongsToMany(Discovery::class);
+    }
 }

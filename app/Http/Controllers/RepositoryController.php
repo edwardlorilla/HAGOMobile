@@ -44,8 +44,8 @@ class RepositoryController extends Controller
         if ($request->photos){
             $photos = $this->getPhoto($request);
         }
+        $discovery
 
-        dd($request->all());
 //        die(var_dump($request->name));
 
        /* $this->validate($request, [
