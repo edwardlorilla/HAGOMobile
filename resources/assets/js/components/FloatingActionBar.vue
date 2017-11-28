@@ -6,7 +6,10 @@
             @click="capturePhoto"
     >
         <v-ons-icon style="position: absolute;left:0; right: 0; top: 0px;" icon="md-camera"></v-ons-icon>
-        <input ref="fileInput" id="file-input" @change="capturePhoto" class="FileUpload" type="file" name="image" accept="image/*" capture="camera"/>
+
+            <input ref="fileInput" id="file-input" @change="capturePhoto" class="FileUpload" type="file" name="image"
+                   accept="image/*" capture="camera"/>
+
     </v-ons-fab>
 </template>
 <style>
@@ -16,6 +19,8 @@
     z-index: 1;
     padding: 50px;
 }
+
+
 
 </style>
 <script>
@@ -32,7 +37,6 @@
         methods:{
             capturePhoto(event){
                 cameraInfo(event)
-
                 if(this.$refs.fileInput.value ){
                     Push('capture-photo')
                 }
@@ -40,5 +44,7 @@
             }
         }
     }
+
+
 
 </script>

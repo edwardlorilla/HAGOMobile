@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Repository;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
-
+use Image;
 class RepositoryController extends Controller
 {
     /**
@@ -36,34 +36,55 @@ class RepositoryController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  \Illuminate\Http\Request $request
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
     {
-        if ($request->photos){
-            $photos = $this->getPhoto($request);
+        $user = \App\User::find(1);
+        $photo = null;
+        if ($files =$request->file('photos')) {
+            $destinationPath = public_path('thumbnail/');
+            if (!file_exists($destinationPath)) {
+                mkdir($destinationPath, 666, true);
+            }
+            $name = time() . $files->getClientOriginalName();
+            $img = Image::make($files->getRealPath())->resize(60, 60, function ($constraint) {
+                $constraint->aspectRatio();
+            })->save($destinationPath.$name);
+            $files->move('images', $name);
+
+            $photo = \App\Photo::create(['file' => $name]);
         }
-        $discovery
+
+        $discovery = new \App\Discovery([
+            'title' => $request->title,
+            'description' => $request->description,
+            'latitude' => $request->latitude,
+            'altitude' => $request->altitude,
+            'longitude' => $request->longitude
+        ]);
+
+        $user->discoveries()->save($discovery)->photos()->attach($photo->id);
 
 //        die(var_dump($request->name));
 
-       /* $this->validate($request, [
-            'title' => 'required|max:100',
-            'body' => 'required'
-        ]);
-        $article = new Article;
-        $article->title = $request->title;
-        $article->body = $request->body;
-        $article->save();
-        Cache::forget('article:all');
-        return response()->json($repository);*/
+        /* $this->validate($request, [
+             'title' => 'required|max:100',
+             'body' => 'required'
+         ]);
+         $article = new Article;
+         $article->title = $request->title;
+         $article->body = $request->body;
+         $article->save();
+         Cache::forget('article:all');
+         return response()->json($repository);*/
     }
 
     /**
      * Display the specified resource.
      *
-     * @param  \App\Repository  $repository
+     * @param  \App\Repository $repository
      * @return \Illuminate\Http\Response
      */
     public function show(Repository $repository)
@@ -74,7 +95,7 @@ class RepositoryController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \App\Repository  $repository
+     * @param  \App\Repository $repository
      * @return \Illuminate\Http\Response
      */
     public function edit(Repository $repository)
@@ -85,8 +106,8 @@ class RepositoryController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Repository  $repository
+     * @param  \Illuminate\Http\Request $request
+     * @param  \App\Repository $repository
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, Repository $repository)
@@ -97,7 +118,7 @@ class RepositoryController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Repository  $repository
+     * @param  \App\Repository $repository
      * @return \Illuminate\Http\Response
      */
     public function destroy(Repository $repository)

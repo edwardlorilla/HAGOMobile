@@ -17,7 +17,7 @@
                     <img ref="imag" :src="image"/>
                     <div v-if="!image">
                         <h2>Select an image</h2>
-                        <input type="file" @change="onFileChange">
+                        <input type="file"  @change="onFileChange">
 
                     </div>
                     <div v-else>
@@ -123,7 +123,7 @@ display: flex;
 
 </style>
 <script>
-import {currentPage, capturePhoto, cnvrtRGBClrToHex, hexColorDelta, cameraInfo, FormDataPost} from './../Ajax/getData'
+import {currentPage, capturePhoto, cnvrtRGBClrToHex, hexColorDelta, cameraInfo, FormDataPost,urltoFile} from './../Ajax/getData'
 export default{
     data(){
         return {
@@ -143,6 +143,7 @@ export default{
                 title: '',
                 description: ''
             },
+            urlFile: null,
             baseColor:  [
               {
                 "name" : "burgundy" ,
@@ -181,11 +182,14 @@ export default{
       this.createImage(files[0]);
     },
     createImage(file) {
+
+        //urltoFile(url, file.name, mimeType)
       var image = new Image();
       var reader = new FileReader();
       var vm = this;
-
+        vm.urlFile = file
       reader.onload = (e) => {
+
         vm.image = e.target.result;
 
       };
@@ -225,9 +229,11 @@ export default{
       var vm = this,
           hexArray = vm.palletesConvertHex()
           vm.hexColor = []
+
+
       //vm.baseColor.push({name: 'vm.image', number: '', hexvalue: hexArray})
       //post({name: 'vm.image', number: '', hexvalue: hexArray})
-        FormDataPost(vm.image,  hexArray,vm.location.latitude, vm.location.longitude, vm.location.altitude, vm.repositoryInfo.title, vm.repositoryInfo.description )
+        FormDataPost( vm.urlFile,  hexArray,vm.location.latitude, vm.location.longitude, vm.location.altitude, vm.repositoryInfo.title, vm.repositoryInfo.description )
 
     },
      showPosition(position) {

@@ -284,7 +284,7 @@ export function FormDataPost(file, payload, latitude, longitude,altitude, title,
     formData.append('photos', file);
     formData.append('latitude', latitude);
     formData.append('longitude', longitude);
-    formData.append('altitude', altitude);
+    formData.append('altitude', _.isNull(altitude) ? 0 : altitude);
     formData.append('title', title);
     formData.append('description', description);
     const config = {

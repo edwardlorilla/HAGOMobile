@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Discovery extends Model
 {
     protected $fillable = [
-        'title', 'description'
+        'title', 'description','latitude','altitude','longitude'
     ];
     public function repositories()
     {

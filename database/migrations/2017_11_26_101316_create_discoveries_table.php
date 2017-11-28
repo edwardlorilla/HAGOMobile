@@ -18,9 +18,9 @@ class CreateDiscoveriesTable extends Migration
             $table->integer('user_id')->unsigned()->index()->nullable();
             $table->string('title')->nullable();
             $table->string('description')->nullable();
-            $table->float('latitude')->nullable();
-            $table->float('altitude')->nullable();
-            $table->float('longitude')->nullable();
+            $table->float('latitude')->unsigned()->nullable();
+            $table->float('altitude')->unsigned()->nullable();
+            $table->float('longitude')->unsigned()  ->nullable();
             $table->timestamps();
         });
         Schema::create('discovery_repository', function (Blueprint $table) {
