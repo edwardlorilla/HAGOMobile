@@ -27,7 +27,7 @@ class User extends Authenticatable
         'password', 'remember_token',
     ];
 
-    public function discoveries(){
-        return $this->hasMany(Discovery::class);
+    public function repositories(){
+        return $this->hasMany(Repository::class);
     }
 }

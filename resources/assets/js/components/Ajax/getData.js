@@ -272,7 +272,7 @@ export function getData() {
     })
 }
 
-export function FormDataPost(file, payload, latitude, longitude,altitude, title, description) {
+export function FormDataPost(file, payload, latitude, longitude,altitude, title, description, similarPlant) {
     var url = '/api/repository'
     if (typeof url !== 'string') {
         throw new TypeError(`Expected a string, got ${typeof url}`);
@@ -283,9 +283,11 @@ export function FormDataPost(file, payload, latitude, longitude,altitude, title,
     const formData = new FormData();
     formData.append('photos', file);
     formData.append('latitude', latitude);
+    formData.append('colors', payload);
     formData.append('longitude', longitude);
     formData.append('altitude', _.isNull(altitude) ? 0 : altitude);
     formData.append('title', title);
+    formData.append('repository_id', similarPlant);
     formData.append('description', description);
     const config = {
         headers: {

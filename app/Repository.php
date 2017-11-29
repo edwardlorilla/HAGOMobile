@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Repository extends Model
 {
     protected $fillable =[
-      'name', 'description', 'scientificName', 'latitude', 'longitude', 'altitude'
+      'title', 'description', 'scientificName', 'latitude', 'longitude', 'altitude', 'color_id', 'repository_id'
     ];
 
     /**
@@ -17,19 +17,17 @@ class Repository extends Model
     {
         return $this->belongsToMany(Photo::class);
     }
-    /**
-     * Get the disovery associated with the given Repository
-     */
-    public function discoveries()
-    {
-        return $this->belongsToMany(Discovery::class);
-    }
     /*
      * admin/user capture associated with
      */
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function repository()
+    {
+        return $this->belongsTo(Repository::class);
     }
     /*
      * color assiciated with the repository

@@ -17,7 +17,7 @@
                     <img ref="imag" :src="image"/>
                     <div v-if="!image">
                         <h2>Select an image</h2>
-                        <input type="file"  @change="onFileChange">
+                        <input type="file" @change="onFileChange">
 
                     </div>
                     <div v-else>
@@ -48,9 +48,9 @@
                             </v-ons-list-item>
                             <v-ons-list-item>
                                 <div class="center" style="display: flex;justify-content: space-between;">
-                                    <v-ons-button @click="addBaseColor" class="btn"  style="width:48%;">Add
+                                    <v-ons-button @click="addBaseColor" class="btn" style="width:48%;">Add
                                     </v-ons-button>
-                                    <v-ons-button @click="removeImage" class="btn-stop"  style="width:48%;">Remove
+                                    <v-ons-button @click="removeImage" class="btn-stop" style="width:48%;">Remove
                                     </v-ons-button>
                                 </div>
                             </v-ons-list-item>
@@ -121,9 +121,10 @@ display: flex;
 
 
 
+
 </style>
 <script>
-import {currentPage, capturePhoto, cnvrtRGBClrToHex, hexColorDelta, cameraInfo, FormDataPost,urltoFile} from './../Ajax/getData'
+import {currentPage, capturePhoto, cnvrtRGBClrToHex, hexColorDelta, cameraInfo, FormDataPost,urltoFile, plantItem} from './../Ajax/getData'
 export default{
     data(){
         return {
@@ -144,25 +145,7 @@ export default{
                 description: ''
             },
             urlFile: null,
-            baseColor:  [
-              {
-                "name" : "burgundy" ,
-                'id': '17A',
-                'photos': [],
-                'description': null,
-                "hexvalue" : [ '564D42','E7EAEF','898885','A6B0BD','979DAC','171619','797E7D','717276','B4A49C']},
-              {
-                "name" : "blue" ,
-                'id': '18B',
-                'photos': [],
-                "hexvalue" : [ "cc3333","ea4c88","993399"]},
-              {
-                "name" : "orange" ,
-                'id': '19C',
-                'photos': [],
-                "hexvalue" : [ "663399","333399","0066cc"]
-              }
-            ],
+            baseColor:  plantItem
         }
     },
     methods:{
@@ -228,12 +211,11 @@ export default{
     addBaseColor(){
       var vm = this,
           hexArray = vm.palletesConvertHex()
-          vm.hexColor = []
 
 
-      //vm.baseColor.push({name: 'vm.image', number: '', hexvalue: hexArray})
-      //post({name: 'vm.image', number: '', hexvalue: hexArray})
-        FormDataPost( vm.urlFile,  hexArray,vm.location.latitude, vm.location.longitude, vm.location.altitude, vm.repositoryInfo.title, vm.repositoryInfo.description )
+      //vm.baseColor.push({name: 'vm.image', number: '', color.colors.split(','): hexArray})
+      //post({name: 'vm.image', number: '', color.colors.split(','): hexArray})
+    FormDataPost( vm.urlFile,  hexArray,vm.location.latitude, vm.location.longitude, vm.location.altitude, vm.repositoryInfo.title, vm.repositoryInfo.description, vm.selectedPlant )
 
     },
      showPosition(position) {
@@ -281,7 +263,6 @@ export default{
         navigator.geolocation.clearWatch(this.watchID);
     },
      computed:{
-
         getNearestColor(){
           var vm = this,
               objectValue = [],
@@ -290,12 +271,12 @@ export default{
               hexColorArray= [],
               hexArray = [],
               hexColorItem=[],
-              nearestColor= _.map(vm.baseColor, function(o) {
+              nearestColor= _.map(vm.baseColor.all, function(o) {
                 for (var j = 0; j < hexValue.length; j++) {
-                  for (var i = 0; i < o.hexvalue.length; i++) {
-                    hexColor = vm.hexColorDelta(hexValue[j], o.hexvalue[i]);
+                  for (var i = 0; i < o.color.colors.split(',').length; i++) {
+                    hexColor = vm.hexColorDelta(hexValue[j], o.color.colors.split(',')[i]);
                     if( hexColor > 0.9){
-                      hexArray.push({photo: !_.isEmpty(o.photos) ? o.photos[0] : null , id: o.id, hexColor: '#'+o.hexvalue[i], resultPercentage: hexColor, hexCompareTo: hexValue[j], hexValue: o.name })
+                      hexArray.push({photo: !_.isEmpty(o.photos) ? o.photos[0] : null , id: o.id, hexColor: '#'+o.color.colors.split(',')[i], resultPercentage: hexColor, hexCompareTo: hexValue[j], hexValue: o.title })
                       hexColorItem.push(hexValue[j], hexColor)
                     }
                   }
@@ -324,6 +305,7 @@ export default{
         }
       },
 }
+
 
 
 

@@ -16,7 +16,7 @@ class RepositoryController extends Controller
     public function index()
     {
         $repository = Cache::rememberForever('repositories:all', function () {
-            return Repository::with('photos', 'color')
+            return Repository::with('photos', 'color', 'repository')
                 ->orderBy('updated_at', 'desc')
                 ->get();
         });
@@ -41,6 +41,10 @@ class RepositoryController extends Controller
      */
     public function store(Request $request)
     {
+        $this->validate(request(), [
+            'colors' =>'required',
+            'photos' =>'required',
+        ]);
         $user = \App\User::find(1);
         $photo = null;
         if ($files =$request->file('photos')) {
@@ -56,17 +60,25 @@ class RepositoryController extends Controller
 
             $photo = \App\Photo::create(['file' => $name]);
         }
-
-        $discovery = new \App\Discovery([
+        $color = \App\Color::create([
+            'colors' => $request->colors
+        ]);
+        $repositoryID = '';
+        if(!is_string((int)$request->repository_id)) {
+            $repositoryID = $request->repository_id;
+        }
+        $repository = new \App\Repository([
             'title' => $request->title,
             'description' => $request->description,
             'latitude' => $request->latitude,
             'altitude' => $request->altitude,
-            'longitude' => $request->longitude
+            'longitude' => $request->longitude,
+            'color_id' => $color->id,
+            'repository_id' => $repositoryID === 'null' ? null : $repositoryID
         ]);
 
-        $user->discoveries()->save($discovery)->photos()->attach($photo->id);
-
+        $user->repositories()->save($repository)->photos()->attach($photo->id);
+        Cache::forget('repositories:all');
 //        die(var_dump($request->name));
 
         /* $this->validate($request, [
