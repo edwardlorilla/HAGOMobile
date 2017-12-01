@@ -4,6 +4,9 @@
             <v-ons-toolbar-button @click="changeView">
                 <v-ons-icon icon="ion-navicon, material:md-menu"></v-ons-icon>
             </v-ons-toolbar-button>
+            <v-ons-toolbar-button @click="isNearestMarkerSort"  >
+                <v-ons-icon :style="{'color': nearest.marker ? 'red' : ''}" icon="fa-map-marker"></v-ons-icon>
+            </v-ons-toolbar-button>
         </div>
         <div class="center" >
             <span v-if="!isSearch">{{title}}</span>
@@ -17,11 +20,12 @@
             <v-ons-toolbar-button @click="grid" v-if="grid" >
                 <v-ons-icon :icon="isGrid.view ? 'ion-grid, material: md-apps' : 'ion-ios-list-outline, material: md-format-list-bulleted'"></v-ons-icon>
             </v-ons-toolbar-button>
+
         </div>
     </v-ons-toolbar>
 </template>
 <script>
-    import {change_view, listView} from './Ajax/getData'
+    import {change_view, listView,isNearestMarkerSort, nearest} from './Ajax/getData'
     export default {
         model: {
             prop: 'my_prop',
@@ -38,10 +42,11 @@
                 type: String
             },
             search: Boolean,
-            grid: Function
+            grid: Function,
         },
         data(){
             return{
+                nearest,
                 isSearch: false,
                 isGrid: listView
             }
@@ -56,8 +61,10 @@
                 change_view()
             },
             send: function (v) {
-
                 this.$emit('my_event', v)
+            },
+            isNearestMarkerSort(){
+                isNearestMarkerSort()
             }
         }
     }

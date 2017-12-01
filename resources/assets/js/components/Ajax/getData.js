@@ -29,6 +29,14 @@ export function onLocationFound(e) {
     userMarker = new L.LatLng(e.latlng.lat, e.latlng.lng);
     plantSelected()
 }
+
+
+export var nearest = {
+    marker: false
+}
+export function isNearestMarkerSort(){
+    nearest.marker = !nearest.marker
+}
 export function plantSelected() {
     new Promise((resolve, reject) => {
         var plantPosition = new L.LatLng(PlantInfo.latitude, PlantInfo.longitude),
@@ -208,6 +216,8 @@ export function setResults(result) {
     })
 }
 
+
+
 export function cameraInfo(event){
     if(event.type == 'change'){
         return new Promise((resolve, reject) => {
@@ -330,8 +340,8 @@ const LoadingComponent = {
 }
 
 export var userLocation = {
-    lat: null,
-    lng: null
+    latitude: null,
+    longitude: null
 }
 
 export function getUserLocation(position) {

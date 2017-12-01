@@ -1,6 +1,9 @@
 <template id="plant">
     <v-ons-page>
-        <custom-toolbar  title="Repositories of Plants" v-model="searchQuery" :grid="isGrid"
+        <custom-toolbar title="Repositories of Plants" v-model="searchQuery"
+                        :nearestMarker="nearestMarker"
+                        :nearest="isNearestMarkerSort"
+                        :grid="isGrid"
                         :search="isSearch"></custom-toolbar>
         <v-ons-progress-bar v-if="!getFuseList.list" indeterminate></v-ons-progress-bar>
         <v-ons-list v-show="plantItem.count > 0">
@@ -14,13 +17,15 @@
     </v-ons-page>
 </template>
 <script>
-    import {getData, plantItem, PlantItem, Push, setResults, getResults, toggleView, listView} from './../Ajax/getData'
+    import {getData, plantItem, PlantItem, Push, setResults, getResults, toggleView, listView, userLocation, gps_distance, nearest} from './../Ajax/getData'
 
     export default{
         props: ['toggleMenu', 'pageName'],
         name: 'viewPlant',
         data(){
             return {
+                nearest,
+                userLocation,
                 plantItem,
                 renderItem(i) {
                     return new Vue({
@@ -69,7 +74,7 @@
                         },
                         filters: {
                             getGridPhoto(photo){
-                                return !_.isEmpty(photo[0]) ? photo[0].file : 'http://placekitten.com/g/40/40'
+                                return !_.isEmpty(photo[0]) ? 'thumbnail/' + photo[0].file : 'http://placekitten.com/g/40/40'
                             }
                         },
                         computed: {
@@ -80,7 +85,7 @@
                             getPhoto(){
                                 var vm = this
                                 var plant = vm.getItem[vm.index];
-                                return !_.isEmpty(plant.photos) ? plant.photos[0].file : 'http://placekitten.com/g/40/40'
+                                return !_.isEmpty(plant.photos) ?  'thumbnail/' +plant.photos[0].file : 'http://placekitten.com/g/40/40'
                             },
                             getItem() {
                                 var vm = this
@@ -150,7 +155,7 @@
                     keys: vm.keys
                 };
 
-                vm.fuse = new Fuse(vm.plantItem.all, options);
+                vm.fuse = new Fuse(_.sortBy(vm.plantItem.all, [function(o) { return vm.userLocation.lat && vm.userLocation.lng && vm.nearest.marker ?  gps_distance(vm.userLocation.lat, vm.userLocation.lng, o.latitude,o.longitude) : o }]), options);
                 return vm.fuse
             },
 
@@ -163,7 +168,8 @@
             },
             isGrid(){
                 toggleView()
-            }
+            },
         }
     }
+
 </script>
