@@ -1,8 +1,6 @@
 <template id="plant">
     <v-ons-page>
         <custom-toolbar title="Repositories of Plants" v-model="searchQuery"
-                        :nearestMarker="nearestMarker"
-                        :nearest="isNearestMarkerSort"
                         :grid="isGrid"
                         :search="isSearch"></custom-toolbar>
         <v-ons-progress-bar v-if="!getFuseList.list" indeterminate></v-ons-progress-bar>
@@ -17,15 +15,13 @@
     </v-ons-page>
 </template>
 <script>
-    import {getData, plantItem, PlantItem, Push, setResults, getResults, toggleView, listView, userLocation, gps_distance, nearest} from './../Ajax/getData'
+    import {getData, plantItem, PlantItem, Push, setResults, getResults, toggleView, listView} from './../Ajax/getData'
 
     export default{
         props: ['toggleMenu', 'pageName'],
         name: 'viewPlant',
         data(){
             return {
-                nearest,
-                userLocation,
                 plantItem,
                 renderItem(i) {
                     return new Vue({
@@ -146,7 +142,7 @@
             getFuseList(){
                 var vm = this
                 var options = {
-                    shouldSort: true,
+                    shouldSort: false,
                     threshold: 0.6,
                     location: 0,
                     distance: 100,
@@ -155,7 +151,8 @@
                     keys: vm.keys
                 };
 
-                vm.fuse = new Fuse(_.sortBy(vm.plantItem.all, [function(o) { return vm.userLocation.lat && vm.userLocation.lng && vm.nearest.marker ?  gps_distance(vm.userLocation.lat, vm.userLocation.lng, o.latitude,o.longitude) : o }]), options);
+                vm.fuse = new Fuse(vm.plantItem.all, options);
+
                 return vm.fuse
             },
 

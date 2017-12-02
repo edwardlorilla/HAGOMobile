@@ -212,7 +212,8 @@ export function toggleView(){
 }
 export function setResults(result) {
     return new Promise((resolve, reject) => {
-        resolve( getResults.all = result);
+        var sortNearest = _.sortBy(result, [function(o) { return userLocation.latitude && userLocation.longitude && nearest.marker ?  gps_distance(userLocation.latitude, userLocation.longitude, o.latitude,o.longitude) : o }]);
+        resolve(  getResults.all = sortNearest || result);
     })
 }
 
