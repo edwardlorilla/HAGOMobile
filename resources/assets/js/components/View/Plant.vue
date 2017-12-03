@@ -3,6 +3,7 @@
         <custom-toolbar title="Repositories of Plants" v-model="searchQuery"
                         :grid="isGrid"
                         :search="isSearch"></custom-toolbar>
+
         <v-ons-progress-bar v-if="!getFuseList.list" indeterminate></v-ons-progress-bar>
         <v-ons-list v-show="plantItem.count > 0">
             <v-ons-lazy-repeat
