@@ -9,14 +9,16 @@ import PlantItemNavigator from  './components/View/PlantItemNavigator.vue'
 import Map from  './components/View/Maps.vue'
 import CapturePhoto from  './components/View/CapturePhoto.vue'
 import SearchScope from  './components/View/SearchScope.vue'
-import SlideFade from  './components/Transition/slide-fade.vue'
+import SlideFade from  './components/Transition/no-mode-translate-fade.vue'
 import Toolbar from  './components/Toolbar.vue'
 import AutoComplete from  './components/AutoComplete.vue'
 import MapSearch from  './components/View/MapSearch.vue'
 import SearchResult from  './components/View/SearchResult.vue'
+import LoginUser from  './components/View/Login.vue'
 import SearchResultMapScope from  './components/View/SearchResultMapScope.vue'
 import FloatingAction from  './components/FloatingActionBar.vue'
 import staggeredFade from  './components/Transition/staggered-fade.vue'
+import noModeTranslateFade from  './components/Transition/no-mode-translate-fade.vue'
 import App from './components/App.vue'
 Vue.component('plant-item-map-view', function (resolve, reject) {
         resolve(PlantItemMapView)
@@ -49,8 +51,16 @@ Vue.component('staggered-fade', function (resolve, reject) {
         resolve(staggeredFade)
     }, 100)
 });
+Vue.component('no-mode-translate-fade', function (resolve, reject) {
+    setTimeout(function () {
+        resolve(noModeTranslateFade)
+    }, 100)
+});
 Vue.component('custom-toolbar', function (resolve, reject) {
     resolve(Toolbar)
+});
+Vue.component('login-user', function (resolve, reject) {
+    resolve(LoginUser)
 });
 Vue.component('floating-action', function (resolve, reject) {
     resolve(FloatingAction)

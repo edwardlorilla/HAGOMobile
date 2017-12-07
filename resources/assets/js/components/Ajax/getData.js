@@ -207,6 +207,13 @@ export function moreDetail() {
 export var listView = {
     view: true
 }
+
+export var isAuth = {
+    auth: window.authUser
+}
+export function toggleAuth(){
+    isAuth.auth = !isAuth.auth
+}
 export function toggleView(){
     listView.view = !listView.view
 }

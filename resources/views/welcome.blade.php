@@ -5,6 +5,12 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
     <script type="text/javascript">
+        window.authUser = {{$auth ? true : 'null'}};
+        window.Laravel = <?php echo json_encode([
+            'csrfToken' => csrf_token(),
+        ]); ?>
+    </script>
+    <script type="text/javascript">
         /* window.Laravel = {csrfToken: '{{ csrf_token() }}'}
          if ('serviceWorker' in navigator){
          window.addEventListener('load', function () {

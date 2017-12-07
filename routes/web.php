@@ -11,6 +11,11 @@
 |
 */
 
+
 Route::get('/', function () {
-    return view('welcome');
+    $auth = Auth::check();
+    return view('welcome', compact('auth'));
 })->where(['all' => '[\/\w\.-]*'])->name('home');
+Route::post('login', 'Auth\LoginController@login')->name('login');;
+Route::post('logout', 'Auth\LoginController@logout')->name('logout');
+

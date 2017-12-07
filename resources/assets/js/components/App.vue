@@ -1,32 +1,44 @@
 <template>
-    <v-ons-splitter>
-        <v-ons-splitter-side
-                swipeable
-                collapse=""
-                side="left"
-                :open.sync="openSide.side"
-                animation="reveal"
-        >
-            <v-ons-page>
-                <v-ons-list>
-                    <v-ons-list-header>Default</v-ons-list-header>
-                    <v-ons-list-item v-for="(page, index) in pages"
-                                     :key="index"
-                                     tappable modifier="chevron"
-                                     @click="changeView(page)"
-                    >
-                        <div class="center">{{ page.name }}</div>
-                    </v-ons-list-item>
-                </v-ons-list>
-            </v-ons-page>
-        </v-ons-splitter-side>
-        <v-ons-splitter-content>
-            <keep-alive :exclude="['plant-item-map-view']">
-                <component :is="currentPage.url" :page-name="currentPage.name"></component>
-            </keep-alive>
-        </v-ons-splitter-content>
+    <no-mode-translate-fade>
+        <ons-page v-if="!isAuth.auth">
+            <ons-toolbar>
+                <div class="center">Log In</div>
+                <div class="right"><v-ons-toolbar-button @click="changeAuth" >Close</v-ons-toolbar-button></div>
+            </ons-toolbar>
 
-    </v-ons-splitter>
+            <login-user></login-user>
+
+        </ons-page>
+        <v-ons-splitter v-else>
+            <v-ons-splitter-side
+                    swipeable
+                    collapse=""
+                    side="left"
+                    :open.sync="openSide.side"
+                    animation="reveal"
+            >
+                <v-ons-page>
+                    <v-ons-list>
+                        <v-ons-list-header>Default</v-ons-list-header>
+                        <v-ons-list-item v-for="(page, index) in pages"
+                                         :key="index"
+                                         tappable modifier="chevron"
+                                         @click="changeView(page)"
+                        >
+                            <div class="center">{{ page.name }}</div>
+                        </v-ons-list-item>
+                    </v-ons-list>
+                </v-ons-page>
+            </v-ons-splitter-side>
+            <v-ons-splitter-content>
+                <keep-alive :exclude="['plant-item-map-view']">
+                    <component :is="currentPage.url" :page-name="currentPage.name"></component>
+                </keep-alive>
+            </v-ons-splitter-content>
+
+        </v-ons-splitter>
+    </no-mode-translate-fade>
+
 </template>
 <style scoped>
 
@@ -120,14 +132,14 @@
 
 </style>
 <script>
-    import {currentPageSwitcher, currentPage, PlantNavigator, SWIPE_SIDE, change_view, getUserLocation} from './Ajax/getData'
+    import {currentPageSwitcher, currentPage, PlantNavigator, SWIPE_SIDE, change_view, getUserLocation, isAuth, toggleAuth} from './Ajax/getData'
     export default {
         components: {
             'plant-navigator': PlantNavigator
         },
         data(){
             return {
-
+                isAuth,
                 currentPage: currentPage,
                 pages: [
                     {
@@ -160,6 +172,9 @@
             }
         },
         methods: {
+            changeAuth(){
+                toggleAuth()
+            },
             onSuccess (position) {
                 var vm = this
                 getUserLocation(position.coords)
