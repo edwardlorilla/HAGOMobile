@@ -34,13 +34,13 @@ export function onLocationFound(e) {
 export var nearest = {
     marker: false
 }
-export function isNearestMarkerSort(){
+export function isNearestMarkerSort() {
     nearest.marker = !nearest.marker
 }
 export function plantSelected() {
     new Promise((resolve, reject) => {
         var plantPosition = new L.LatLng(PlantInfo.latitude, PlantInfo.longitude),
-            photo = !_.isEmpty(PlantInfo.photos[0]) ? PlantInfo.photos[0].file : null
+        photo = !_.isEmpty(PlantInfo.photos[0]) ? PlantInfo.photos[0].file : null
         var plantMarker = L.marker(plantPosition)
             .bindPopup(
                 '<div style="z-index: 402; max-width: 80vw; ">' +
@@ -49,17 +49,17 @@ export function plantSelected() {
                 "</div>"
             )
         markerClusters.addLayer(plantMarker);
-        markers.push(plantMarker);
-        map.addLayer(markerClusters)
+    markers.push(plantMarker);
+    map.addLayer(markerClusters)
 
 
-        if (!plantMarker._icon) {
-            plantMarker.__parent.spiderfy();
-        }
+    if (!plantMarker._icon) {
+        plantMarker.__parent.spiderfy();
+    }
 
-        plantMarker.openPopup();
-        resolve()
-    })
+    plantMarker.openPopup();
+    resolve()
+})
 }
 export var tileSet = {
     all: [
@@ -152,11 +152,11 @@ export var currentPage = {
 }
 export function currentPageSwitcher(url, name) {
     new Promise((resolve, reject) => {
-        resolve(
-            currentPage.url = url,
-            currentPage.name = name
-        );
-    })
+        resolve(currentPage.url = url,
+        currentPage.name = name
+)
+    ;
+})
 
 }
 
@@ -189,7 +189,7 @@ export var StackItem = {
 export function PlantIndex(id) {
     var plant = _.findIndex(plantItem.all, {id: id});
     PlantFound.index = plantItem.all[plant];
-    PlantInfo=plantItem.all[plant];
+    PlantInfo = plantItem.all[plant];
 }
 export const PlantFound = {
     index: null
@@ -211,27 +211,36 @@ export var listView = {
 export var isAuth = {
     auth: window.authUser
 }
-export function toggleAuth(){
+export function toggleAuth() {
     isAuth.auth = !isAuth.auth
 }
-export function toggleView(){
+export function toggleView() {
     listView.view = !listView.view
 }
 export function setResults(result) {
     return new Promise((resolve, reject) => {
-        var sortNearest = _.sortBy(result, [function(o) { return userLocation.latitude && userLocation.longitude && nearest.marker ?  gps_distance(userLocation.latitude, userLocation.longitude, o.latitude,o.longitude) : o }]);
-        resolve(  getResults.all = sortNearest || result);
-    })
+            var sortNearest = _.sortBy(result, [function (o) {
+                return userLocation.latitude && userLocation.longitude && nearest.marker ? gps_distance(userLocation.latitude, userLocation.longitude, o.latitude, o.longitude) : o
+            }]);
+    resolve(getResults.all = sortNearest || result);
+})
 }
 
 
+export var isDisable =  {
+    state: false
+}
 
-export function cameraInfo(event){
-    if(event.type == 'change'){
+export function changeDisable(change){
+    isDisable.state = change
+}
+
+export function cameraInfo(event) {
+    if (event.type == 'change') {
         return new Promise((resolve, reject) => {
-            resolve( capturePhoto = event);
+                resolve(capturePhoto = event);
     })
-    }else{
+    } else {
         event.target.value = null
     }
 }
@@ -239,30 +248,30 @@ export var capturePhoto = null
 export var getResults = {
     all: null
 }
-export function cnvrtRGBClrToHex(rgbClr){
+export function cnvrtRGBClrToHex(rgbClr) {
     var rgbClr = rgbClr.split(',');
     var r = rgbClr[0];
     var g = rgbClr[1];
     var b = rgbClr[2];
     return (r << 16 | g << 8 | b).toString(16).toUpperCase()
 }
-export function hexColorDelta(hex1, hex2){
+export function hexColorDelta(hex1, hex2) {
     var r1 = parseInt(hex1.substring(0, 2), 16);
     var g1 = parseInt(hex1.substring(2, 4), 16);
     var b1 = parseInt(hex1.substring(4, 6), 16);
-    // get red/green/blue int values of hex2
+// get red/green/blue int values of hex2
     var r2 = parseInt(hex2.substring(0, 2), 16);
     var g2 = parseInt(hex2.substring(2, 4), 16);
     var b2 = parseInt(hex2.substring(4, 6), 16);
-    // calculate differences between reds, greens and blues
+// calculate differences between reds, greens and blues
     var r = 255 - Math.abs(r1 - r2);
     var g = 255 - Math.abs(g1 - g2);
     var b = 255 - Math.abs(b1 - b2);
-    // limit differences between 0 and 1
+// limit differences between 0 and 1
     r /= 255;
     g /= 255;
     b /= 255;
-    // 0 means opposit colors, 1 means same colors
+// 0 means opposit colors, 1 means same colors
     return (r + g + b) / 3;
 }
 export function get() {
@@ -290,13 +299,13 @@ export function getData() {
     })
 }
 
-export function FormDataPost(file, payload, latitude, longitude,altitude, title, description, similarPlant) {
+export function FormDataPost(file, payload, latitude, longitude, altitude, title, description, similarPlant) {
     var url = '/api/repository'
     if (typeof url !== 'string') {
         throw new TypeError(`Expected a string, got ${typeof url}`);
     }
 
-    // You can add checks to ensure the url is valid, if you wish
+// You can add checks to ensure the url is valid, if you wish
 
     const formData = new FormData();
     formData.append('photos', file);
@@ -340,11 +349,11 @@ export function change_view() {
 const LoadingComponent = {
     name: 'loading-component',
     template: `
-                <div class="pulse">
-                  <span></span>
-                  H
-                </div>
-    `,
+            <div class="pulse">
+              <span></span>
+              H
+            </div>
+`,
 }
 
 export var userLocation = {
@@ -357,15 +366,20 @@ export function getUserLocation(position) {
     userLocation.longitude = position.longitude
 }
 
-export const PlantNavigator = () => ({
+export const PlantNavigator = () =>
+({
     component: new Promise((resolve, reject) => {
         setTimeout(() => {
-            require(['./../View/PlantNavigator.vue'], resolve)
-        }, 2000)
-    }),
-    loading: LoadingComponent,
-    error: ErrorComponent,
-    delay: 1
+    require(['./../View/PlantNavigator.vue'], resolve)
+}, 2000)
+}),
+loading: LoadingComponent,
+    error
+:
+ErrorComponent,
+    delay
+:
+1
 })
 
 

@@ -1,11 +1,12 @@
 <template>
     <no-mode-translate-fade>
         <ons-page v-if="!isAuth.auth">
+
             <ons-toolbar>
                 <div class="center">Log In</div>
                 <div class="right"><v-ons-toolbar-button @click="changeAuth" >Close</v-ons-toolbar-button></div>
             </ons-toolbar>
-
+            <v-ons-progress-bar v-show="isDisable.state" indeterminate></v-ons-progress-bar>
             <login-user></login-user>
 
         </ons-page>
@@ -132,13 +133,14 @@
 
 </style>
 <script>
-    import {currentPageSwitcher, currentPage, PlantNavigator, SWIPE_SIDE, change_view, getUserLocation, isAuth, toggleAuth} from './Ajax/getData'
+    import {isDisable, currentPageSwitcher, currentPage, PlantNavigator, SWIPE_SIDE, change_view, getUserLocation, isAuth, toggleAuth} from './Ajax/getData'
     export default {
         components: {
             'plant-navigator': PlantNavigator
         },
         data(){
             return {
+                isDisable,
                 isAuth,
                 currentPage: currentPage,
                 pages: [
