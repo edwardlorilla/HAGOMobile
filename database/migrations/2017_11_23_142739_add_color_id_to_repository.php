@@ -27,6 +27,7 @@ class AddColorIdToRepository extends Migration
     public function down()
     {
         Schema::table('repositories', function (Blueprint $table) {
+            $table->dropForeign('repositories_color_id_foreign');
             $table->dropColumn(['color_id']);
         });
     }

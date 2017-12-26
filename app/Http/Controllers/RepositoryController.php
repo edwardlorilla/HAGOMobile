@@ -15,10 +15,10 @@ class RepositoryController extends Controller
      */
     public function index()
     {
-        $repository = Repository::with('photos', 'color', 'repository')
+        $repositories = Repository::with('photos', 'color', 'repository')
                 ->orderBy('updated_at', 'desc')
                 ->get();
-        return response()->json($repository);
+        return response()->json($repositories);
     }
 
     /**

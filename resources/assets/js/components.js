@@ -3,6 +3,7 @@
  */
 window.Vue = require('vue');
 import Plant from  './components/View/Plant.vue'
+import MySighting  from  './components/View/MySighting.vue'
 import PlantItem from  './components/View/PlantItem.vue'
 import PlantItemMapView from  './components/View/PlantMapView.vue'
 import PlantItemNavigator from  './components/View/PlantItemNavigator.vue'
@@ -39,6 +40,11 @@ Vue.component('plant-item', function (resolve, reject) {
 Vue.component('view-map', function (resolve, reject) {
     setTimeout(function () {
         resolve(Map)
+    }, 100)
+});
+Vue.component('my-sightings', function (resolve, reject) {
+    setTimeout(function () {
+        resolve(MySighting)
     }, 100)
 });
 Vue.component('plant-item-navigator', function (resolve, reject) {

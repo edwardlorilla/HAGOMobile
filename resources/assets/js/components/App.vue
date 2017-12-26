@@ -1,7 +1,6 @@
 <template>
     <no-mode-translate-fade>
         <ons-page v-if="!isAuth.auth">
-
             <ons-toolbar>
                 <div class="center">Log In</div>
                 <div class="right"><v-ons-toolbar-button @click="changeAuth" >Close</v-ons-toolbar-button></div>
@@ -147,6 +146,9 @@
                     {
                         url: 'plant-navigator',
                         name: 'Repositories of Plants'
+                    },{
+                        url: 'my-sightings',
+                        name: 'My Sightings'
                     },
                     {
                         url: 'view-map',
@@ -156,6 +158,7 @@
                         url: 'view-settings',
                         name: 'Setting'
                     }
+
                 ],
                 openSide: SWIPE_SIDE,
                 userLocation: null,

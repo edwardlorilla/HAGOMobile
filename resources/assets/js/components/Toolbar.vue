@@ -4,9 +4,9 @@
             <v-ons-toolbar-button @click="changeView">
                 <v-ons-icon icon="ion-navicon, material:md-menu"></v-ons-icon>
             </v-ons-toolbar-button>
-            <v-ons-toolbar-button v-if="!isSearch" @click="isNearestMarkerSort"  >
+            <!--v-ons-toolbar-button v-if="!isSearch" @click="isNearestMarkerSort"  >
                 <v-ons-icon :style="{'color': nearest.marker ? 'red' : ''}" icon="fa-street-view"></v-ons-icon>
-            </v-ons-toolbar-button>
+            </v-ons-toolbar-button>-->
         </div>
         <div class="center" >
             <span v-if="!isSearch">{{title}}</span>
@@ -17,21 +17,26 @@
             <v-ons-toolbar-button v-if="search" @click="searchLocal">
                 <v-ons-icon icon="ion-search, material: md-search"></v-ons-icon>
             </v-ons-toolbar-button>
-            <v-ons-toolbar-button @click="grid" v-if="grid" >
-                <v-ons-icon :icon="isGrid.view ? 'ion-grid, material: md-apps' : 'ion-ios-list-outline, material: md-format-list-bulleted'"></v-ons-icon>
+            <v-ons-toolbar-button @click="showPopover($event, 'down', true)">
+                <v-ons-icon icon="md-more-vert"></v-ons-icon>
             </v-ons-toolbar-button>
+            <!--<v-ons-toolbar-button @click="grid" v-if="grid" >
+
+                <v-ons-icon :icon="isGrid.view ? 'ion-grid, material: md-apps' : 'ion-ios-list-outline, material: md-format-list-bulleted'"></v-ons-icon>
+            </v-ons-toolbar-button>-->
 
         </div>
     </v-ons-toolbar>
 </template>
 <script>
-    import {change_view, listView,isNearestMarkerSort, nearest} from './Ajax/getData'
+    import {change_view,} from './Ajax/getData'
     export default {
         model: {
             prop: 'my_prop',
             event: 'my_event'
         },
         props: {
+            showPopover: Function,
             modifier:{
                 default: true
             },
@@ -46,9 +51,7 @@
         },
         data(){
             return{
-                nearest,
-                isSearch: false,
-                isGrid: listView
+                isSearch: false
             }
         },
         methods: {
@@ -63,9 +66,6 @@
             send: function (v) {
                 this.$emit('my_event', v)
             },
-            isNearestMarkerSort(){
-                isNearestMarkerSort()
-            }
         }
     }
 </script>

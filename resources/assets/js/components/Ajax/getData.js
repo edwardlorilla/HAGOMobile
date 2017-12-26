@@ -36,6 +36,7 @@ export var nearest = {
 }
 export function isNearestMarkerSort() {
     nearest.marker = !nearest.marker
+    console.log(nearest.marker)
 }
 export function plantSelected() {
     new Promise((resolve, reject) => {
@@ -217,19 +218,38 @@ export function toggleAuth() {
 export function toggleView() {
     listView.view = !listView.view
 }
+export var mySighting = {
+    marker: 0
+}
+
+export function toggleMySighting(value){
+        console.log(value)
+        mySighting.marker = value
+
+}
+
 export function setResults(result) {
+        return new Promise((resolve, reject) => {
+    resolve(getResults.all = result);
+})
+}
+export function setSigthingResults(result) {
     return new Promise((resolve, reject) => {
             var sortNearest = _.sortBy(result, [function (o) {
                 return userLocation.latitude && userLocation.longitude && nearest.marker ? gps_distance(userLocation.latitude, userLocation.longitude, o.latitude, o.longitude) : o
             }]);
-    resolve(getResults.all = sortNearest || result);
-})
+        resolve(getResults.all = sortNearest);
+    })
 }
 
+export var getSigthingResults = {
+    all: null
+}
 
 export var isDisable =  {
     state: false
 }
+
 
 export function changeDisable(change){
     isDisable.state = change
@@ -298,6 +318,7 @@ export function getData() {
         plantItem.count = data.length
     })
 }
+
 
 export function FormDataPost(file, payload, latitude, longitude, altitude, title, description, similarPlant) {
     var url = '/api/repository'

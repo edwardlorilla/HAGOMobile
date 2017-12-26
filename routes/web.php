@@ -13,7 +13,7 @@
 
 
 Route::get('/', function () {
-    $auth = Auth::check();
+    $auth = auth()->user();
     return view('welcome', compact('auth'));
 })->where(['all' => '[\/\w\.-]*'])->name('home');
 Route::post('login', 'Auth\LoginController@login')->name('login');;

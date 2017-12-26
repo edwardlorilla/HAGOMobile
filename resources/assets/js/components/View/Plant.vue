@@ -1,14 +1,53 @@
 <template id="plant">
     <v-ons-page>
-        <custom-toolbar title="Repositories of Plants" v-model="searchQuery"
-                        :grid="isGrid"
-                        :search="isSearch"></custom-toolbar>
-
+        <custom-toolbar  :title="currentPage.name" v-model="searchQuery"
+                         :show-popover="showPopover"
+                         :search="isSearch"></custom-toolbar>
         <v-ons-progress-bar v-if="!getFuseList.list" indeterminate></v-ons-progress-bar>
-        <v-ons-list v-show="plantItem.count > 0">
+        <v-ons-popover cancelable
+                       :visible.sync="popoverVisible"
+                       :target="popoverTarget"
+                       :direction="popoverDirection"
+                       :cover-target="coverTarget"
+        >
+            <v-ons-list-title>Views</v-ons-list-title>
+            <ons-list>
+                <ons-list-item @click="isGrid">
+                    <label class="center" for="switch1">
+
+                        <v-ons-icon :icon="!listView.view ? 'ion-grid, material: md-apps' : 'ion-ios-list-outline, material: md-format-list-bulleted'"></v-ons-icon>
+                        {{ listView.view ? ' List View' : ' Grid View' }}
+                    </label>
+                    <div class="right">
+                        <v-ons-switch  input-id="switch1"
+                                       :disabled="!getSearchQuery.length > 0"
+                        >
+                        </v-ons-switch>
+                    </div>
+                </ons-list-item>
+                <ons-list-item @click="isNearestMarkerSort">
+                    <label class="center" for="switch1">
+
+                        <v-ons-icon icon="fa-street-view"></v-ons-icon>
+                        Sort Nearest
+                    </label>
+
+                    <div class="right">
+                        <v-ons-switch  input-id="switch1"
+                                       :disabled="!getSearchQuery.length > 0"
+                        >
+                        </v-ons-switch>
+                    </div>
+                </ons-list-item>
+
+            </ons-list>
+
+        </v-ons-popover>
+        <v-ons-list>
             <v-ons-lazy-repeat
-                    v-if="plantItem.count > 0"
+                    v-if="getFuseList.list"
                     :render-item="renderItem"
+                    :calculate-item-height="calculateItemHeight"
                     :length="getSearchQuery.length">
             </v-ons-lazy-repeat>
         </v-ons-list>
@@ -16,19 +55,25 @@
     </v-ons-page>
 </template>
 <script>
-    import {getData, plantItem, PlantItem, Push, setResults, getResults, toggleView, listView} from './../Ajax/getData'
+    import {isNearestMarkerSort, nearest, currentPage, mySighting, userLocation, getData, plantItem, PlantItem, Push, setResults, getResults, toggleView, listView, gps_distance} from './../Ajax/getData'
 
     export default{
         props: ['toggleMenu', 'pageName'],
         name: 'viewPlant',
         data(){
             return {
-                plantItem,
-                renderItem(i) {
+                nearest,
+                currentPage,
+                mySighting,
+                popoverVisible: false,
+                popoverTarget: null,
+                popoverDirection: 'up',
+                coverTarget: false,
+                plant: plantItem,
+                renderItem(i)  {
                     return new Vue({
                         template: `
                             <div v-if="plant.all[index]"  :key="index" >
-
                             <v-ons-list-item @click="getMapInfo(plant.all[index])"  v-if="listView.view">
                                 <v-ons-row  >
                                     <v-ons-col  width="95px">
@@ -38,7 +83,7 @@
                                     </v-ons-col>
                                     <v-ons-col>
                                       <div class="name">
-                                       {{plant.all[index].name}}
+                                       {{plant.all[index].title}}
                                       </div>
                                       <div class="location">
                                         <i class="fa fa-map-marker"></i>
@@ -75,7 +120,6 @@
                             }
                         },
                         computed: {
-
                             onOrientation(){
                                 return parseInt(this.windowWidth / 100)
                             },
@@ -102,7 +146,7 @@
                         }
                     });
                 },
-                keys: ['name'],
+                keys: ['title'],
                 isSearch: true,
                 isSearching: false,
                 results: [],
@@ -112,16 +156,10 @@
                 windowWidth:  window.innerWidth
             }
         },
-        beforeMount(){
-            plantItem
-        },
-        deactivated(){
-
-        },
         mounted(){
             var vm = this
-            getData()
             window.addEventListener('resize', this.handleWindowResize);
+            vm.getPlantRepository()
         },
         beforeDestroy: function () {
             window.removeEventListener('resize', this. handleWindowResize)
@@ -133,7 +171,8 @@
             getSearchQuery() {
                 var vm = this
                 if (vm.searchQuery.trim() === '') {
-                    setResults(vm.plantItem.all)
+
+                    setResults(vm.fuse.list)
                 }
                 else {
                     setResults(vm.getFuseList.search(vm.searchQuery.trim()))
@@ -151,23 +190,35 @@
                     minMatchCharLength: 1,
                     keys: vm.keys
                 };
-
-                vm.fuse = new Fuse(vm.plantItem.all, options);
-
+                var sortNearest = _.sortBy(vm.plant.all, [function(o) { return userLocation.latitude && userLocation.longitude  && vm.nearest.marker  ?  gps_distance(userLocation.latitude, userLocation.longitude, o.latitude,o.longitude) : o }]);
+                vm.fuse = new Fuse(sortNearest, options);
                 return vm.fuse
             },
 
         },
         watch: {},
         methods: {
-            handleWindowResize(event)
-            {
+            isNearestMarkerSort(){
+                isNearestMarkerSort()
+            },
+            showPopover(event, direction, coverTarget = false) {
+              this.popoverTarget = event;
+              this.popoverDirection = direction;
+              this.coverTarget = coverTarget;
+              this.popoverVisible = true;
+            },
+            calculateItemHeight(){
+                return 92;
+            },
+            handleWindowResize(event){
                 this.windowWidth = event.currentTarget.innerWidth;
+            },
+            getPlantRepository(){
+                getData()
             },
             isGrid(){
                 toggleView()
-            },
+            }
         }
     }
-
 </script>

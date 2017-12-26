@@ -140,7 +140,7 @@
                 totalPanY: 126.1817,
                 markers: [],
                 markerClusters: null,
-                selectedTileSet: 3,
+                selectedTileSet: '3',
                 userLocation: userLocation,
 
                 userMarker: null,
@@ -406,7 +406,8 @@
             setTileSet(selectedTileLayer){
                 var vm = this;
                 var basemap = null
-                var tile = this.tileSets.all[selectedTileLayer]
+                var tileLayer = _.parseInt(selectedTileLayer)
+                var tile = this.tileSets.all[tileLayer]
                 if (tile.name == 'OpenStreetMap') {
                     basemap = L.tileLayer(tile.tileLayer, {
                         attribution: tile.attribution

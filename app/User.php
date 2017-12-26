@@ -30,4 +30,9 @@ class User extends Authenticatable
     public function repositories(){
         return $this->hasMany(Repository::class);
     }
+
+    public function roles()
+    {
+        return $this->belongsToMany(Role::class);
+    }
 }

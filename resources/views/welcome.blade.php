@@ -6,9 +6,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
     <script type="text/javascript">
         window.authUser = {{$auth ? true : 'null'}};
+        window.currentUser = <?php echo json_encode(
+            $auth); ?>;
         window.Laravel = <?php echo json_encode([
             'csrfToken' => csrf_token(),
-        ]); ?>
+        ]); ?>;
     </script>
     <script type="text/javascript">
         /* window.Laravel = {csrfToken: '{{ csrf_token() }}'}

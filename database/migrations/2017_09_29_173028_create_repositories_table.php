@@ -17,6 +17,7 @@ class CreateRepositoriesTable extends Migration
             $table->increments('id');
             $table->integer('user_id')->unsigned()->index()->nullable();
             $table->integer('repository_id')->unsigned()->index()->nullable();
+            $table->boolean('published')->default(false);
             $table->string('title')->nullable();
             $table->text('description')->nullable();
             $table->string('scientificName')->nullable();
