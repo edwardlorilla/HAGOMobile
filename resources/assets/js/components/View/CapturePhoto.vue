@@ -215,7 +215,7 @@ export default{
 
       //vm.baseColor.push({name: 'vm.image', number: '', color.colors.split(','): hexArray})
       //post({name: 'vm.image', number: '', color.colors.split(','): hexArray})
-    FormDataPost( vm.urlFile,  hexArray,vm.location.latitude, vm.location.longitude, vm.location.altitude, vm.repositoryInfo.title, vm.repositoryInfo.description, vm.selectedPlant )
+    FormDataPost( vm.image,  hexArray,vm.location.latitude, vm.location.longitude, vm.location.altitude, vm.repositoryInfo.title, vm.repositoryInfo.description, vm.selectedPlant )
 
     },
      showPosition(position) {

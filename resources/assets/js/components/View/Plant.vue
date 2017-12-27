@@ -1,6 +1,6 @@
 <template id="plant">
     <v-ons-page>
-        <custom-toolbar  :title="currentPage.name" v-model="searchQuery"
+        <custom-toolbar  :title="viewUrls[toggleMySighting | parseInt ]" v-model="searchQuery"
                          :show-popover="showPopover"
                          :search="isSearch"></custom-toolbar>
         <v-ons-progress-bar v-if="!getFuseList.list" indeterminate></v-ons-progress-bar>
@@ -25,6 +25,19 @@
                         </v-ons-switch>
                     </div>
                 </ons-list-item>
+                <v-ons-list-item tappable v-for="(url, index) in viewUrls" :key="index">
+                    <label class="left">
+                        <v-ons-radio
+                                :input-id="'radio_' + index"
+                                :value="index"
+                                v-model="selectedMySighthing"
+                        >
+                        </v-ons-radio>
+                    </label>
+                    <label :for="'radio_' + index" class="center">
+                        {{url}}
+                    </label>
+                </v-ons-list-item>
                 <ons-list-item @click="isNearestMarkerSort">
                     <label class="center" for="switch1">
 
@@ -55,13 +68,15 @@
     </v-ons-page>
 </template>
 <script>
-    import {isNearestMarkerSort, nearest, currentPage, mySighting, userLocation, getData, plantItem, PlantItem, Push, setResults, getResults, toggleView, listView, gps_distance} from './../Ajax/getData'
+    import {toggleMySighting, isNearestMarkerSort, nearest, currentPage, mySighting, userLocation, getData, plantItem, PlantItem, Push, setResults, getResults, toggleView, listView, gps_distance} from './../Ajax/getData'
 
     export default{
-        props: ['toggleMenu', 'pageName'],
+        props: ['pageName'],
         name: 'viewPlant',
         data(){
             return {
+                viewUrls: ['Repositories of Plants', 'My Sighting'],
+                selectedMySighthing:'0',
                 nearest,
                 currentPage,
                 mySighting,
@@ -165,6 +180,11 @@
             window.removeEventListener('resize', this. handleWindowResize)
         },
         computed: {
+            toggleMySighting(){
+            var vm = this
+                toggleMySighting(vm.selectedMySighthing)
+                return vm.selectedMySighthing
+            },
             onOrientation(){
                 return parseInt(this.windowWidth / 100)
             },
@@ -190,11 +210,16 @@
                     minMatchCharLength: 1,
                     keys: vm.keys
                 };
-                var sortNearest = _.sortBy(vm.plant.all, [function(o) { return userLocation.latitude && userLocation.longitude  && vm.nearest.marker  ?  gps_distance(userLocation.latitude, userLocation.longitude, o.latitude,o.longitude) : o }]);
-                vm.fuse = new Fuse(sortNearest, options);
+
+                vm.fuse = new Fuse(vm.plant.all, options);
                 return vm.fuse
             },
 
+        },
+        filters:{
+            parseInt(value){
+                return _.parseInt(value)
+            }
         },
         watch: {},
         methods: {

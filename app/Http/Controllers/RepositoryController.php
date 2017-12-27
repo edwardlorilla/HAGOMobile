@@ -6,6 +6,7 @@ use App\Repository;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Image;
+
 class RepositoryController extends Controller
 {
     /**
@@ -16,8 +17,8 @@ class RepositoryController extends Controller
     public function index()
     {
         $repositories = Repository::with('photos', 'color', 'repository')
-                ->orderBy('updated_at', 'desc')
-                ->get();
+            ->orderBy('updated_at', 'desc')
+            ->get();
         return response()->json($repositories);
     }
 
@@ -39,12 +40,42 @@ class RepositoryController extends Controller
      */
     public function store(Request $request)
     {
-        $this->validate(request(), [
-            'colors' =>'required',
-            'photos' =>'required',
-        ]);
+        //dd($request->all());
+
+
         $user = \App\User::find(1);
         $photo = null;
+        $imageData = $request->photos;
+        $fileName = uniqid() . '.' . explode('/', explode(':', substr($imageData, 0, strpos($imageData, ';')))[1])[1];
+        $img = Image::make($request->photos);
+        $img->resize(60, 60, function ($constraint) {
+            $constraint->aspectRatio();
+        })->save(public_path('images/thumb_') . $fileName);
+        $img->save(public_path('images/') . $fileName);
+        $photo = \App\Photo::create(['file' => $fileName]);
+        $color = $request->colors ?  \App\Color::create([
+            'colors' => $request->colors
+        ]) : null;
+        $repositoryID = '';
+        if (!is_string((int)$request->repository_id)) {
+            $repositoryID = $request->repository_id;
+        }
+        $repository = new \App\Repository([
+            'title' => $request->title,
+            'description' => $request->description,
+            'latitude' => $request->latitude,
+            'altitude' => $request->altitude,
+            'longitude' => $request->longitude,
+            'color_id' => $color->id,
+            'repository_id' => $repositoryID === 'null' ? null : $repositoryID
+        ]);
+
+        $user->repositories()->save($repository)->photos()->attach($photo->id);
+        return response()->json(['fileName' => $fileName, 'error' => false]);
+
+        /*
+
+
         if ($files =$request->file('photos')) {
             $destinationPath = public_path('thumbnail/');
             if (!file_exists($destinationPath)) {
@@ -76,7 +107,7 @@ class RepositoryController extends Controller
         ]);
 
         $user->repositories()->save($repository)->photos()->attach($photo->id);
-        Cache::forget('repositories:all');
+        Cache::forget('repositories:all');*/
 //        die(var_dump($request->name));
 
         /* $this->validate($request, [

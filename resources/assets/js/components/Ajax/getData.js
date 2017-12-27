@@ -223,14 +223,18 @@ export var mySighting = {
 }
 
 export function toggleMySighting(value){
-        console.log(value)
-        mySighting.marker = value
+        //_.parseInt
+        var parseValue = _.parseInt(value)
+        mySighting.marker = parseValue
 
 }
 
 export function setResults(result) {
+    var filterResult;
         return new Promise((resolve, reject) => {
-    resolve(getResults.all = result);
+                var sortNearest = _.sortBy(result, [function(o) { return userLocation.latitude && userLocation.longitude  && nearest.marker  ?  gps_distance(userLocation.latitude, userLocation.longitude, o.latitude,o.longitude) : o }]);
+                filterResult = _.filter(sortNearest, [ 'published',   mySighting.marker ])
+    resolve(getResults.all = filterResult);
 })
 }
 export function setSigthingResults(result) {
@@ -238,6 +242,7 @@ export function setSigthingResults(result) {
             var sortNearest = _.sortBy(result, [function (o) {
                 return userLocation.latitude && userLocation.longitude && nearest.marker ? gps_distance(userLocation.latitude, userLocation.longitude, o.latitude, o.longitude) : o
             }]);
+
         resolve(getResults.all = sortNearest);
     })
 }
