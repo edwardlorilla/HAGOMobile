@@ -46,7 +46,8 @@
             getPhoto(){
                 var vm = this
                 var photo = vm.plantInfo.photos[0];
-                return photo ? photo.file : null
+                console.log(vm.plantInfo)
+                return photo ? 'images/' +photo.file : null
             }
         },
         methods: {

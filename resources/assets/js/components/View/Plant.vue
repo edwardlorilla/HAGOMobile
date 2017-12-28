@@ -3,7 +3,7 @@
         <custom-toolbar  :title="viewUrls[toggleMySighting | parseInt ]" v-model="searchQuery"
                          :show-popover="showPopover"
                          :search="isSearch"></custom-toolbar>
-        <v-ons-progress-bar v-if="!getFuseList.list" indeterminate></v-ons-progress-bar>
+        <v-ons-progress-bar v-if="!getSearchQuery.length > 0" indeterminate></v-ons-progress-bar>
         <v-ons-popover cancelable
                        :visible.sync="popoverVisible"
                        :target="popoverTarget"
@@ -11,7 +11,14 @@
                        :cover-target="coverTarget"
         >
             <v-ons-list-title>Views</v-ons-list-title>
+
             <ons-list>
+                <ons-list-item>
+                    <div class="center" @click="$emit('refresh')">
+                        Refresh
+                    </div>
+                </ons-list-item>
+
                 <ons-list-item @click="isGrid">
                     <label class="center" for="switch1">
 
@@ -131,7 +138,7 @@
                         },
                         filters: {
                             getGridPhoto(photo){
-                                return !_.isEmpty(photo[0]) ? 'thumbnail/' + photo[0].file : 'http://placekitten.com/g/40/40'
+                                return !_.isEmpty(photo[0].file) ? 'images/thumb_' + photo[0].file : (photo ? photo : null)
                             }
                         },
                         computed: {
@@ -141,7 +148,7 @@
                             getPhoto(){
                                 var vm = this
                                 var plant = vm.getItem[vm.index];
-                                return !_.isEmpty(plant.photos) ?  'thumbnail/' +plant.photos[0].file : 'http://placekitten.com/g/40/40'
+                                return !_.isEmpty(plant.photos[0].file) ?  'images/thumb_' +plant.photos[0].file :  plant.photos
                             },
                             getItem() {
                                 var vm = this
@@ -191,13 +198,12 @@
             getSearchQuery() {
                 var vm = this
                 if (vm.searchQuery.trim() === '') {
-
-                    setResults(vm.fuse.list)
+                    setResults(vm.getFuseList.list)
                 }
                 else {
                     setResults(vm.getFuseList.search(vm.searchQuery.trim()))
                 }
-                return listView.view ? getResults.all :  _.chunk(getResults.all, vm.onOrientation)
+                 return  listView.view ? getResults.all  :  _.chunk(getResults.all, vm.onOrientation)
             },
             getFuseList(){
                 var vm = this
@@ -221,7 +227,11 @@
                 return _.parseInt(value)
             }
         },
-        watch: {},
+        watch: {
+            searchQuery(){
+
+            }
+        },
         methods: {
             isNearestMarkerSort(){
                 isNearestMarkerSort()

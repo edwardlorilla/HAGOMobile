@@ -124,7 +124,7 @@ display: flex;
 
 </style>
 <script>
-import {currentPage, capturePhoto, cnvrtRGBClrToHex, hexColorDelta, cameraInfo, FormDataPost,urltoFile, plantItem} from './../Ajax/getData'
+import {plantPush, currentPage, capturePhoto, cnvrtRGBClrToHex, hexColorDelta, cameraInfo, FormDataPost,urltoFile, plantItem} from './../Ajax/getData'
 export default{
     data(){
         return {
@@ -212,9 +212,6 @@ export default{
       var vm = this,
           hexArray = vm.palletesConvertHex()
 
-
-      //vm.baseColor.push({name: 'vm.image', number: '', color.colors.split(','): hexArray})
-      //post({name: 'vm.image', number: '', color.colors.split(','): hexArray})
     FormDataPost( vm.image,  hexArray,vm.location.latitude, vm.location.longitude, vm.location.altitude, vm.repositoryInfo.title, vm.repositoryInfo.description, vm.selectedPlant )
 
     },
@@ -289,7 +286,6 @@ export default{
                 .groupBy('hexValue')
                 .toPairs()
                 .map(function(currentData){
-                    console.log(currentData)
                   currentData.push(currentData[1].length)
                   currentData.push(currentData[1][0].id)
                   currentData.push(currentData[1][0].photo)

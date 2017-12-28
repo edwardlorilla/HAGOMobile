@@ -48,18 +48,23 @@ class RepositoryController extends Controller
         $imageData = $request->photos;
         $fileName = uniqid() . '.' . explode('/', explode(':', substr($imageData, 0, strpos($imageData, ';')))[1])[1];
         $img = Image::make($request->photos);
+
+        $img->save(public_path('images/') . $fileName);
         $img->resize(60, 60, function ($constraint) {
             $constraint->aspectRatio();
         })->save(public_path('images/thumb_') . $fileName);
-        $img->save(public_path('images/') . $fileName);
         $photo = \App\Photo::create(['file' => $fileName]);
         $color = $request->colors ?  \App\Color::create([
             'colors' => $request->colors
         ]) : null;
         $repositoryID = '';
+        $repository_id = '';
         if (!is_string((int)$request->repository_id)) {
             $repositoryID = $request->repository_id;
+            $repository_id = \App\Repository::find($repositoryID);
         }
+
+        \App\User::find(1);
         $repository = new \App\Repository([
             'title' => $request->title,
             'description' => $request->description,
@@ -69,9 +74,27 @@ class RepositoryController extends Controller
             'color_id' => $color->id,
             'repository_id' => $repositoryID === 'null' ? null : $repositoryID
         ]);
-
         $user->repositories()->save($repository)->photos()->attach($photo->id);
-        return response()->json(['fileName' => $fileName, 'error' => false]);
+        return response()->json([
+            'id' => $repository->id,
+            'title' => $request->title,
+            'description' => $request->description,
+            'latitude' => $request->latitude,
+            'altitude' => $request->altitude,
+            'longitude' => $request->longitude,
+            'color_id' => $color->id,
+            'repository_id' => $repositoryID === 'null' ? null : $repositoryID,
+            'photos' => [
+                [
+                    'file' => $fileName
+                ]
+            ],
+            'color' => [
+                'colors' => $request->colors ? $request->colors : null
+            ],
+            "repository" => $repository_id
+
+        ]);
 
         /*
 
