@@ -12,10 +12,10 @@
 */
 
 
-Route::get('/', function () {
-    $auth = auth()->user();
-    return view('welcome', compact('auth'));
-})->where(['all' => '[\/\w\.-]*'])->name('home');
-Route::post('login', 'Auth\LoginController@login')->name('login');;
-Route::post('logout', 'Auth\LoginController@logout')->name('logout');
+Route::any('/{all?}', function () {
+
+    return view('welcome');
+})->where(['all' => '.*']);
+/*Route::post('login', 'Auth\LoginController@login')->name('login');;
+Route::post('logout', 'Auth\LoginController@logout')->name('logout');*/
 

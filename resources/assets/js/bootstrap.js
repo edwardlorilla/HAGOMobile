@@ -1,4 +1,13 @@
-
+var config = {
+    apiKey: "AIzaSyA11mrE7kp2bUQ_36_qgLSfQ1_iLmO58nw",
+    authDomain: "repositories-d0a35.firebaseapp.com",
+    databaseURL: "https://repositories-d0a35.firebaseio.com",
+    projectId: "repositories-d0a35",
+    storageBucket: "repositories-d0a35.appspot.com",
+    messagingSenderId: "258477361482"
+};
+firebase.initializeApp(config);
+window.firebase = firebase
 window._ = require('lodash');
 
 window.Fuse =  require('fuse.js');
@@ -25,6 +34,11 @@ if (token) {
     window.axios.defaults.headers.common['X-CSRF-TOKEN'] = token.content;
 } else {
     console.error('CSRF token not found: https://laravel.com/docs/csrf#csrf-x-csrf-token');
+}
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function () {
+        navigator.serviceWorker.register('/sw.js')
+    })
 }
 /*window.axios.defaults.headers.common = {
     'Accept': 'application/json',

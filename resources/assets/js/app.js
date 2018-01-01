@@ -5,8 +5,8 @@
  * building robust, powerful web applications using Vue and Laravel.
  */
 
-require('./bootstrap');
 
+require('./bootstrap');
 window.Vue = require('vue');
 
 /**
@@ -18,9 +18,43 @@ window.Vue = require('vue');
 
 import VueOnsen from 'vue-onsenui'; // This already imports 'onsenui'
 import App from './components/App.vue';
+import loginForm from './components/View/Login.vue';
+import AppView from './components/AppView.vue';
 import components from './components'
 import VueRecyclerviewNew from 'vue-recyclerview'
+import VueRouter from 'vue-router'
+
+Vue.use(VueRouter)
 Vue.use(VueRecyclerviewNew)
 Vue.use(VueOnsen);
+const router = new VueRouter({
+    mode: 'history',
+    routes: [
+        { path: '/login', component:   loginForm,
+            beforeEnter:(function(to, from, next){
+                firebase.auth().onAuthStateChanged(function(user) {
+                    if (user) {
+                        next('/')
+                    } else {
+                        next()
+                    }
+                });
+            })
+        },
+        { path: '/', component:   App,
+            beforeEnter:(function(to, from, next){
+                firebase.auth().onAuthStateChanged(function(user) {
+                    if (user) {
+                        next()
+                    } else {
+                        next('/login')
+                    }
+                });
+            })
+        },
 
-new Vue(Vue.util.extend(App)).$mount('#app');
+    ]
+})
+new Vue(Vue.util.extend({router, mounted(){
+
+}},AppView)).$mount('#app');

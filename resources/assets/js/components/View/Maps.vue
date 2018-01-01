@@ -51,7 +51,7 @@
             <div class="center-textbox">
                 <search-result-scope v-if="isArray"
                                      :style="{'margin-top': $ons.platform.isAndroidPhone() ? 5 + 'px' : 50 + 'px'}">
-                    <v-ons-list-item v-for="(search, index) in resultItem" :key="index" @click="onResult(search)">
+                        <v-ons-list-item v-for="(search, index) in resultItem" :key="index" @click="onResult(search)">
                         <div class="left">
                             <img style="object-fit: cover;" class="list-item__thumbnail" :src="search.photos | getPhoto">
                         </div>
@@ -109,7 +109,7 @@
     export default{
         filters:{
             getPhoto(photo){
-                return !_.isEmpty(photo) ? photo[0].file : 'http://placekitten.com/g/40/40'
+                return !_.isEmpty(photo) ? 'images/thumb_' + photo[0].file : 'http://placekitten.com/g/40/40'
             }
         },
         props: {
@@ -122,7 +122,7 @@
             return {
                 openFabInfo: false,
                 visible: true,
-                keys: ['name'],
+                keys: ['title'],
                 fuse: '',
                 searchQuery: '',
 
@@ -195,10 +195,10 @@
             },
             resultItem(){
                 var vm = this
-                if (this.searchQuery.trim() === '')
+                if (vm.searchQuery.trim() === '')
                     return null
                 else
-                    return this.fuse.search(this.searchQuery.trim()).splice(0, 3)
+                    return vm.fuse.search(vm.searchQuery.trim()).splice(0, 3)
             },
             getLocation(){
                 return _.uniqWith(this.coords, _.isEqual)
@@ -439,7 +439,7 @@
                     var floraLocation = new L.LatLng(position.lat, position.lng) || null;
                     var userDistance = floraLocation ? vm.createPolyLine(floraLocation, vm.userLocation) : null;
                     vm.map.setView(position, 15);
-                    vm.markers[id]._popup._content = '<div style="z-index: 402; max-width: 80vw;"><h2>' + itemObject.name + '</h2>' + userDistance + itemObject.content + '<img style="width: 100%;" src="' + itemObject.image + '" /> ' + '</div>' || null
+                    vm.markers[id]._popup._content = '<div style="z-index: 402; max-width: 80vw;"><h2>' + itemObject.title + '</h2>' + userDistance + itemObject.content + '<img style="width: 100%;" src="images/' + itemObject.image + '" /> ' + '</div>' || null
 
 
                     if (!marker._icon) marker.__parent.spiderfy();
@@ -461,12 +461,12 @@
                     vm.userLocation ? userDistance = vm.createPolyLine(floralocation, vm.userLocation) : null;
                     var markerX = L.marker([val.latitude, val.longitude], {
                         id: val.id,
-                        title: "marker_" + i,
-                        name: val.name,
+                        title: val.title,
+                        name: val.title,
                         content: val.description,
                         image: photo,
                         closeOnClick: true
-                    }).bindPopup('<div style="z-index: 402; max-width: 80vw; "><h2>' + val.name  + '</h2>' + userDistance  + val.description + '<img style="width: 100%;" src="' + photo + '"/>' + "</div>");
+                    }).bindPopup('<div style="z-index: 402; max-width: 80vw; "><h2>' + val.title  + '</h2>' + userDistance  + val.description + '<img style="width: 100%;" src="images/' + photo + '"/>' + "</div>");
                     markerX._id = val.id
                     vm.markerClusters.addLayer(markerX);
                     vm.markers.push(markerX);

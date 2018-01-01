@@ -2,10 +2,12 @@
  * Created by Lorilla on 30/09/2017.
  */
 
+
 export var map = null
 export var markerClusters = null
 export var markers = []
 export var userMarker = null
+
 export function onLocationFound(e) {
     var radius = e.accuracy / 2;
     var userIcon = L.icon({
@@ -36,7 +38,6 @@ export var nearest = {
 }
 export function isNearestMarkerSort() {
     nearest.marker = !nearest.marker
-    console.log(nearest.marker)
 }
 export function plantSelected() {
     new Promise((resolve, reject) => {
@@ -152,6 +153,11 @@ export var currentPage = {
     name: 'Repositories of Plants'
 }
 export function currentPageSwitcher(url, name) {
+    if (name === 'My Sightings') {
+        toggleMySighting('0')
+    } else if (name === 'Repositories of Plants') {
+        toggleMySighting('1')
+    }
     new Promise((resolve, reject) => {
         resolve(currentPage.url = url,
         currentPage.name = name
@@ -160,33 +166,27 @@ export function currentPageSwitcher(url, name) {
 })
 
 }
-
 export var popUp = {
     popoverVisible: false,
     popoverTarget: null,
     popoverDirection: 'up',
     coverTarget: false
 }
-
 export function showPopover(event, direction, coverTarget = false) {
     popUp.popoverTarget = event;
     popUp.popoverDirection = direction;
     popUp.coverTarget = coverTarget;
     popUp.popoverVisible = true;
 }
-
 export var Stack = {
     page: ['view-plant']
 }
-
 export function Push(page) {
     Stack.page.push(page)
 }
-
 export var StackItem = {
     page: ['plant-item']
 }
-
 export function PlantIndex(id) {
     var plant = _.findIndex(plantItem.all, {id: id});
     PlantFound.index = plantItem.all[plant];
@@ -219,21 +219,23 @@ export function toggleView() {
     listView.view = !listView.view
 }
 export var mySighting = {
-    marker: 0
+    marker: 1
 }
 
-export function toggleMySighting(value){
-        //_.parseInt
-        var parseValue = _.parseInt(value)
-        mySighting.marker = parseValue
+export function toggleMySighting(value) {
+    //_.parseInt
+    var parseValue = _.parseInt(value)
+    return mySighting.marker = parseValue
 
 }
 
 export function setResults(result) {
     var filterResult;
-        return new Promise((resolve, reject) => {
-                var sortNearest = _.sortBy(result, [function(o) { return userLocation.latitude && userLocation.longitude  && nearest.marker  ?  gps_distance(userLocation.latitude, userLocation.longitude, o.latitude,o.longitude) : o }]);
-                filterResult = _.filter(sortNearest, [ 'published',   mySighting.marker ])
+    return new Promise((resolve, reject) => {
+            var sortNearest = _.sortBy(result, [function (o) {
+                return userLocation.latitude && userLocation.longitude && nearest.marker ? gps_distance(userLocation.latitude, userLocation.longitude, o.latitude, o.longitude) : o
+            }]);
+    filterResult = _.filter(sortNearest, ['published', mySighting.marker])
     resolve(getResults.all = filterResult);
 })
 }
@@ -243,20 +245,20 @@ export function setSigthingResults(result) {
                 return userLocation.latitude && userLocation.longitude && nearest.marker ? gps_distance(userLocation.latitude, userLocation.longitude, o.latitude, o.longitude) : o
             }]);
 
-        resolve(getResults.all = sortNearest);
-    })
+    resolve(getResults.all = sortNearest);
+})
 }
 
 export var getSigthingResults = {
     all: null
 }
 
-export var isDisable =  {
+export var isDisable = {
     state: false
 }
 
 
-export function changeDisable(change){
+export function changeDisable(change) {
     isDisable.state = change
 }
 
@@ -271,7 +273,7 @@ export function cameraInfo(event) {
 }
 export var capturePhoto = null
 export var getResults = {
-    all: null
+    all: []
 }
 export function cnvrtRGBClrToHex(rgbClr) {
     var rgbClr = rgbClr.split(',');
@@ -299,80 +301,128 @@ export function hexColorDelta(hex1, hex2) {
 // 0 means opposit colors, 1 means same colors
     return (r + g + b) / 3;
 }
+
+
+
+export var networkDataReceived = false;
 export function get() {
     /*var spreadsheetID = '1Y2UtYW0Wl4QSTW_TYJiYgFIgrltmixecV9en0WhuUSc';
      var worksheetID = 'od6';
      var url = 'https://spreadsheets.google.com/feeds/list/' + spreadsheetID + '/' + worksheetID + '/public/values?alt=json';*/
-    var url = '/api/repository'
-    return axios({
-        method: 'GET',
-        url: url
-    })
+    var user = firebase.auth().currentUser;
+    var url = `/api/repository/${user.uid}`;
+
+    return axios.get(url)
 }
+
 
 export function getData() {
-    var url = '/api/repository'
-    return axios({
-        method: 'GET',
-        url: url
-    }).then(function (response) {
-
+    return get()
+        .then(function (response) {
+        networkDataReceived = true
         var data = response.data
-        plantItem.all = data
-        getResults.all = data
-        plantItem.count = data.length
+        allRepositories = data
+        plantItem.all = allRepositories
+        getResults.all = allRepositories
+        plantItem.count = allRepositories.length
     })
 }
-
+if ('indexedDB' in window) {
+    readAllData('posts')
+        .then(function(data) {
+            if (!networkDataReceived) {
+                console.log('indexed')
+                allRepositories = data
+                plantItem.all = allRepositories
+                getResults.all = allRepositories
+                plantItem.count = allRepositories.length
+            }
+        });
+}
 
 export function FormDataPost(file, payload, latitude, longitude, altitude, title, description, similarPlant) {
-    var url = '/api/repository'
+    var url = '/api/repository';
+    var user = firebase.auth().currentUser ;
     if (typeof url !== 'string') {
         throw new TypeError(`Expected a string, got ${typeof url}`);
     }
 
 // You can add checks to ensure the url is valid, if you wish
 
-    const formData = new FormData();
-    formData.append('photos', file);
-    formData.append('latitude', latitude);
-    formData.append('colors', payload);
-    formData.append('longitude', longitude);
-    formData.append('altitude', _.isNull(altitude) ? 0 : altitude);
-    formData.append('title', title);
-    formData.append('repository_id', similarPlant);
-    formData.append('description', description);
-    const config = {
-        headers: {
-            'content-type': 'multipart/form-data'
-        }
-    };
-    return axios.post(url, formData, config).then(function (response) {
-        getData()
-    })
-    .catch(function (error) {
-        console.log(error);
-    });
+    if ('serviceWorker' in navigator && 'SyncManager' in window) {
+
+        navigator.serviceWorker.ready
+            .then(function (sw) {
+                var post = {
+                    firebase:user.uid,
+                    id: new Date().toISOString(),
+                    photos: file,
+                    latitude: latitude,
+                    colors: payload,
+                    longitude: longitude,
+                    altitude: _.isNull(altitude) ? 0 : altitude,
+                    title: title,
+                    repository_id: similarPlant,
+                    description: description
+                };
+                writeData('sync-posts', post)
+                    .then(function () {
+                        console.log('sync-new-posts')
+                        return sw.sync.register('sync-new-posts')
+                    })
+                    .catch(function (err) {
+                        console.log(err)
+                    })
+
+            });
+    } else {
+        console.log('sync');
+        const formData = new FormData();
+
+        formData.append('firebase', user.uid);
+        formData.append('photos', file);
+        formData.append('latitude', latitude);
+        formData.append('colors', payload);
+        formData.append('longitude', longitude);
+        formData.append('altitude', _.isNull(altitude) ? 0 : altitude);
+        formData.append('title', title);
+        formData.append('repository_id', similarPlant);
+        formData.append('description', description);
+        const config = {
+            headers: {
+                'content-type': 'multipart/form-data'
+            }
+        };
+        return axios.post(url, formData, config)
+            .then(function (response) {
+                getData()
+            })
+            .catch(function (error) {
+                console.log(error);
+            });
+    }
+
 };
-
-
+export var all = {
+    repositories: []
+}
 
 export function IDGenerator() {
 
     this.length = 8;
     this.timestamp = +new Date;
 
-    var _getRandomInt = function( min, max ) {
-        return Math.floor( Math.random() * ( max - min + 1 ) ) + min;
+    var _getRandomInt = function (min, max) {
+        return Math.floor(Math.random() * ( max - min + 1 )) + min;
     }
 
-    this.generate = function() {
+    this.generate = function () {
         var ts = this.timestamp.toString();
-        var parts = ts.split( "" ).reverse();
+        var parts = ts.split("").reverse();
         var id = "";
 
-        for( var i = 0; i < this.length; ++i ) {
-            var index = _getRandomInt( 0, parts.length - 1 );
+        for (var i = 0; i < this.length; ++i) {
+            var index = _getRandomInt(0, parts.length - 1);
             id += parts[index];
         }
 
@@ -405,10 +455,10 @@ export function change_view() {
 const LoadingComponent = {
     name: 'loading-component',
     template: `
-            <div class="pulse">
-              <span></span>
-              H
-            </div>
+        <div class="pulse">
+          <span></span>
+          H
+        </div>
 `,
 }
 
@@ -422,8 +472,7 @@ export function getUserLocation(position) {
     userLocation.longitude = position.longitude
 }
 
-export const PlantNavigator = () =>
-({
+export const PlantNavigator = () =>({
     component: new Promise((resolve, reject) => {
         setTimeout(() => {
     require(['./../View/PlantNavigator.vue'], resolve)

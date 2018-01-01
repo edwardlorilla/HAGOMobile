@@ -1,6 +1,6 @@
-<template id="plant">
+<template>
     <v-ons-page>
-        <custom-toolbar  :title="viewUrls[toggleMySighting | parseInt ]" v-model="searchQuery"
+        <custom-toolbar  :title="viewUrls[radioToggle]" v-model="searchQuery"
                          :show-popover="showPopover"
                          :search="isSearch"></custom-toolbar>
         <v-ons-progress-bar v-if="!getSearchQuery.length > 0" indeterminate></v-ons-progress-bar>
@@ -13,52 +13,62 @@
             <v-ons-list-title>Views</v-ons-list-title>
 
             <ons-list>
-                <ons-list-item>
-                    <div class="center" @click="$emit('refresh')">
-                        Refresh
-                    </div>
-                </ons-list-item>
 
-                <ons-list-item @click="isGrid">
-                    <label class="center" for="switch1">
-
-                        <v-ons-icon :icon="!listView.view ? 'ion-grid, material: md-apps' : 'ion-ios-list-outline, material: md-format-list-bulleted'"></v-ons-icon>
-                        {{ listView.view ? ' List View' : ' Grid View' }}
-                    </label>
-                    <div class="right">
-                        <v-ons-switch  input-id="switch1"
-                                       :disabled="!getSearchQuery.length > 0"
-                        >
-                        </v-ons-switch>
-                    </div>
-                </ons-list-item>
-                <v-ons-list-item tappable v-for="(url, index) in viewUrls" :key="index">
+                <!--<v-ons-list-item tappable>
                     <label class="left">
                         <v-ons-radio
-                                :input-id="'radio_' + index"
-                                :value="index"
-                                v-model="selectedMySighthing"
+                                input-id="radio_1"
+                                value="0"
+                                v-model="selectedView"
                         >
                         </v-ons-radio>
                     </label>
-                    <label :for="'radio_' + index" class="center">
-                        {{url}}
+                    <label for="radio_1" class="center">
+                        {{viewUrls[0]}}
                     </label>
                 </v-ons-list-item>
-                <ons-list-item @click="isNearestMarkerSort">
+                <v-ons-list-item tappable>
+                    <label class="left">
+                        <v-ons-radio
+                                input-id="radio_2"
+                                value="1"
+                                v-model="selectedView"
+                        >
+                        </v-ons-radio>
+                    </label>
+                    <label for="radio_2" class="center">
+                        {{viewUrls[1]}}
+                    </label>
+                </v-ons-list-item>-->
+                <v-ons-list-item>
                     <label class="center" for="switch1">
 
                         <v-ons-icon icon="fa-street-view"></v-ons-icon>
                         Sort Nearest
                     </label>
 
-                    <div class="right">
+                    <div class="right"  @click="isNearestMarkerSort">
                         <v-ons-switch  input-id="switch1"
                                        :disabled="!getSearchQuery.length > 0"
+                                       v-model="nearestMarker"
                         >
                         </v-ons-switch>
                     </div>
-                </ons-list-item>
+                </v-ons-list-item>
+                <v-ons-list-item >
+                    <label class="center" for="switch2">
+
+                        <v-ons-icon :icon="!listView.view ? 'ion-grid, material: md-apps' : 'ion-ios-list-outline, material: md-format-list-bulleted'"></v-ons-icon>
+                        {{ listView.view ? ' List View' : ' Grid View' }}
+                    </label>
+                    <div class="right" @click="isGrid">
+                        <v-ons-switch  input-id="switch2"
+                                       :disabled="!getSearchQuery.length > 0"
+                                       v-model="isView"
+                        >
+                        </v-ons-switch>
+                    </div>
+                </v-ons-list-item>
 
             </ons-list>
 
@@ -78,12 +88,12 @@
     import {toggleMySighting, isNearestMarkerSort, nearest, currentPage, mySighting, userLocation, getData, plantItem, PlantItem, Push, setResults, getResults, toggleView, listView, gps_distance} from './../Ajax/getData'
 
     export default{
-        props: ['pageName'],
-        name: 'viewPlant',
         data(){
             return {
-                viewUrls: ['Repositories of Plants', 'My Sighting'],
-                selectedMySighthing:'0',
+                nearestMarker: false,
+                isView: false,
+                selectedView: mySighting.marker.toString(),
+                viewUrls: ['My Sighting','Repositories of Plants'],
                 nearest,
                 currentPage,
                 mySighting,
@@ -138,7 +148,7 @@
                         },
                         filters: {
                             getGridPhoto(photo){
-                                return !_.isEmpty(photo[0].file) ? 'images/thumb_' + photo[0].file : (photo ? photo : null)
+                                return !_.isEmpty(photo) ? 'images/thumb_' + photo[0].file : (photo ? photo : null)
                             }
                         },
                         computed: {
@@ -148,7 +158,7 @@
                             getPhoto(){
                                 var vm = this
                                 var plant = vm.getItem[vm.index];
-                                return !_.isEmpty(plant.photos[0].file) ?  'images/thumb_' +plant.photos[0].file :  plant.photos
+                                return !_.isEmpty(plant.photos) ?  'images/thumb_' +plant.photos[0].file :  plant.photos
                             },
                             getItem() {
                                 var vm = this
@@ -187,10 +197,13 @@
             window.removeEventListener('resize', this. handleWindowResize)
         },
         computed: {
+            radioToggle(){
+                return mySighting.marker
+            },
             toggleMySighting(){
             var vm = this
-                toggleMySighting(vm.selectedMySighthing)
-                return vm.selectedMySighthing
+                toggleMySighting(vm.selectedView)
+                return vm.selectedView
             },
             onOrientation(){
                 return parseInt(this.windowWidth / 100)

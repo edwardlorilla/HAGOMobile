@@ -1,15 +1,7 @@
 <template>
-    <no-mode-translate-fade>
-        <ons-page v-if="!isAuth.auth">
-            <ons-toolbar>
-                <div class="center">Log In</div>
-                <div class="right"><v-ons-toolbar-button @click="changeAuth" >Close</v-ons-toolbar-button></div>
-            </ons-toolbar>
-            <v-ons-progress-bar v-show="isDisable.state" indeterminate></v-ons-progress-bar>
-            <login-user></login-user>
 
-        </ons-page>
-        <v-ons-splitter v-else>
+
+        <v-ons-splitter>
             <v-ons-splitter-side
                     swipeable
                     collapse=""
@@ -37,7 +29,6 @@
             </v-ons-splitter-content>
 
         </v-ons-splitter>
-    </no-mode-translate-fade>
 
 </template>
 <style scoped>
@@ -147,7 +138,7 @@
                         url: 'plant-navigator',
                         name: 'Repositories of Plants'
                     },{
-                        url: 'my-sightings',
+                        url: 'plant-navigator',
                         name: 'My Sightings'
                     },
                     {
@@ -175,6 +166,7 @@
             if ('geolocation' in navigator) {
                 navigator.geolocation.getCurrentPosition(vm.onSuccess, vm.onError, vm.positionOptions)
             }
+
         },
         methods: {
             changeAuth(){

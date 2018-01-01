@@ -1,7 +1,7 @@
 <template>
         <div class="center">
-            <span class="list-item__title">{{search ? search.name : ''}}</span><span
-                class="list-item__subtitle">On the Internet</span>
+            <span class="list-item__title">{{search ? search.title : ''}}</span><span
+                class="list-item__subtitle"></span>
         </div>
 </template>
 <style>

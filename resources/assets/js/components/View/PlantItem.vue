@@ -7,7 +7,7 @@
                     <v-ons-back-button>Back</v-ons-back-button>
                 </v-ons-toolbar-button>
             </div>
-            <div class="center">{{plantInfo.name}}</div>
+            <div class="center">{{plantInfo.title}}</div>
         </v-ons-toolbar>
 
         <v-ons-card>
