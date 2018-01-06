@@ -23,7 +23,8 @@ import AppView from './components/AppView.vue';
 import components from './components'
 import VueRecyclerviewNew from 'vue-recyclerview'
 import VueRouter from 'vue-router'
-
+import VueClazyLoad from 'vue-clazy-load';
+Vue.use(VueClazyLoad);
 Vue.use(VueRouter)
 Vue.use(VueRecyclerviewNew)
 Vue.use(VueOnsen);

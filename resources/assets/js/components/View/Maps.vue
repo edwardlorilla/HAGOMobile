@@ -107,6 +107,7 @@
     import {tileSet} from './TileSet'
     import {moreDetail, change_view, PlantFound, userLocation, plantItem, gps_distance, PlantIndex} from './../Ajax/getData'
     export default{
+        name: 'plant-item-map-view',
         filters:{
             getPhoto(photo){
                 return !_.isEmpty(photo) ? 'images/thumb_' + photo[0].file : 'http://placekitten.com/g/40/40'

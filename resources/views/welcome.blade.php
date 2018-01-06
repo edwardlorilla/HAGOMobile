@@ -24,6 +24,7 @@
 
 
     </script>
+    <script src="https://cdn.polyfill.io/v2/polyfill.min.js?features=IntersectionObserver"></script>
     <script src='https://www.gstatic.com/firebasejs/4.8.0/firebase.js'></script>
     <script src='https://cdnjs.cloudflare.com/ajax/libs/blueimp-md5/2.10.0/js/md5.js'></script>
     <script src="/js/promise.js"></script>

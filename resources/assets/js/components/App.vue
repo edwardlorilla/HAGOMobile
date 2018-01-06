@@ -23,7 +23,7 @@
                 </v-ons-page>
             </v-ons-splitter-side>
             <v-ons-splitter-content>
-                <keep-alive :exclude="['plant-item-map-view']">
+                <keep-alive :exclude="['plant-view']">
                     <component :is="currentPage.url" :page-name="currentPage.name"></component>
                 </keep-alive>
             </v-ons-splitter-content>

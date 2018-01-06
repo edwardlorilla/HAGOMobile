@@ -48,12 +48,15 @@ export default{
         },
         userLogin(){
             var vm = this
+
             if (vm.isFormValid()) {
+                changeDisable(true)
                 vm.errors = []
-                vm.isLoading = true
                 firebase.auth().signInWithEmailAndPassword(vm.loginUser.email, vm.loginUser.password).then(function (user) {
+                    changeDisable(false)
                     vm.$router.push('/')
                 }).catch(function (error) {
+                    changeDisable(false)
                     vm.errors.push(error.message)
                 })
             }

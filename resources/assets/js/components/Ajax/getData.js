@@ -184,6 +184,9 @@ export var Stack = {
 export function Push(page) {
     Stack.page.push(page)
 }
+export function Splice() {
+    Stack.page.pop();
+}
 export var StackItem = {
     page: ['plant-item']
 }
@@ -233,7 +236,7 @@ export function setResults(result) {
     var filterResult;
     return new Promise((resolve, reject) => {
             var sortNearest = _.sortBy(result, [function (o) {
-                return userLocation.latitude && userLocation.longitude && nearest.marker ? gps_distance(userLocation.latitude, userLocation.longitude, o.latitude, o.longitude) : o
+                return userLocation.latitude && userLocation.longitude && nearest.marker ? gps_distance(userLocation.latitude, userLocation.longitude, o.latitude, o.longitude) : o.updated_at
             }]);
     filterResult = _.filter(sortNearest, ['published', mySighting.marker])
     resolve(getResults.all = filterResult);
@@ -248,7 +251,14 @@ export function setSigthingResults(result) {
     resolve(getResults.all = sortNearest);
 })
 }
-
+export function setSimilar(color){
+    return new Promise(  function(resolve, reject) {
+        resolve(getSimilar.color = color)
+    } );
+}
+export var getSimilar = {
+    color:[]
+}
 export var getSigthingResults = {
     all: null
 }
@@ -315,29 +325,59 @@ export function get() {
     return axios.get(url)
 }
 
-
+export function readData(){
+    readAllData('sync-posts')
+        .then(function (data) {
+            if(data){
+                for (var dt of data) {
+                    fetch('/api/repository', {
+                        method: 'POST',
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            firebase: dt.firebase,
+                            id: dt.id,
+                            photos: dt.photos,
+                            latitude: dt.latitude,
+                            colors: dt.colors.toString(),
+                            longitude: dt.longitude,
+                            altitude: dt.altitude,
+                            title: dt.title,
+                            repository_id: dt.repository_id,
+                            description: dt.description
+                        })
+                    })
+                        .then(function (res) {
+                            return res.json()
+                        })
+                        .then(function(data){
+                            console.log(data)
+                            return writeData('posts', data)
+                        })
+                        .then(function(){
+                            deleteItemFromData('sync-posts', dt.id);
+                        })
+                        .catch(function (err) {
+                            console.log('Error while sending data', err);
+                        });
+                }
+            }
+        })
+}
 export function getData() {
     return get()
         .then(function (response) {
-        networkDataReceived = true
-        var data = response.data
-        allRepositories = data
-        plantItem.all = allRepositories
-        getResults.all = allRepositories
-        plantItem.count = allRepositories.length
-    })
-}
-if ('indexedDB' in window) {
-    readAllData('posts')
-        .then(function(data) {
-            if (!networkDataReceived) {
-                console.log('indexed')
-                allRepositories = data
-                plantItem.all = allRepositories
-                getResults.all = allRepositories
-                plantItem.count = allRepositories.length
-            }
-        });
+            networkDataReceived = true
+            var data = response.data
+            allRepositories = data
+            plantItem.all = allRepositories
+            getResults.all = allRepositories
+            plantItem.count = allRepositories.length
+            readData()
+        })
 }
 
 export function FormDataPost(file, payload, latitude, longitude, altitude, title, description, similarPlant) {
@@ -349,34 +389,6 @@ export function FormDataPost(file, payload, latitude, longitude, altitude, title
 
 // You can add checks to ensure the url is valid, if you wish
 
-    if ('serviceWorker' in navigator && 'SyncManager' in window) {
-
-        navigator.serviceWorker.ready
-            .then(function (sw) {
-                var post = {
-                    firebase:user.uid,
-                    id: new Date().toISOString(),
-                    photos: file,
-                    latitude: latitude,
-                    colors: payload,
-                    longitude: longitude,
-                    altitude: _.isNull(altitude) ? 0 : altitude,
-                    title: title,
-                    repository_id: similarPlant,
-                    description: description
-                };
-                writeData('sync-posts', post)
-                    .then(function () {
-                        console.log('sync-new-posts')
-                        return sw.sync.register('sync-new-posts')
-                    })
-                    .catch(function (err) {
-                        console.log(err)
-                    })
-
-            });
-    } else {
-        console.log('sync');
         const formData = new FormData();
 
         formData.append('firebase', user.uid);
@@ -393,16 +405,55 @@ export function FormDataPost(file, payload, latitude, longitude, altitude, title
                 'content-type': 'multipart/form-data'
             }
         };
+
         return axios.post(url, formData, config)
             .then(function (response) {
-                getData()
+                allRepositories = response.data
+                plantItem.all = allRepositories
+                getResults.all = allRepositories
+                plantItem.count = allRepositories.length
+                readData()
+                //getData();
+                var page = Stack.page
+                page.unshift('view-plant')
+                Stack.page.pop();
+
             })
             .catch(function (error) {
                 console.log(error);
-            });
-    }
+                var post = {
+                    firebase: user.uid,
+                    id: new Date().toISOString(),
+                    photos: file,
+                    latitude: latitude,
+                    colors: payload,
+                    longitude: longitude,
+                    altitude: _.isNull(altitude) ? 0 : altitude,
+                    title: title,
+                    repository_id: similarPlant,
+                    description: description
+                };
+                writeData('sync-posts', post)
+                    .then(function () {
 
-};
+                    })
+                    .catch(function (err) {
+                        console.log(err)
+                    })
+            });
+    };
+if ('indexedDB' in window) {
+    readAllData('posts')
+        .then(function(data) {
+            if (!networkDataReceived) {
+                console.log('indexed')
+                allRepositories = data
+                plantItem.all = allRepositories
+                getResults.all = allRepositories
+                plantItem.count = allRepositories.length
+            }
+        });
+}
 export var all = {
     repositories: []
 }

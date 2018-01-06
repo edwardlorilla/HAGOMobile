@@ -1,14 +1,14 @@
 webpackJsonp([0],{
 
-/***/ 123:
+/***/ 127:
 /***/ (function(module, exports, __webpack_require__) {
 
 var disposed = false
 var normalizeComponent = __webpack_require__(0)
 /* script */
-var __vue_script__ = __webpack_require__(124)
+var __vue_script__ = __webpack_require__(128)
 /* template */
-var __vue_template__ = __webpack_require__(125)
+var __vue_template__ = __webpack_require__(129)
 /* styles */
 var __vue_styles__ = null
 /* scopeId */
@@ -47,7 +47,7 @@ module.exports = Component.exports
 
 /***/ }),
 
-/***/ 124:
+/***/ 128:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -64,14 +64,14 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony default export */ __webpack_exports__["default"] = ({
     data: function data() {
         return {
-            stack: __WEBPACK_IMPORTED_MODULE_0__Ajax_getData__["i" /* Stack */]
+            stack: __WEBPACK_IMPORTED_MODULE_0__Ajax_getData__["j" /* Stack */]
         };
     }
 });
 
 /***/ }),
 
-/***/ 125:
+/***/ 129:
 /***/ (function(module, exports, __webpack_require__) {
 
 var render = function() {

@@ -39,22 +39,27 @@
                     <label for="radio_2" class="center">
                         {{viewUrls[1]}}
                     </label>
+                </v-ons-list-item>
+                <v-ons-list-item>
+                    <v-ons-button @click="$emit('refresh')">
+                        Refresh
+                    </v-ons-button>
                 </v-ons-list-item>-->
                 <v-ons-list-item>
-                    <label class="center" for="switch1">
+                <label class="center" for="switch1">
 
-                        <v-ons-icon icon="fa-street-view"></v-ons-icon>
-                        Sort Nearest
-                    </label>
+                    <v-ons-icon icon="fa-street-view"></v-ons-icon>
+                    Sort Nearest
+                </label>
 
-                    <div class="right"  @click="isNearestMarkerSort">
-                        <v-ons-switch  input-id="switch1"
-                                       :disabled="!getSearchQuery.length > 0"
-                                       v-model="nearestMarker"
-                        >
-                        </v-ons-switch>
-                    </div>
-                </v-ons-list-item>
+                <div class="right"  @click="isNearestMarkerSort">
+                    <v-ons-switch  input-id="switch1"
+                                   :disabled="!getSearchQuery.length > 0"
+                                   v-model="nearestMarker"
+                    >
+                    </v-ons-switch>
+                </div>
+            </v-ons-list-item>
                 <v-ons-list-item >
                     <label class="center" for="switch2">
 
@@ -73,7 +78,7 @@
             </ons-list>
 
         </v-ons-popover>
-        <v-ons-list>
+        <v-ons-list >
             <v-ons-lazy-repeat
                     v-if="getFuseList.list"
                     :render-item="renderItem"
@@ -88,6 +93,7 @@
     import {toggleMySighting, isNearestMarkerSort, nearest, currentPage, mySighting, userLocation, getData, plantItem, PlantItem, Push, setResults, getResults, toggleView, listView, gps_distance} from './../Ajax/getData'
 
     export default{
+        name: 'plant-view',
         data(){
             return {
                 nearestMarker: false,

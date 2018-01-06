@@ -12,8 +12,8 @@ var STATIC_FILES = [
     '/css/app.css',
     '/css/bundle.css',
 ]
-var CACHE_STATIC_NAME = 'static-v35';
-var CACHE_DYNAMIC_NAME = 'dynamic-v22';
+var CACHE_STATIC_NAME = 'static-v63';
+var CACHE_DYNAMIC_NAME = 'dynamic-v49';
 self.addEventListener('install', function (event) {
     console.log('[Service Worker] Installing Service Worker ...', event);
     event.waitUntil(
@@ -44,7 +44,6 @@ self.addEventListener('activate', function (event) {
 function isInArray(string, array) {
     var cachePath;
     if (string.indexOf(self.origin) === 0) { // request targets domain where we serve the page from (i.e. NOT a CDN)
-        console.log('matched ', string);
         cachePath = string.substring(self.origin.length); // take the part of the URL AFTER the domain (e.g. after localhost:8080)
     } else {
         cachePath = string; // store the full request (for CDNs)
@@ -74,7 +73,8 @@ self.addEventListener('fetch', function (event) {
                 return res;
             })
         );
-    } else if (isInArray(event.request.url, STATIC_FILES)) {
+    }
+    else if (isInArray(event.request.url, STATIC_FILES)) {
         event.respondWith(
             caches.match(event.request)
         );
@@ -140,31 +140,14 @@ self.addEventListener('sync', function (event) {
                             })
                         })
                             .then(function (res) {
-                                return res.json();
-
-                                /*if (res.ok) {
-
-                                 deleteItemFromData('sync-posts', dt.id); // Isn't working correctly!
-                                 fetch(requestedUrl)
-                                 .then(function(res) {
-                                 return res.json();
-                                 })
-                                 .then(function(data) {
-                                 var clonedRes = res;
-                                 clearAllData('posts')
-
-                                 .then(function () {
-                                 for (var key in res) {
-                                 writeData('posts', data[key])
-                                 }
-                                 });
-                                 });
-
-                                 }*/
+                                return res.json()
                             })
                             .then(function(data){
-                                writeData('posts', data)
-                                console.log( data)
+                                console.log(data)
+                                return writeData('posts', data)
+                            })
+                            .then(function(){
+                                deleteItemFromData('sync-posts', dt.id);
                             })
                             .catch(function (err) {
                                 console.log('Error while sending data', err);
