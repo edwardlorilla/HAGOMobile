@@ -367,6 +367,7 @@ export function readData(){
             }
         })
 }
+//
 export function getData() {
     return get()
         .then(function (response) {
