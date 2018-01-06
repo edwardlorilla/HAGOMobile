@@ -1,8 +1,8 @@
 <template>
     <v-ons-page>
-        <custom-toolbar  :title="viewUrls[radioToggle]" v-model="searchQuery"
-                         :show-popover="showPopover"
-                         :search="isSearch"></custom-toolbar>
+        <custom-toolbar :title="viewUrls[radioToggle]" v-model="searchQuery"
+                        :show-popover="showPopover"
+                        :search="isSearch"></custom-toolbar>
         <v-ons-progress-bar v-if="!getSearchQuery.length > 0" indeterminate></v-ons-progress-bar>
         <v-ons-popover cancelable
                        :visible.sync="popoverVisible"
@@ -13,63 +13,32 @@
             <v-ons-list-title>Views</v-ons-list-title>
 
             <ons-list>
+                <v-ons-list-item>
+                    <label class="center" for="switch1">
 
-                <!--<v-ons-list-item tappable>
-                    <label class="left">
-                        <v-ons-radio
-                                input-id="radio_1"
-                                value="0"
-                                v-model="selectedView"
+                        <v-ons-icon icon="fa-street-view"></v-ons-icon>
+                        Sort Nearest
+                    </label>
+
+                    <div class="right" @click="isNearestMarkerSort">
+                        <v-ons-switch input-id="switch1"
+                                      :disabled="!getSearchQuery.length > 0"
+                                      v-model="nearestMarker"
                         >
-                        </v-ons-radio>
-                    </label>
-                    <label for="radio_1" class="center">
-                        {{viewUrls[0]}}
-                    </label>
-                </v-ons-list-item>
-                <v-ons-list-item tappable>
-                    <label class="left">
-                        <v-ons-radio
-                                input-id="radio_2"
-                                value="1"
-                                v-model="selectedView"
-                        >
-                        </v-ons-radio>
-                    </label>
-                    <label for="radio_2" class="center">
-                        {{viewUrls[1]}}
-                    </label>
+                        </v-ons-switch>
+                    </div>
                 </v-ons-list-item>
                 <v-ons-list-item>
-                    <v-ons-button @click="$emit('refresh')">
-                        Refresh
-                    </v-ons-button>
-                </v-ons-list-item>-->
-                <v-ons-list-item>
-                <label class="center" for="switch1">
-
-                    <v-ons-icon icon="fa-street-view"></v-ons-icon>
-                    Sort Nearest
-                </label>
-
-                <div class="right"  @click="isNearestMarkerSort">
-                    <v-ons-switch  input-id="switch1"
-                                   :disabled="!getSearchQuery.length > 0"
-                                   v-model="nearestMarker"
-                    >
-                    </v-ons-switch>
-                </div>
-            </v-ons-list-item>
-                <v-ons-list-item >
                     <label class="center" for="switch2">
 
-                        <v-ons-icon :icon="!listView.view ? 'ion-grid, material: md-apps' : 'ion-ios-list-outline, material: md-format-list-bulleted'"></v-ons-icon>
+                        <v-ons-icon
+                                :icon="!listView.view ? 'ion-grid, material: md-apps' : 'ion-ios-list-outline, material: md-format-list-bulleted'"></v-ons-icon>
                         {{ listView.view ? ' List View' : ' Grid View' }}
                     </label>
                     <div class="right" @click="isGrid">
-                        <v-ons-switch  input-id="switch2"
-                                       :disabled="!getSearchQuery.length > 0"
-                                       v-model="isView"
+                        <v-ons-switch input-id="switch2"
+                                      :disabled="!getSearchQuery.length > 0"
+                                      v-model="isView"
                         >
                         </v-ons-switch>
                     </div>
@@ -78,7 +47,15 @@
             </ons-list>
 
         </v-ons-popover>
-        <v-ons-list >
+        <v-ons-pull-hook
+                :action="loadItem"
+                @changestate="state = $event.state"
+        >
+            <span v-show="state === 'initial'"> Pull to refresh </span>
+            <span v-show="state === 'preaction'"> Release </span>
+            <span v-show="state === 'action'"> Loading... </span>
+        </v-ons-pull-hook>
+        <v-ons-list>
             <v-ons-lazy-repeat
                     v-if="getFuseList.list"
                     :render-item="renderItem"
@@ -90,16 +67,33 @@
     </v-ons-page>
 </template>
 <script>
-    import {toggleMySighting, isNearestMarkerSort, nearest, currentPage, mySighting, userLocation, getData, plantItem, PlantItem, Push, setResults, getResults, toggleView, listView, gps_distance} from './../Ajax/getData'
+    import {
+            toggleMySighting,
+            isNearestMarkerSort,
+            nearest,
+            currentPage,
+            mySighting,
+            userLocation,
+            getData,
+            plantItem,
+            PlantItem,
+            Push,
+            setResults,
+            getResults,
+            toggleView,
+            listView,
+            gps_distance
+    } from './../Ajax/getData'
 
     export default{
         name: 'plant-view',
         data(){
             return {
+                state: 'initial',
                 nearestMarker: false,
                 isView: false,
                 selectedView: mySighting.marker.toString(),
-                viewUrls: ['My Sighting','Repositories of Plants'],
+                viewUrls: ['My Sighting', 'Repositories of Plants'],
                 nearest,
                 currentPage,
                 mySighting,
@@ -143,14 +137,14 @@
                                 index: i,
                                 plant: getResults,
                                 listView: listView,
-                                windowWidth:  window.innerWidth
+                                windowWidth: window.innerWidth
                             };
                         },
                         mounted(){
                             window.addEventListener('resize', this.handleWindowResize);
                         },
                         beforeDestroy: function () {
-                            window.removeEventListener('resize', this. handleWindowResize)
+                            window.removeEventListener('resize', this.handleWindowResize)
                         },
                         filters: {
                             getGridPhoto(photo){
@@ -164,11 +158,11 @@
                             getPhoto(){
                                 var vm = this
                                 var plant = vm.getItem[vm.index];
-                                return !_.isEmpty(plant.photos) ?  'images/thumb_' +plant.photos[0].file :  plant.photos
+                                return !_.isEmpty(plant.photos) ? 'images/thumb_' + plant.photos[0].file : plant.photos
                             },
                             getItem() {
                                 var vm = this
-                                return vm.listView.view ? vm.plant.all :  _.chunk(getResults.all, vm.onOrientation)
+                                return vm.listView.view ? vm.plant.all : _.chunk(getResults.all, vm.onOrientation)
                             }
                         },
                         methods: {
@@ -191,7 +185,7 @@
                 fuse: '',
                 searchQuery: '',
                 listView: listView,
-                windowWidth:  window.innerWidth
+                windowWidth: window.innerWidth
             }
         },
         mounted(){
@@ -200,14 +194,14 @@
             vm.getPlantRepository()
         },
         beforeDestroy: function () {
-            window.removeEventListener('resize', this. handleWindowResize)
+            window.removeEventListener('resize', this.handleWindowResize)
         },
         computed: {
             radioToggle(){
                 return mySighting.marker
             },
             toggleMySighting(){
-            var vm = this
+                var vm = this
                 toggleMySighting(vm.selectedView)
                 return vm.selectedView
             },
@@ -222,7 +216,7 @@
                 else {
                     setResults(vm.getFuseList.search(vm.searchQuery.trim()))
                 }
-                 return  listView.view ? getResults.all  :  _.chunk(getResults.all, vm.onOrientation)
+                return listView.view ? getResults.all : _.chunk(getResults.all, vm.onOrientation)
             },
             getFuseList(){
                 var vm = this
@@ -241,7 +235,7 @@
             },
 
         },
-        filters:{
+        filters: {
             parseInt(value){
                 return _.parseInt(value)
             }
@@ -252,14 +246,20 @@
             }
         },
         methods: {
+            loadItem(done) {
+                setTimeout(function () {
+                    getData()
+                    done();
+                }, 400);
+            },
             isNearestMarkerSort(){
                 isNearestMarkerSort()
             },
             showPopover(event, direction, coverTarget = false) {
-              this.popoverTarget = event;
-              this.popoverDirection = direction;
-              this.coverTarget = coverTarget;
-              this.popoverVisible = true;
+                this.popoverTarget = event;
+                this.popoverDirection = direction;
+                this.coverTarget = coverTarget;
+                this.popoverVisible = true;
             },
             calculateItemHeight(){
                 return 92;
