@@ -57,7 +57,7 @@
                         <v-ons-list-header>
                             Get nearest color
                         </v-ons-list-header>
-                        <virtual-list  v-if="showNearest" :size="40" :remain="8"  wtag="div">
+                        <virtual-list :size="40" :remain="8"  wtag="div">
                             <div v-for="(nearest,index, key) in getNearestColor" :key="index">
                                 <v-ons-list-item v-for="near in nearest" :key="index" tappable>
                                     <div class="left">
@@ -276,9 +276,6 @@
             if (capturePhoto) {
                 vm.onFileChange(capturePhoto)
             }
-            setTimeout(function(){
-                vm.showNearest = true
-            }, 3000);
             if ("geolocation" in navigator) {
                 /* geolocation is available */
                 vm.watchID = navigator.geolocation.watchPosition(function (position) {

@@ -236,7 +236,7 @@ export function setResults(result) {
     var filterResult;
     return new Promise((resolve, reject) => {
             var sortNearest = _.sortBy(result, [function (o) {
-                return userLocation.latitude && userLocation.longitude && nearest.marker ? gps_distance(userLocation.latitude, userLocation.longitude, o.latitude, o.longitude) : o.updated_at
+                return userLocation.latitude && userLocation.longitude && nearest.marker ? gps_distance(userLocation.latitude, userLocation.longitude, o.latitude, o.longitude) : o
             }]);
     filterResult = _.filter(sortNearest, ['published', mySighting.marker])
     resolve(getResults.all = filterResult);

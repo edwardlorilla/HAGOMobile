@@ -41,10 +41,8 @@ export default{
     methods: {
         isFormValid(){
             var vm = this
-            if (vm.loginUser.email.length > 0 && vm.loginUser.password.length > 0) {
-                return true
-            }
-            return false
+            return !!(vm.loginUser.email.length > 0 && vm.loginUser.password.length > 0);
+
         },
         userLogin(){
             var vm = this
