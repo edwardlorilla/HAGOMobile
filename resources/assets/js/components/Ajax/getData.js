@@ -2,7 +2,6 @@
  * Created by Lorilla on 30/09/2017.
  */
 
-
 export var map = null
 export var markerClusters = null
 export var markers = []
@@ -67,33 +66,33 @@ export var tileSet = {
     all: [
         {
             name: 'Streets ',
-            tileLayer: 'http://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}'
+            tileLayer: 'https://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}'
         },
         {
             name: 'Hybrid',
-            tileLayer: 'http://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}'
+            tileLayer: 'https://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}'
         },
         {
             name: 'Satellite',
-            tileLayer: 'http://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}'
+            tileLayer: 'https://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}'
         },
         {
             name: 'Terrain',
-            tileLayer: 'http://{s}.google.com/vt/lyrs=p&x={x}&y={y}&z={z}'
+            tileLayer: 'https://{s}.google.com/vt/lyrs=p&x={x}&y={y}&z={z}'
         },
         {
             name: 'Terrain Stamen',
-            tileLayer: 'http://tile.stamen.com/terrain/{z}/{x}/{y}.jpg'
+            tileLayer: 'https://tile.stamen.com/terrain/{z}/{x}/{y}.jpg'
         }, {
             name: 'OpenStreetMap',
-            tileLayer: 'http://{s}.tile.osm.org/{z}/{x}/{y}.png',
-            attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+            tileLayer: 'https://{s}.tile.osm.org/{z}/{x}/{y}.png',
+            attribution: '&copy; <a href="https://osm.org/copyright">OpenStreetMap</a> contributors'
         }
         // {
         //   name: 'Terrain Stamen',
-        //   mapquestLink :'<a href="http://www.mapquest.com//">MapQuest</a>',
-        //   mapquestPic : '<img src="http://developer.mapquest.com/content/osm/mq_logo.png">',
-        //   tileLayer: 'http://otile{s}.mqcdn.com/tiles/1.0.0/sat/{z}/{x}/{y}.png'
+        //   mapquestLink :'<a href="https://www.mapquest.com//">MapQuest</a>',
+        //   mapquestPic : '<img src="https://developer.mapquest.com/content/osm/mq_logo.png">',
+        //   tileLayer: 'https://otile{s}.mqcdn.com/tiles/1.0.0/sat/{z}/{x}/{y}.png'
         // }
     ]
 }
@@ -180,6 +179,18 @@ export function showPopover(event, direction, coverTarget = false) {
 }
 export var Stack = {
     page: ['view-plant']
+}
+export var Chat = {
+    page: ['chat-view']
+}
+export var chatInfo = {
+    detail: null
+}
+export function getChatInfo(chat){
+    chatInfo.detail = chat
+}
+export function ChatPush(page) {
+    Chat.page.push(page)
 }
 export function Push(page) {
     Stack.page.push(page)
@@ -321,7 +332,6 @@ export function get() {
      var url = 'https://spreadsheets.google.com/feeds/list/' + spreadsheetID + '/' + worksheetID + '/public/values?alt=json';*/
     var user = firebase.auth().currentUser;
     var url = `/api/repository/${user.uid}`;
-
     return axios.get(url)
 }
 
@@ -368,6 +378,20 @@ export function readData(){
         })
 }
 //
+
+export var users = {
+    chat: []
+}
+export function usersChat(user){
+    users.chat = user
+}
+
+export var user = {
+    detail: null
+}
+export function storeUserDetail(user){
+    return user.detail = user
+}
 export function getData() {
     return get()
         .then(function (response) {
@@ -380,7 +404,40 @@ export function getData() {
             readData()
         })
 }
+export function editRepositories(plantInfo){
+    var url = `/api/repository/${plantInfo.id}`;
+    var user = firebase.auth().currentUser;
+    if (typeof url !== 'string') {
+        throw new TypeError(`Expected a string, got ${typeof url}`);
+    }
+    var edit = {
+        firebase: user.uid,
+        title: plantInfo.title,
+        description: plantInfo.description
+    };
+    return axios.put(url, edit).then(function (response) {
+        var updateRepositories = response.data;
+        if ('indexedDB' in window) {
+            return update('posts', plantInfo)
+        }
+    }).then(function(){
+        getData()
+    }).catch(function (error) {
+        writeData('sync-update-posts', plantInfo)
+    });
 
+
+
+
+
+/*
+    return axios.put(url, edit)
+            .then(function (response) {
+                console.log('update')
+
+            })*/
+
+}
 export function FormDataPost(file, payload, latitude, longitude, altitude, title, description, similarPlant) {
     var url = '/api/repository';
     var user = firebase.auth().currentUser ;
@@ -414,11 +471,10 @@ export function FormDataPost(file, payload, latitude, longitude, altitude, title
                 getResults.all = allRepositories
                 plantItem.count = allRepositories.length
                 readData()
-                //getData();
-                var page = Stack.page
-                page.unshift('view-plant')
-                Stack.page.pop();
+                return Stack.page.pop();
 
+            }).then(function(){
+                getData()
             })
             .catch(function (error) {
                 console.log(error);
@@ -455,6 +511,7 @@ if ('indexedDB' in window) {
             }
         });
 }
+
 export var all = {
     repositories: []
 }
@@ -571,5 +628,30 @@ export function gps_distance(lat1, lon1, lat2, lon2) {
     var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
     var d = R * c;
     return d;
+}
+
+
+export var onHold = {
+    handler: false
+}
+export function onHoldFalse(){
+    onHold.handler = false
+}
+export function onHoldHandler(){
+    onHold.handler === true ? onHold.handler = false : onHold.handler = true
+}
+
+export function deletePlants(plants) {
+    var user = firebase.auth().currentUser;
+    for (var i = 0; i < plants.length; i++) {
+        deleteItemFromData('posts', plants[i])
+            .then(function(data) {
+                console.log(data)
+                axios.post(`/api/repository/${data}/${user.uid}`).then(function () {
+                    i == plants.length ? getData() : null
+                })
+            });
+    }
+
 }
 

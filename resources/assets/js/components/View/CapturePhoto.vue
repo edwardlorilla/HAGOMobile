@@ -77,8 +77,8 @@
                                                      :src="getPhoto(near.photo)">
                                             </transition>
                                             <transition name="fade" slot="placeholder">
-                                                <div slot="placeholder">
-                                                    Loading....
+                                                <div class="center" slot="placeholder">
+                                                    <v-ons-progress-circular indeterminate></v-ons-progress-circular>
                                                 </div>
                                             </transition>
                                         </clazy-load>
@@ -326,7 +326,7 @@
                         for (var j = 0; j < hexValue.length; j++) {
                             for (var i = 0; i < o.color.colors.split(',').length; i++) {
                                 hexColor = vm.hexColorDelta(hexValue[j], o.color.colors.split(',')[i]);
-                                if (hexColor > 0.95) {
+                                if (hexColor > 0.90) {
                                     hexArray.push({
                                         photo: !_.isEmpty(o.photos) ? o.photos[0] : null,
                                         id: o.id,

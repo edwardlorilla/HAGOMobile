@@ -40,6 +40,8 @@ if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('/sw.js')
     })
 }
+
+window.Store = require('./store.js');
 /*window.axios.defaults.headers.common = {
     'Accept': 'application/json',
     'Content-Type': 'application/json'

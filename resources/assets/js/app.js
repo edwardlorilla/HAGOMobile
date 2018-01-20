@@ -1,4 +1,3 @@
-
 /**
  * First we will load all of this project's JavaScript dependencies which
  * includes Vue and other libraries. It is a great starting point when
@@ -19,21 +18,29 @@ window.Vue = require('vue');
 import VueOnsen from 'vue-onsenui'; // This already imports 'onsenui'
 import App from './components/App.vue';
 import loginForm from './components/View/Login.vue';
+import registerForm from './components/View/Register.vue';
 import AppView from './components/AppView.vue';
 import components from './components'
 import VueRecyclerviewNew from 'vue-recyclerview'
 import VueRouter from 'vue-router'
 import VueClazyLoad from 'vue-clazy-load';
+import InfiniteScroll from 'v-infinite-scroll'
+
+Vue.use(InfiniteScroll)
 Vue.use(VueClazyLoad);
 Vue.use(VueRouter)
 Vue.use(VueRecyclerviewNew)
 Vue.use(VueOnsen);
+
 const router = new VueRouter({
     mode: 'history',
     routes: [
-        { path: '/login', component:   loginForm,
-            beforeEnter:(function(to, from, next){
-                firebase.auth().onAuthStateChanged(function(user) {
+        {
+            path: '/login',
+            component: loginForm,
+            name:'login',
+            beforeEnter: (function (to, from, next) {
+                firebase.auth().onAuthStateChanged(function (user) {
                     if (user) {
                         next('/')
                     } else {
@@ -42,9 +49,24 @@ const router = new VueRouter({
                 });
             })
         },
-        { path: '/', component:   App,
-            beforeEnter:(function(to, from, next){
-                firebase.auth().onAuthStateChanged(function(user) {
+        {
+            path: '/register',
+            component: registerForm,
+            name:'register',
+            beforeEnter: (function (to, from, next) {
+                firebase.auth().onAuthStateChanged(function (user) {
+                    if (user) {
+                        next({ path: '/' })
+                    } else {
+                        next()
+                    }
+                });
+            })
+        },
+        {
+            path: '/', component: App,
+            beforeEnter: (function (to, from, next) {
+                firebase.auth().onAuthStateChanged(function (user) {
                     if (user) {
                         next()
                     } else {
@@ -56,6 +78,26 @@ const router = new VueRouter({
 
     ]
 })
-new Vue(Vue.util.extend({router, mounted(){
+new Vue(Vue.util.extend({
+    router,
+    methods:{
+        handleConnectivityChange(status) {
+            console.log(status)
+        }
+    },
 
-}},AppView)).$mount('#app');
+    created(){
+        document.addEventListener('init', function (e) {
+            var scrollValue = 0;
+            var page = e.target;
+
+            page.querySelector('.page__content').addEventListener('scroll', function (e) {
+                var delta = this.scrollTop - scrollValue;
+                if (Math.abs(delta) > 8) {
+                    page.classList.toggle('hidden-bar', delta > 0 && scrollValue > 36)
+                    scrollValue = this.scrollTop;
+                }
+            });
+        })
+    }
+}, AppView)).$mount('#app');

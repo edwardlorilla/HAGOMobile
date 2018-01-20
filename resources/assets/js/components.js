@@ -3,11 +3,16 @@
  */
 window.Vue = require('vue');
 import Plant from  './components/View/Plant.vue'
+import OfflineHandler from  './components/View/OfflineHandler.vue'
+import Setting from  './components/View/Setting.vue'
 import MySighting  from  './components/View/MySighting.vue'
 import PlantItem from  './components/View/PlantItem.vue'
 import PlantItemMapView from  './components/View/PlantMapView.vue'
 import PlantItemNavigator from  './components/View/PlantItemNavigator.vue'
 import Map from  './components/View/Maps.vue'
+import ChatView from  './components/View/Chat.vue'
+import Chat from  './components/View/ChatView.vue'
+import ChatManage from  './components/View/ChatManage.vue'
 import CapturePhoto from  './components/View/CapturePhoto.vue'
 import SearchScope from  './components/View/SearchScope.vue'
 import SlideFade from  './components/Transition/no-mode-translate-fade.vue'
@@ -30,6 +35,10 @@ Vue.component('splitter-content', function (resolve, reject) {
 Vue.component('view-plant', function (resolve, reject) {
     setTimeout(function () {
         resolve(Plant)
+    }, 100)
+});Vue.component('view-settings', function (resolve, reject) {
+    setTimeout(function () {
+        resolve(Setting)
     }, 100)
 });
 Vue.component('plant-item', function (resolve, reject) {
@@ -91,6 +100,19 @@ Vue.component('search-result-scope', function (resolve, reject) {
 });
 Vue.component('slide-fade', function (resolve, reject) {
     resolve(SlideFade)
+});
+
+Vue.component('chat-view', function (resolve, reject) {
+    resolve(ChatView)
+});
+Vue.component('chat', function (resolve, reject) {
+    resolve(Chat)
+});
+Vue.component('chat-manage', function (resolve, reject) {
+    resolve(ChatManage)
+});
+Vue.component('offline-handler', function (resolve, reject) {
+    resolve(OfflineHandler)
 });
 
 

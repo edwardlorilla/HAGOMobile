@@ -13,11 +13,11 @@ use Illuminate\Http\Request;
 |
 */
 Route::post('login', 'LoginController@login');
-Route::middleware('auth:api')->get('/user', function (Request $request) {
-    return $request->user();
-});
 
-
-
+Route::get('repository/signout', 'RepositoryController@logout');
 Route::get('repository/{firebase}', 'RepositoryController@index');
+Route::get('user/{user}/{firebase}', 'UserController@show');
+Route::post('repository/{repository}/{firebase}', 'RepositoryController@destroy');
+
 Route::apiResource('repository', 'RepositoryController');
+Route::apiResource('user', 'UserController');

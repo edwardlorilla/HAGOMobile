@@ -19,7 +19,7 @@
 
 </style>
 <script>
-    import {Splice, Push, cameraInfo, capturePhoto} from './Ajax/getData'
+    import {Splice, Push, cameraInfo, capturePhoto, onHoldFalse} from './Ajax/getData'
     export default {
         data(){
             return{
@@ -35,9 +35,10 @@
                 vm.$refs.fileInput.click()
             },
             capturePhoto(event){
+                onHoldFalse()
+
                 cameraInfo(event)
                 if(this.$refs.fileInput.value ){
-                    Splice()
                     Push('capture-photo')
                 }
 

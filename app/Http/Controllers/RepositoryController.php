@@ -17,7 +17,7 @@ class RepositoryController extends Controller
     public function index($firebase)
     {
         $user = Cache::rememberForever('user_repository:all', function () use ($firebase) {
-            return  \App\User::where('firebase_uid', $firebase)->first()->with('repositories.photos','repositories.color', 'repositories.repository')->get()[0]['repositories'];
+            return \App\User::with('repositories.photos', 'repositories.color', 'repositories.repository')->where('firebase_uid', $firebase)->first()['repositories'];
 
         });
 
@@ -27,7 +27,7 @@ class RepositoryController extends Controller
             ->orderBy('updated_at', 'desc')
             ->get();
 
-        $repository_user =$user->merge($repositories );
+        $repository_user = $user->merge($repositories);
 
 //        return response()->json($repositories);
         return response()->json($repository_user);
@@ -64,8 +64,8 @@ class RepositoryController extends Controller
         })->save(public_path('images/thumb_') . $fileName);
         $photo = \App\Photo::create(['file' => $fileName]);
 
-        $color = $request->colors ?  \App\Color::create([
-            'colors' =>  $request->colors
+        $color = $request->colors ? \App\Color::create([
+            'colors' => $request->colors
         ]) : null;
         $repositoryID = '';
         $repository_id = '';
@@ -186,7 +186,11 @@ class RepositoryController extends Controller
      */
     public function update(Request $request, Repository $repository)
     {
-        //
+        $repository->title = $request->title;
+        $repository->description = $request->description;
+        $repository->save();
+        Cache::forget('user_repository:' . $repository->id);
+        Cache::forget('user_repository:all');
     }
 
     /**
@@ -195,16 +199,18 @@ class RepositoryController extends Controller
      * @param  \App\Repository $repository
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Repository $repository)
+    public function destroy(Repository $repository, $firebase)
     {
-        /*$user = User::findOrFail($id);
-        if (!(empty($user->photo->file))) {
-            unlink(public_path() . $user->photo->file);
-        }
-        $user->delete();*/
+        $user_repository = \App\User::with(['repositories' => function($query) use ($repository){
+            $query->where('id', $repository->id)->first()->delete();
+            Cache::forget('user_repository:'.$repository->id);
+            Cache::forget('user_repository:all');
+        }])->where('firebase_uid', $firebase)->first();
+
+        return response()->json('Deleted Sucessfully!');
     }
 
-    public function getPhoto(Request $request)
+    public function getPhoto(Request $user_repository)
     {
         $photo = new \App\Photo();
         if ($file = $request->photos) {
@@ -222,4 +228,10 @@ class RepositoryController extends Controller
         }
         return $photo;
     }
+
+    public function logout(){
+        Cache::forget('user_repository:all');
+        return response()->json('Sign out!');
+    }
+
 }

@@ -4,6 +4,7 @@ importScripts('/js/idb.js');
 importScripts('/js/utility.js');
 var STATIC_FILES = [
     '/',
+    '/manifest.json',
     '/js/app.js',
     '/js/bundle.js',
     '/js/fetch.js',
@@ -12,8 +13,8 @@ var STATIC_FILES = [
     '/css/app.css',
     '/css/bundle.css',
 ]
-var CACHE_STATIC_NAME = 'static-v63';
-var CACHE_DYNAMIC_NAME = 'dynamic-v49';
+var CACHE_STATIC_NAME = 'static-v64';
+var CACHE_DYNAMIC_NAME = 'dynamic-v50';
 self.addEventListener('install', function (event) {
     console.log('[Service Worker] Installing Service Worker ...', event);
     event.waitUntil(

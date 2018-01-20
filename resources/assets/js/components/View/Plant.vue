@@ -1,6 +1,9 @@
 <template>
-    <v-ons-page>
-        <custom-toolbar :title="viewUrls[radioToggle]" v-model="searchQuery"
+    <v-ons-page  id="main">
+        <custom-toolbar :title="viewUrls[radioToggle]"
+                        v-model="searchQuery"
+                        :selectCount="filtersPlantSelect"
+                        :deletePlant="selectedDelete"
                         :show-popover="showPopover"
                         :search="isSearch"></custom-toolbar>
         <v-ons-progress-bar v-if="!getSearchQuery.length > 0" indeterminate></v-ons-progress-bar>
@@ -55,6 +58,7 @@
             <span v-show="state === 'preaction'"> Release </span>
             <span v-show="state === 'action'"> Loading... </span>
         </v-ons-pull-hook>
+        <v-ons-gesture-detector>
         <v-ons-list>
             <v-ons-lazy-repeat
                     v-if="getFuseList.list"
@@ -63,11 +67,14 @@
                     :length="getSearchQuery.length">
             </v-ons-lazy-repeat>
         </v-ons-list>
+        </v-ons-gesture-detector>
         <floating-action></floating-action>
     </v-ons-page>
 </template>
 <script>
     import {
+            onHoldHandler,
+            onHold,
             toggleMySighting,
             isNearestMarkerSort,
             nearest,
@@ -82,7 +89,8 @@
             getResults,
             toggleView,
             listView,
-            gps_distance
+            gps_distance,
+            deletePlants
     } from './../Ajax/getData'
 
     export default{
@@ -95,6 +103,8 @@
                 selectedView: mySighting.marker.toString(),
                 viewUrls: ['My Sighting', 'Repositories of Plants'],
                 nearest,
+                user_id: firebase.auth().currentUser.displayName,
+                user_uid: firebase.auth().currentUser.uid,
                 currentPage,
                 mySighting,
                 popoverVisible: false,
@@ -105,43 +115,58 @@
                 renderItem(i)  {
                     return new Vue({
                         template: `
-                            <div v-if="plant.all[index]"  :key="index" >
-                            <v-ons-list-item @click="getMapInfo(plant.all[index])"  v-if="listView.view">
-                                <v-ons-row  >
-                                    <v-ons-col  width="95px">
-                                      <img class="thumbnail"
-                                            style="object-fit: cover;width: 60px; height:60px;"
-                                             :src="getPhoto">
-                                    </v-ons-col>
-                                    <v-ons-col>
-                                      <div class="name">
-                                       {{plant.all[index].title}}
-                                      </div>
-                                      <div class="location">
-                                        <i class="fa fa-map-marker"></i>
-                                        {{plant.all[index].description.slice(0, 20)}}
-                                      </div>
-                                    </v-ons-col>
-                                    <v-ons-col width="40px"></v-ons-col>
-                                  </v-ons-row>
-                              </v-ons-list-item>
-                            <v-ons-row  v-else>
-                                <v-ons-col  style="width: 60px;"  v-for="row in getItem[index]" :key="index">
-                                  <v-ons-card @click="getMapInfo(row)"   :key="index"><img class="thumbnail" style="object-fit: cover;width: 60px; height:60px;" :src="row.photos | getGridPhoto"/></v-ons-card>
-                                </v-ons-col>
-                             </v-ons-row>
+                            <div  v-if="plant.all[index]"  :key="index" >
+                                <staggered-fade>
+                                    <v-ons-list-item   v-if="listView.view">
+                                        <v-ons-row  >
+                                            <v-ons-col v-if="onHold.handler && mySighting.marker === 0" width="95px">
+                                                <v-ons-checkbox
+                                                    :input-id="'checkbox-' + index"
+                                                    v-model="plant.all[index].checkedPlant"
+                                                  >
+                                                </v-ons-checkbox>
+                                            </v-ons-col>
+                                            <v-ons-col style="width:95px;" @click="getMapInfo(plant.all[index])">
+                                              <img class="thumbnail"
+                                                    style="object-fit: cover;width: 60px; height:60px;"
+                                                     :src="getPhoto">
+                                            </v-ons-col>
+                                            <v-ons-col>
+                                              <div class="name">
+                                               {{plant.all[index].title}}
+                                              </div>
+                                              <div class="location">
+                                                <i class="fa fa-map-marker"></i>
+                                                {{plant.all[index].description.slice(0, 20)}}
+                                              </div>
+                                            </v-ons-col>
+                                          </v-ons-row>
+                                      </v-ons-list-item>
+                                    <v-ons-row  v-else>
+                                        <v-ons-col  style="width: 60px;"  v-for="row in getItem[index]" :key="index">
+                                          <v-ons-card @click="getMapInfo(row)"   :key="index"><img class="thumbnail" style="object-fit: cover;width: 60px; height:60px;" :src="row.photos | getGridPhoto"/></v-ons-card>
+                                        </v-ons-col>
+                                     </v-ons-row>
+                                </staggered-fade>
                             </div>
                         `,
                         data() {
                             return {
+                                onHold,
                                 index: i,
                                 plant: getResults,
                                 listView: listView,
-                                windowWidth: window.innerWidth
+                                windowWidth: window.innerWidth,
+                                mySighting,
+                                user_id: firebase.auth().currentUser.displayName
                             };
                         },
                         mounted(){
+                            var vm = this
                             window.addEventListener('resize', this.handleWindowResize);
+                            vm.$set( vm.plant.all[vm.index], 'checkedPlant', false )
+
+
                         },
                         beforeDestroy: function () {
                             window.removeEventListener('resize', this.handleWindowResize)
@@ -166,6 +191,9 @@
                             }
                         },
                         methods: {
+                            parseInt(value){
+                                return _.parseInt(value)
+                            },
                             handleWindowResize(event)
                             {
                                 this.windowWidth = event.currentTarget.innerWidth;
@@ -185,15 +213,28 @@
                 fuse: '',
                 searchQuery: '',
                 listView: listView,
-                windowWidth: window.innerWidth
+                windowWidth: window.innerWidth,
+                filterPlant: []
             }
         },
         mounted(){
             var vm = this
             window.addEventListener('resize', this.handleWindowResize);
             vm.getPlantRepository()
+            //TODO: hold to delete
+            if(vm.currentPage.url === "plant-navigator"){
+                document.addEventListener('hold', function(event) {
+                    console.log('hold')
+                    onHoldHandler()
+                });
+            }
+
+
         },
         beforeDestroy: function () {
+            window.removeEventListener('hold', function(event) {
+                onHoldHandler()
+            });
             window.removeEventListener('resize', this.handleWindowResize)
         },
         computed: {
@@ -233,7 +274,10 @@
                 vm.fuse = new Fuse(vm.plant.all, options);
                 return vm.fuse
             },
-
+            filtersPlantSelect(){
+                var vm = this
+                return _.map(_.filter(vm.plant.all, ['checkedPlant', true]))
+            }
         },
         filters: {
             parseInt(value){
@@ -246,6 +290,12 @@
             }
         },
         methods: {
+
+            selectedDelete(){
+                var vm = this
+
+                deletePlants( vm.filtersPlantSelect, 'id')
+            },
             loadItem(done) {
                 setTimeout(function () {
                     getData()
