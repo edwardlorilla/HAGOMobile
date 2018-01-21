@@ -19,6 +19,7 @@ import VueOnsen from 'vue-onsenui'; // This already imports 'onsenui'
 import App from './components/App.vue';
 import loginForm from './components/View/Login.vue';
 import registerForm from './components/View/Register.vue';
+import {readData} from './components/Ajax/getData';
 import AppView from './components/AppView.vue';
 import components from './components'
 import VueRecyclerviewNew from 'vue-recyclerview'
@@ -82,16 +83,28 @@ new Vue(Vue.util.extend({
     router,
     methods:{
         handleConnectivityChange(status) {
-            console.log(status)
+            if(status){
+                if('serviceWorker' in navigator && 'SyncManager' in window){
+                    navigator.serviceWorker.ready
+                        .then(function(sw){
+                            sw.sync.register('sync-new-posts')
+                        })
+                        .catch(function (error) {
+                            console.log(error)
+                        })
+                }else{
+
+                }
+
+            }
         }
     },
-
     created(){
         document.addEventListener('init', function (e) {
             var scrollValue = 0;
             var page = e.target;
 
-            page.querySelector('.page__content').addEventListener('scroll', function (e) {
+            page.querySelector('.scroll').addEventListener('scroll', function (e) {
                 var delta = this.scrollTop - scrollValue;
                 if (Math.abs(delta) > 8) {
                     page.classList.toggle('hidden-bar', delta > 0 && scrollValue > 36)

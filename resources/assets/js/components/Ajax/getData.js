@@ -401,7 +401,7 @@ export function getData() {
             plantItem.all = allRepositories
             getResults.all = allRepositories
             plantItem.count = allRepositories.length
-            readData()
+            return response
         })
 }
 export function editRepositories(plantInfo){
@@ -438,6 +438,16 @@ export function editRepositories(plantInfo){
             })*/
 
 }
+
+
+export function toObject(arr) {
+    var rv = {};
+    for (var i = 0; i < arr.length; ++i)
+        if (arr[i] !== undefined) rv[i] = arr[i];
+    return rv;
+}
+
+
 export function FormDataPost(file, payload, latitude, longitude, altitude, title, description, similarPlant) {
     var url = '/api/repository';
     var user = firebase.auth().currentUser ;
@@ -470,20 +480,18 @@ export function FormDataPost(file, payload, latitude, longitude, altitude, title
                 plantItem.all = allRepositories
                 getResults.all = allRepositories
                 plantItem.count = allRepositories.length
-                readData()
                 return Stack.page.pop();
 
             }).then(function(){
                 getData()
             })
             .catch(function (error) {
-                console.log(error);
                 var post = {
                     firebase: user.uid,
-                    id: new Date().toISOString(),
+                    id: _.parseInt(new Date().getTime()),
                     photos: file,
                     latitude: latitude,
-                    colors: payload,
+                    color: payload,
                     longitude: longitude,
                     altitude: _.isNull(altitude) ? 0 : altitude,
                     title: title,
@@ -492,7 +500,36 @@ export function FormDataPost(file, payload, latitude, longitude, altitude, title
                 };
                 writeData('sync-posts', post)
                     .then(function () {
+                        writeData('posts', post).then(function () {
+                            readAllData('posts')
+                                .then(function (data) {
+                                    console.log('indexed')
+                                    var clonedRes = data
+                                    clearAllData('posts')
+                                        .then(function () {
+                                            return clonedRes;
+                                        })
+                                        .then(function (data) {
+                                            console.log('writing')
+                                            for (var key in data) {
+                                                console.log(`writing ${key}`)
+                                                writeData('posts', data[key])
+                                            }
+                                            console.log('done')
+                                            return data
+                                        }).then(function () {
 
+                                        readAllData('posts')
+                                            .then(function (data) {
+                                                console.log('readng')
+                                                allRepositories = data
+                                                plantItem.all = allRepositories
+                                                getResults.all = allRepositories
+                                                plantItem.count = allRepositories.length
+                                            });
+                                    });
+                                });
+                        })
                     })
                     .catch(function (err) {
                         console.log(err)

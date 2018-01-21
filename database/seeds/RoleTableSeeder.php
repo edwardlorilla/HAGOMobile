@@ -41,5 +41,7 @@ class RoleTableSeeder extends Seeder
             'name' => 'User',
             'description' => 'A standard user that can have a licence assigned to them. No administrative features.'
         ]);
+
+
     }
 }

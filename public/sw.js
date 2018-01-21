@@ -13,8 +13,8 @@ var STATIC_FILES = [
     '/css/app.css',
     '/css/bundle.css',
 ]
-var CACHE_STATIC_NAME = 'static-v64';
-var CACHE_DYNAMIC_NAME = 'dynamic-v50';
+var CACHE_STATIC_NAME = 'static-v65';
+var CACHE_DYNAMIC_NAME = 'dynamic-v51';
 self.addEventListener('install', function (event) {
     console.log('[Service Worker] Installing Service Worker ...', event);
     event.waitUntil(
@@ -132,7 +132,7 @@ self.addEventListener('sync', function (event) {
                                 id: dt.id,
                                 photos: dt.photos,
                                 latitude: dt.latitude,
-                                colors: dt.colors.toString(),
+                                colors: dt.color.toString(),
                                 longitude: dt.longitude,
                                 altitude: dt.altitude,
                                 title: dt.title,

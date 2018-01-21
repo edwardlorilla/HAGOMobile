@@ -2,7 +2,8 @@
  * Created by Lorilla on 02/10/2017.
  */
 window.Vue = require('vue');
-import Plant from  './components/View/Plant.vue'
+import Plant from  './components/View/Plantv2.vue'
+import VirtualList from 'vue-virtual-scroll-list'
 import OfflineHandler from  './components/View/OfflineHandler.vue'
 import Setting from  './components/View/Setting.vue'
 import MySighting  from  './components/View/MySighting.vue'
@@ -113,6 +114,9 @@ Vue.component('chat-manage', function (resolve, reject) {
 });
 Vue.component('offline-handler', function (resolve, reject) {
     resolve(OfflineHandler)
+});
+Vue.component('virtual-list', function (resolve, reject) {
+    resolve(VirtualList)
 });
 
 

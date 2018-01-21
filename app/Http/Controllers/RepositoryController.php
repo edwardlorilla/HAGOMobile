@@ -51,6 +51,7 @@ class RepositoryController extends Controller
      */
     public function store(Request $request)
     {
+//        return response()->json($request->all());
         $user = \App\User::where('firebase_uid', $request->firebase)->first();
 
 

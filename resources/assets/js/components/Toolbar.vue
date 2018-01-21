@@ -1,5 +1,5 @@
 <template>
-    <v-ons-toolbar  :modifier="modifier">
+    <v-ons-toolbar  modifier>
         <div class="left">
             <v-ons-toolbar-button v-if="onHold.handler && mySighting.marker === 0" @click="onHoldHandler">
                 <v-ons-icon icon="ion-android-arrow-back"></v-ons-icon>
