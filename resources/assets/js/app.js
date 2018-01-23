@@ -16,8 +16,8 @@ window.Vue = require('vue');
 // Vue.component('example', require('./components/Example.vue'));
 
 import VueOnsen from 'vue-onsenui'; // This already imports 'onsenui'
-import App from './components/App.vue';
-import loginForm from './components/View/Login.vue';
+import App from './components/AppHandler.vue';
+import loginForm from './components/View/LoginHandler.vue';
 import registerForm from './components/View/Register.vue';
 import {readData} from './components/Ajax/getData';
 import AppView from './components/AppView.vue';
@@ -26,7 +26,6 @@ import VueRecyclerviewNew from 'vue-recyclerview'
 import VueRouter from 'vue-router'
 import VueClazyLoad from 'vue-clazy-load';
 import InfiniteScroll from 'v-infinite-scroll'
-
 Vue.use(InfiniteScroll)
 Vue.use(VueClazyLoad);
 Vue.use(VueRouter)
@@ -41,8 +40,9 @@ const router = new VueRouter({
             component: loginForm,
             name:'login',
             beforeEnter: (function (to, from, next) {
+                var vm = this
                 firebase.auth().onAuthStateChanged(function (user) {
-                    if (user) {
+                    if (user ) {
                         next('/')
                     } else {
                         next()
@@ -68,7 +68,7 @@ const router = new VueRouter({
             path: '/', component: App,
             beforeEnter: (function (to, from, next) {
                 firebase.auth().onAuthStateChanged(function (user) {
-                    if (user) {
+                    if (user ) {
                         next()
                     } else {
                         next('/login')
@@ -104,7 +104,7 @@ new Vue(Vue.util.extend({
             var scrollValue = 0;
             var page = e.target;
 
-            page.querySelector('.scroll').addEventListener('scroll', function (e) {
+            page.querySelector('.page__content').addEventListener('scroll', function (e) {
                 var delta = this.scrollTop - scrollValue;
                 if (Math.abs(delta) > 8) {
                     page.classList.toggle('hidden-bar', delta > 0 && scrollValue > 36)

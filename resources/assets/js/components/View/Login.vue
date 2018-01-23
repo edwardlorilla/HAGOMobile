@@ -2,7 +2,6 @@
     <ons-page>
         <ons-toolbar>
             <div class="center">Log In</div>
-            <!--<div class="right"><v-ons-toolbar-button @click="changeAuth" >Close</v-ons-toolbar-button></div>-->
         </ons-toolbar>
         <v-ons-progress-bar v-show="isDisable.state" indeterminate></v-ons-progress-bar>
         <div class="login-form">
@@ -23,60 +22,8 @@
 
 </template>
 <script>
-import {isDisable, changeDisable, toggleAuth} from './../Ajax/getData'
-export default{
-    data(){
-        return {
-            isDisable,
-            loginUser: {
-                email: '',
-                password: '',
-            },
-            isLoading: false,
-            errors: []
-        }
-    },
-    mounted(){
-        console.log('123qwe')
-    },
-    methods: {
-        isFormValid(){
-            var vm = this
-            return !!(vm.loginUser.email.length > 0 && vm.loginUser.password.length > 0);
-
-        },
-        userLogin(){
-            var vm = this
-
-            if (vm.isFormValid()) {
-                changeDisable(true)
-                vm.errors = []
-                firebase.auth().signInWithEmailAndPassword(vm.loginUser.email, vm.loginUser.password).then(function (user) {
-                    changeDisable(false)
-                    vm.$router.push('/')
-                }).catch(function (error) {
-                    changeDisable(false)
-                    vm.errors.push(error.message)
-                })
-            }
-            /* var vm = this
-              changeDisable(true)
-            axios.post('/login', vm.loginUser)
-               .then(function (response) {
-                 console.log(response);
-                 changeDisable(false)
-                 toggleAuth()
-               })
-               .catch(function (error) {
-                 console.log(error);
-                  changeDisable(false)
-               });*/
-
-        }
+    import {signin} from './loginMixin'
+    export default {
+        mixins: [signin]
     }
-}
-
-
-
-
 </script>

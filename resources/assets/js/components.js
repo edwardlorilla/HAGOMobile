@@ -22,17 +22,28 @@ import AutoComplete from  './components/AutoComplete.vue'
 import MapSearch from  './components/View/MapSearch.vue'
 import SearchResult from  './components/View/SearchResult.vue'
 import LoginUser from  './components/View/Login.vue'
+import LoginBrowser from  './components/View/LoginBrowser.vue'
 import SearchResultMapScope from  './components/View/SearchResultMapScope.vue'
 import FloatingAction from  './components/FloatingActionBar.vue'
 import staggeredFade from  './components/Transition/staggered-fade.vue'
 import noModeTranslateFade from  './components/Transition/no-mode-translate-fade.vue'
 import App from './components/App.vue'
+import AppHandler from './components/AppHandler.vue'
+import AppBrowser from './components/AppBrowser.vue'
 Vue.component('plant-item-map-view', function (resolve, reject) {
         resolve(PlantItemMapView)
 });
 Vue.component('splitter-content', function (resolve, reject) {
         resolve(App)
 });
+Vue.component('app-handler', function (resolve, reject) {
+        resolve(AppHandler)
+});
+Vue.component('app-browser', function (resolve, reject) {
+        resolve(AppBrowser)
+});
+
+
 Vue.component('view-plant', function (resolve, reject) {
     setTimeout(function () {
         resolve(Plant)
@@ -77,6 +88,9 @@ Vue.component('custom-toolbar', function (resolve, reject) {
 });
 Vue.component('login-user', function (resolve, reject) {
     resolve(LoginUser)
+});
+Vue.component('login-browser', function (resolve, reject) {
+    resolve(LoginBrowser)
 });
 Vue.component('floating-action', function (resolve, reject) {
     resolve(FloatingAction)

@@ -88,6 +88,7 @@
             setResults,
             getResults,
             toggleView,
+            onHoldHandler,
             listView,
             gps_distance,
             deletePlants
@@ -224,7 +225,6 @@
             //TODO: hold to delete
             if(vm.currentPage.url === "plant-navigator"){
                 document.addEventListener('hold', function(event) {
-                    console.log('hold')
                     onHoldHandler()
                 });
             }
@@ -241,11 +241,7 @@
             radioToggle(){
                 return mySighting.marker
             },
-            toggleMySighting(){
-                var vm = this
-                toggleMySighting(vm.selectedView)
-                return vm.selectedView
-            },
+
             onOrientation(){
                 return parseInt(this.windowWidth / 100)
             },
@@ -290,7 +286,11 @@
             }
         },
         methods: {
-
+            toggleMySighting(){
+                var vm = this
+                toggleMySighting(vm.selectedView)
+                return vm.selectedView
+            },
             selectedDelete(){
                 var vm = this
 

@@ -38,7 +38,7 @@
             getPhoto(){
                 var vm = this
                 var plant = vm.data
-                return !_.isEmpty(plant.photos) ? plant.photos[0].file : 'http://placekitten.com/g/40/40'
+                return !_.isEmpty(plant.photos) ? plant.photos[0].file : 'https://placekitten.com/g/40/40'
             }
         }
 

@@ -1,5 +1,5 @@
 <template>
-    <v-ons-page :infinite-scroll="infiniteScroll">
+    <v-ons-page id="main">
         <v-ons-toolbar>
             <div class="left">
                 <v-ons-back-button></v-ons-back-button>
@@ -57,39 +57,42 @@
                         <v-ons-list-header>
                             Get nearest color
                         </v-ons-list-header>
-                        <virtual-list :size="40" :remain="8"  wtag="div">
-                            <div v-for="(nearest,index, key) in getNearestColor" :key="index">
-                                <v-ons-list-item v-for="near in nearest" :key="index" tappable>
-                                    <div class="left">
-                                        <v-ons-radio
-                                                :input-id="'radio-' + index"
-                                                :value="near.id"
-                                                v-model="selectedPlant"
-                                        >
-                                        </v-ons-radio>
+                        <v-ons-list>
+                            <virtual-list :size="78" :remain="20" >
+                                <div v-for="(nearest,index, key) in getNearestColor" :key="index">
+                                    <v-ons-list-item v-for="near in nearest" :key="index" tappable>
+                                        <div class="left">
+                                            <v-ons-radio
+                                                    :input-id="'radio-' + index"
+                                                    :value="near.id"
+                                                    v-model="selectedPlant"
+                                            >
+                                            </v-ons-radio>
 
-                                    </div>
-                                    <div class="right">
-                                        <clazy-load :src="getPhoto(near.photo)">
-                                            <transition name="fade" slot="image">
-                                                <img class="thumbnail"
-                                                     style="object-fit: cover;width: 60px; height:60px;"
-                                                     :src="getPhoto(near.photo)">
-                                            </transition>
-                                            <transition name="fade" slot="placeholder">
-                                                <div class="center" slot="placeholder">
-                                                    <v-ons-progress-circular indeterminate></v-ons-progress-circular>
-                                                </div>
-                                            </transition>
-                                        </clazy-load>
-                                    </div>
-                                    <div :for="'radio-' + index" class="center">
-                                        <span class="list-item__title">{{near.hexValue}}</span><span class="list-item__subtitle">{{near.description}}</span>
-                                    </div>
-                                </v-ons-list-item>
+                                        </div>
+                                        <div class="right">
+                                            <clazy-load :src="getPhoto(near.photo)">
+                                                <transition name="fade" slot="image">
+                                                    <img class="thumbnail"
+                                                         style="object-fit: cover;width: 60px; height:60px;"
+                                                         :src="getPhoto(near.photo)">
+                                                </transition>
+                                                <transition name="fade" slot="placeholder">
+                                                    <div class="center" slot="placeholder">
+                                                        <v-ons-progress-circular indeterminate></v-ons-progress-circular>
+                                                    </div>
+                                                </transition>
+                                            </clazy-load>
+                                        </div>
+                                        <div :for="'radio-' + index" class="center">
+                                            <span class="list-item__title">{{near.hexValue}}</span><span class="list-item__subtitle">{{near.description}}</span>
+                                        </div>
+                                    </v-ons-list-item>
 
-                            </div>
-                        </virtual-list>
+                                </div>
+                            </virtual-list>
+                        </v-ons-list>
+
 
                     </div>
                 </div>
@@ -185,16 +188,11 @@
                 var vm = this
                 vm.$refs.fileOnChange.click()
             },
-            infiniteScroll(done){
-                //i = i + 1;
-
-                done();
-            },
             sortList(value){
                 return value.splice(0, 5)
             },
             getPhoto(photo){
-                return photo ? 'images/thumb_' + photo.file : null
+                return !_.isEmpty(photo.file) ? 'images/thumb_' + photo.file : photo
             },
             hexColorDelta(hex1, hex2) {
                 return hexColorDelta(hex1, hex2)
@@ -328,7 +326,7 @@
                                 hexColor = vm.hexColorDelta(hexValue[j], o.color.colors.split(',')[i]);
                                 if (hexColor > 0.90) {
                                     hexArray.push({
-                                        photo: !_.isEmpty(o.photos) ? o.photos[0] : null,
+                                        photo: !_.isEmpty(o.photos) ? (_.isArray(o.photos) ? o.photos[0] : o.photos) : null,
                                         id: o.id,
                                         description: o.description,
                                         hexColor: '#' + o.color.colors.split(',')[i],

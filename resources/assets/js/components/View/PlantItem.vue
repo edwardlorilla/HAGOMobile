@@ -73,7 +73,7 @@
             </v-ons-list-item>
         </v-ons-list>
         <v-ons-bottom-toolbar modifier="transparent" style="margin: 16px">
-            <v-ons-button class="btn" v-if="plantInfo.id" modifier="large" @click="getMapInfo"
+            <v-ons-button class="btn-btn" v-if="plantInfo.id" modifier="large" @click="getMapInfo"
                           style="margin: 6px 0; text-align: center;">
                 <v-ons-icon icon="ion-search"></v-ons-icon>
                 Find Location
@@ -131,7 +131,6 @@
             }
         },
         computed: {
-
             backgroundImage(){
                 var vm = this
                 return `https://maps.googleapis.com/maps/api/staticmap?center=${vm.plantInfo.latitude},${vm.plantInfo.longitude}&zoom=30&size=500x500&sensor=false&markers=color:blue%7C${vm.plantInfo.latitude},${vm.plantInfo.longitude}&scale=2&maptype=${vm.viewMap ? 'roadmap' : 'satellite'}&key=AIzaSyDpziJj9FNZsHcCJamWE2I_NNMzH3luh3U`

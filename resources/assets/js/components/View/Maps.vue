@@ -75,7 +75,7 @@
                 <v-ons-fab
                             v-show="!isWatch"
                            position="bottom center"
-                           class="btn"
+                           class="btn-btn"
                            :visible="!isWatch"
                            @click="onStart"
                 >
@@ -84,7 +84,7 @@
                 <v-ons-fab
                         v-show="openFabInfo"
                         position="bottom right"
-                        class="btn"
+                        class="btn-btn"
                         :visible="openFabInfo"
                         @click="moreDetail"
 

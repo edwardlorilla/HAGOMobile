@@ -13,8 +13,8 @@ var STATIC_FILES = [
     '/css/app.css',
     '/css/bundle.css',
 ]
-var CACHE_STATIC_NAME = 'static-v65';
-var CACHE_DYNAMIC_NAME = 'dynamic-v51';
+var CACHE_STATIC_NAME = 'static-v66';
+var CACHE_DYNAMIC_NAME = 'dynamic-v52';
 self.addEventListener('install', function (event) {
     console.log('[Service Worker] Installing Service Worker ...', event);
     event.waitUntil(
@@ -132,7 +132,7 @@ self.addEventListener('sync', function (event) {
                                 id: dt.id,
                                 photos: dt.photos,
                                 latitude: dt.latitude,
-                                colors: dt.color.toString(),
+                                colors: dt.color.colors,
                                 longitude: dt.longitude,
                                 altitude: dt.altitude,
                                 title: dt.title,
@@ -144,11 +144,12 @@ self.addEventListener('sync', function (event) {
                                 return res.json()
                             })
                             .then(function(data){
-                                console.log(data)
+                                console.log( dt.id)
+                                deleteItemFromData('sync-posts', dt.id);
                                 return writeData('posts', data)
                             })
                             .then(function(){
-                                deleteItemFromData('sync-posts', dt.id);
+
                             })
                             .catch(function (err) {
                                 console.log('Error while sending data', err);

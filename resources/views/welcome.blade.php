@@ -86,7 +86,7 @@
     {{--{!! style_ts(mix('/css/bundle.css')) !!}
     {!! style_ts(mix('/css/app.css')) !!}--}}
     {!! style_ts('https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.2.0/leaflet.css') !!}
-    <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.1.0/MarkerCluster.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.1.0/MarkerCluster.css">
     <link rel="stylesheet"
           href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.1.0/MarkerCluster.Default.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.2.0/leaflet.js"></script>
@@ -104,16 +104,21 @@
             width: 100%;
             height: 100%;
             font-family: 'Open Sans Condensed', sans-serif;
+            /*background-image: linear-gradient(to right, #A2DB95, #24CCAA);*/
         }
 
         body {
             padding: 0;
-            margin: 0;
+            margin: 0;,
+
         }
     </style>
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+
     <link href='https://api.tiles.mapbox.com/mapbox.js/plugins/leaflet-fullscreen/v0.0.4/leaflet.fullscreen.css'
           rel='stylesheet'>
+
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
     <script type="text/javascript">
 
 
@@ -125,11 +130,11 @@
 
 
     </script>
+
 </head>
 <body>
 
 <div id="app">
-
 </div>
 </body>
 {{--{!! script_ts(mix('/js/bundle.js')) !!}

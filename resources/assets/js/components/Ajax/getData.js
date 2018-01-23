@@ -411,6 +411,7 @@ export function editRepositories(plantInfo){
         throw new TypeError(`Expected a string, got ${typeof url}`);
     }
     var edit = {
+        action: 'edit',
         firebase: user.uid,
         title: plantInfo.title,
         description: plantInfo.description
@@ -418,12 +419,16 @@ export function editRepositories(plantInfo){
     return axios.put(url, edit).then(function (response) {
         var updateRepositories = response.data;
         if ('indexedDB' in window) {
-            return update('posts', plantInfo)
+            return updateItem('posts', plantInfo)
         }
     }).then(function(){
         getData()
     }).catch(function (error) {
-        writeData('sync-update-posts', plantInfo)
+        if ('indexedDB' in window) {
+            updateItem('posts', plantInfo )
+            writeData('sync-posts', plantInfo)
+        }
+
     });
 
 
@@ -487,53 +492,31 @@ export function FormDataPost(file, payload, latitude, longitude, altitude, title
             })
             .catch(function (error) {
                 var post = {
+                    action: 'post',
                     firebase: user.uid,
-                    id: _.parseInt(new Date().getTime()),
+                    id: new Date().toISOString(),
                     photos: file,
                     latitude: latitude,
-                    color: payload,
+                    color: {'colors': payload.toString()},
                     longitude: longitude,
                     altitude: _.isNull(altitude) ? 0 : altitude,
                     title: title,
                     repository_id: similarPlant,
                     description: description
                 };
-                writeData('sync-posts', post)
-                    .then(function () {
-                        writeData('posts', post).then(function () {
-                            readAllData('posts')
-                                .then(function (data) {
-                                    console.log('indexed')
-                                    var clonedRes = data
-                                    clearAllData('posts')
-                                        .then(function () {
-                                            return clonedRes;
-                                        })
-                                        .then(function (data) {
-                                            console.log('writing')
-                                            for (var key in data) {
-                                                console.log(`writing ${key}`)
-                                                writeData('posts', data[key])
-                                            }
-                                            console.log('done')
-                                            return data
-                                        }).then(function () {
 
-                                        readAllData('posts')
-                                            .then(function (data) {
-                                                console.log('readng')
-                                                allRepositories = data
-                                                plantItem.all = allRepositories
-                                                getResults.all = allRepositories
-                                                plantItem.count = allRepositories.length
-                                            });
-                                    });
-                                });
-                        })
-                    })
-                    .catch(function (err) {
-                        console.log(err)
-                    })
+                writeData('posts', post)
+                writeData('sync-posts', post).then(function () {
+                    if ('indexedDB' in window) {
+                        readAllData('posts')
+                            .then(function (data) {
+                                allRepositories = data
+                                plantItem.all = allRepositories
+                                getResults.all = allRepositories
+                                plantItem.count = allRepositories.length
+                            });
+                    }
+                })
             });
     };
 if ('indexedDB' in window) {
@@ -683,9 +666,16 @@ export function deletePlants(plants) {
     for (var i = 0; i < plants.length; i++) {
         deleteItemFromData('posts', plants[i])
             .then(function(data) {
-                console.log(data)
                 axios.post(`/api/repository/${data}/${user.uid}`).then(function () {
                     i == plants.length ? getData() : null
+                }).catch(function (err) {
+                    var deleteData = {
+                        action: 'delete',
+                        firebase: user.uid,
+                        user: data,
+                        id: new Date().toISOString()
+                    }
+                    writeData('sync-posts', deleteData)
                 })
             });
     }

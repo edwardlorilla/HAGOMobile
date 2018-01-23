@@ -135,6 +135,7 @@
         isAuth,
         toggleAuth,
         user,
+        getData,
         storeUserDetail
     } from './Ajax/getData'
     export default {
@@ -206,7 +207,7 @@
                     vm.currentUser = response.data
                 })
             }, 3000);
-
+            getData()
 
         },
         created(){
