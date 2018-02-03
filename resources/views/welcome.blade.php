@@ -104,9 +104,9 @@
             width: 100%;
             height: 100%;
             font-family: 'Open Sans Condensed', sans-serif;
-            /*background-image: linear-gradient(to right, #A2DB95, #24CCAA);*/
+        background: #f6f6f6;
+            /*background-image: linear-gradient(-100deg, #A2DB95, #24CCAA);*/
         }
-
         body {
             padding: 0;
             margin: 0;,
@@ -119,6 +119,7 @@
           rel='stylesheet'>
 
     <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+
     <script type="text/javascript">
 
 
@@ -141,6 +142,8 @@
 {!! script_ts(mix('/js/app.js')) !!}--}}
 <script type="text/javascript" src="{{mix('/js/bundle.js')}}"></script>
 <script type="text/javascript" src="{{mix('/js/app.js')}}"></script>
+
+<script type="text/javascript" src="http://labs.easyblog.it/maps/leaflet-compass/src/leaflet-compass.js"></script>
 <script>
     // Thanks: https://github.com/component/textarea-caret-position
 

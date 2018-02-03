@@ -145,7 +145,7 @@ export var AppMixin =  {
         },
         userCurrent(){
             var vm = this
-            return vm.currentUser ? vm.currentUser.name : null
+            return vm.currentUser ? vm.currentUser.name : vm.user.email
         }
 
     }

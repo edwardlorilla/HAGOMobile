@@ -31,8 +31,8 @@ class User extends Authenticatable
         return $this->hasMany(Repository::class);
     }
 
-    public function roles()
+    public function role()
     {
-        return $this->belongsToMany(Role::class);
+        return $this->belongsTo(Role::class);
     }
 }

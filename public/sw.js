@@ -55,7 +55,10 @@ var requestedUrl = null;
 self.addEventListener('fetch', function (event) {
 
     var url = new RegExp('/api/repository\/(.*)').test(event.request.url)
-
+    if(new RegExp('/api/user\/(.*)').test(event.request.url)){
+        console.log('ignore')
+        return
+    }
     if ( url && event.request.url.indexOf(event.request.url) > -1) {
         requestedUrl = event.request.url
         event.respondWith(fetch(event.request)

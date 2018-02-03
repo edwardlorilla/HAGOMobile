@@ -152,7 +152,7 @@ export var currentPage = {
     name: 'Repositories of Plants'
 }
 export function currentPageSwitcher(url, name) {
-    if (name === 'My Sightings') {
+    if (name === 'Gallery') {
         toggleMySighting('0')
     } else if (name === 'Repositories of Plants') {
         toggleMySighting('1')
@@ -160,8 +160,7 @@ export function currentPageSwitcher(url, name) {
     new Promise((resolve, reject) => {
         resolve(currentPage.url = url,
         currentPage.name = name
-)
-    ;
+);
 })
 
 }
@@ -206,6 +205,16 @@ export function PlantIndex(id) {
     PlantFound.index = plantItem.all[plant];
     PlantInfo = plantItem.all[plant];
 }
+
+export function mySigthing(){
+
+    currentPageSwitcher('plant-navigator',"Repositories of Plants", 0)
+
+}
+export function clearPlantInfo(){
+    PlantFound.index = null;
+    PlantInfo = null;
+}
 export const PlantFound = {
     index: null
 }
@@ -216,8 +225,17 @@ export function popItem() {
     Stack.page.pop()
 }
 export function moreDetail() {
-    currentPageSwitcher('plant-navigator', 'View Plant Repository')
+    var currentPageName = PlantInfo.published
+    mySighting.marker = currentPageName
+    currentPageSwitcher('plant-navigator', 'Gallery' ,currentPageName )
     Stack.page.push("plant-item")
+}
+
+export function removeFirst() {
+    Stack.page.shift()
+}
+export function AddFirst() {
+    Stack.page.unshift('view-plant')
 }
 export var listView = {
     view: true
@@ -333,6 +351,19 @@ export function get() {
     var user = firebase.auth().currentUser;
     var url = `/api/repository/${user.uid}`;
     return axios.get(url)
+
+}
+export var allId = {
+    distributions: [],
+    categories: [],
+    families: [],
+    vegetations: []
+}
+export function fetchAll(distribution, category, family, vegetation){
+    allId.distributions = distribution
+    allId.categories = category
+    allId.families = family
+    allId.vegetations = vegetation
 }
 
 export function readData(){
@@ -380,11 +411,36 @@ export function readData(){
 //
 
 export var users = {
-    chat: []
+    chat: [],
+
+}
+
+export var list = {
+    users:[]
+}
+export function removeUser(user){
+    var userIndex = _.findIndex(list.users, ['id', user.id]);
+    list.users.splice(userIndex, 1);
+}
+export function updateUser(user){
+    var userIndex = _.findIndex(list.users, ['id', user.id]);
+    list.users[userIndex] = user;
+}
+export function listUser(user){
+    list.users = user
+}
+export function addRepository(image, colors, location, repositoryInfo, selected){
+    var user = firebase.auth().currentUser ;
+    var url = `../api/repository/create/${user.uid}`;
+    if (typeof url !== 'string') {
+        throw new TypeError(`Expected a string, got ${typeof url}`);
+    }
+    return axios.post(url, {'image': image, 'colors': colors.toString(), 'location': location, 'repositoryInfo': repositoryInfo, 'selected': selected })
 }
 export function usersChat(user){
     users.chat = user
 }
+
 
 export var user = {
     detail: null
@@ -396,11 +452,24 @@ export function getData() {
     return get()
         .then(function (response) {
             networkDataReceived = true
+            plantItem.repositories = []
+            plantItem.sighting = []
             var data = response.data
             allRepositories = data
             plantItem.all = allRepositories
             getResults.all = allRepositories
             plantItem.count = allRepositories.length
+
+
+            for(var i in data){
+                if(data[i].published === 1){
+                    plantItem.repositories.push(data[i])
+                }else{
+                    plantItem.sighting.push(data[i])
+                }
+            }
+
+
             return response
         })
 }
@@ -451,8 +520,12 @@ export function toObject(arr) {
         if (arr[i] !== undefined) rv[i] = arr[i];
     return rv;
 }
-
-
+export var storeData = {
+    post: null
+}
+export function storePost(post){
+    storeData.post = post
+}
 export function FormDataPost(file, payload, latitude, longitude, altitude, title, description, similarPlant) {
     var url = '/api/repository';
     var user = firebase.auth().currentUser ;
@@ -473,6 +546,7 @@ export function FormDataPost(file, payload, latitude, longitude, altitude, title
         formData.append('title', title);
         formData.append('repository_id', similarPlant);
         formData.append('description', description);
+        formData.append('published', 0);
         const config = {
             headers: {
                 'content-type': 'multipart/form-data'
@@ -481,15 +555,23 @@ export function FormDataPost(file, payload, latitude, longitude, altitude, title
 
         return axios.post(url, formData, config)
             .then(function (response) {
-                allRepositories = response.data
-                plantItem.all = allRepositories
-                getResults.all = allRepositories
-                plantItem.count = allRepositories.length
-                return Stack.page.pop();
 
-            }).then(function(){
-                getData()
+                writeData('posts', response.data).then(function () {
+                    readAllData('posts')
+                        .then(function (data) {
+                            allRepositories = data
+                            plantItem.all = allRepositories
+                            getResults.all = allRepositories
+                            plantItem.count = allRepositories.length
+                        });
+                })
+                //getData()
+
+                Stack.page.pop();
+
+                return response.data
             })
+
             .catch(function (error) {
                 var post = {
                     action: 'post',
@@ -504,19 +586,20 @@ export function FormDataPost(file, payload, latitude, longitude, altitude, title
                     repository_id: similarPlant,
                     description: description
                 };
-
-                writeData('posts', post)
-                writeData('sync-posts', post).then(function () {
-                    if ('indexedDB' in window) {
-                        readAllData('posts')
-                            .then(function (data) {
-                                allRepositories = data
-                                plantItem.all = allRepositories
-                                getResults.all = allRepositories
-                                plantItem.count = allRepositories.length
-                            });
-                    }
-                })
+                if(error){
+                    writeData('posts', post)
+                    writeData('sync-posts', post).then(function () {
+                        if ('indexedDB' in window) {
+                            readAllData('posts')
+                                .then(function (data) {
+                                    allRepositories = data
+                                    plantItem.all = allRepositories
+                                    getResults.all = allRepositories
+                                    plantItem.count = allRepositories.length
+                                });
+                        }
+                    })
+                }
             });
     };
 if ('indexedDB' in window) {
@@ -562,6 +645,8 @@ export function IDGenerator() {
 }
 export var plantItem = {
     all: [],
+    repositories:[],
+    sighting: [],
     count: 0
 }
 

@@ -1,102 +1,126 @@
 <template id="home">
-    <v-ons-page>
-        <v-ons-progress-bar v-if="!userLocation.lat" indeterminate></v-ons-progress-bar>
-        <v-ons-toolbar>
-            <div class="left">
-                <v-ons-toolbar-button v-if="pageName" @click="changeView">
-                    <v-ons-icon icon="ion-navicon, material:md-menu"></v-ons-icon>
-                </v-ons-toolbar-button>
-                <v-ons-back-button v-else>Page 1</v-ons-back-button>
-            </div>
-            <div class="right">
-                <v-ons-toolbar-button @click="showPopover($event, 'down', true)">
-                    <v-ons-icon v-if="$ons.platform.isAndroid()" icon="md-layers"></v-ons-icon>
-                    <v-ons-icon v-else icon="ion-gear-b, material:md-settings"></v-ons-icon>
-                </v-ons-toolbar-button>
-            </div>
-            <div class="center">
+    <v-ons-tabbar swipeable tab-border="false">
+        <template slot="pages">
+            <v-ons-page>
+                <v-ons-progress-bar v-if="!userLocation.lat" indeterminate></v-ons-progress-bar>
+                <v-ons-toolbar>
+                    <div class="left">
+                        <v-ons-toolbar-button v-if="pageName" @click="changeView">
+                            <v-ons-icon icon="ion-navicon, material:md-menu"></v-ons-icon>
+                        </v-ons-toolbar-button>
+                        <v-ons-back-button v-else>Back</v-ons-back-button>
+                    </div>
+                    <div class="right">
+                        <v-ons-toolbar-button>
+                            <v-ons-icon icon="fa-search" @click="onSearch = true" v-if="!onSearch"></v-ons-icon>
+                            <v-ons-icon icon="fa-check" @click="onSearch = false; searchQuery = ''" v-if="onSearch"></v-ons-icon>
+                        </v-ons-toolbar-button>
+                        <v-ons-toolbar-button v-if="!onSearch" @click="showPopover($event, 'down', true)">
+                            <v-ons-icon v-if="$ons.platform.isAndroid()" icon="md-layers"></v-ons-icon>
+                            <v-ons-icon v-else icon="ion-gear-b, material:md-settings"></v-ons-icon>
+                        </v-ons-toolbar-button>
+                        <v-ons-toolbar-button v-if="!onSearch" @click="mySigthing()">
+                            <v-ons-icon  icon="fa-eye"></v-ons-icon>
+                        </v-ons-toolbar-button>
+                    </div>
+                    <div class="center">
 
-                <search-map class="center-textbox" v-model="searchQuery"></search-map>
+                        <search-map class="center-textbox" v-if="onSearch" v-model="searchQuery"></search-map>
 
-            </div>
-        </v-ons-toolbar>
+                    </div>
+                </v-ons-toolbar>
+                <v-ons-popover cancelable
+                               :visible.sync="popoverVisible"
+                               :target="popoverTarget"
+                               :direction="popoverDirection"
+                               :cover-target="coverTarget"
+                >
 
-        <v-ons-popover cancelable
-                       :visible.sync="popoverVisible"
-                       :target="popoverTarget"
-                       :direction="popoverDirection"
-                       :cover-target="coverTarget"
-        >
-
-            <v-ons-list-item v-for="(tileset, index) in tileSets.all" :key="index" tappable
-                             @change="setTileSet(selectedTileSet)">
-                <label class="left">
-                    <v-ons-radio
-                            :input-id="'checkbox-' + index"
-                            :value="index"
-                            v-model="selectedTileSet"
-                    >
-                    </v-ons-radio>
-                </label>
-                <label class="center" :for="'checkbox-' + index">
-                    {{ tileset.name }}
-                </label>
-            </v-ons-list-item>
-
-        </v-ons-popover>
-
-        {{watchLocation}}
-        {{totalDistance}}
-        <div class="addMarker">
-            <div class="center-textbox">
-                <search-result-scope v-if="isArray"
-                                     :style="{'margin-top': $ons.platform.isAndroidPhone() ? 5 + 'px' : 50 + 'px'}">
-                        <v-ons-list-item v-for="(search, index) in resultItem" :key="index" @click="onResult(search)">
-                        <div class="left">
-                            <img style="object-fit: cover;" class="list-item__thumbnail" :src="search.photos | getPhoto">
-                        </div>
-                        <search-result :search="search"></search-result>
+                    <v-ons-list-item v-for="(tileset, index) in tileSets.all" :key="index" tappable
+                                     @change="setTileSet(selectedTileSet)">
+                        <label class="left">
+                            <v-ons-radio
+                                    :input-id="'checkbox-' + index"
+                                    :value="index"
+                                    v-model="selectedTileSet"
+                            >
+                            </v-ons-radio>
+                        </label>
+                        <label class="center" :for="'checkbox-' + index">
+                            {{ tileset.name }}
+                        </label>
                     </v-ons-list-item>
-                </search-result-scope>
-            </div>
-        </div>
 
-        <div class="addMarker"  style="bottom: 0">
-            <div style="display: flex;justify-content: center; ">
-                <v-ons-fab
-                        v-show="isWatch"
-                        position="bottom center"
-                        class="btn-stop"
-                        :visible="isWatch"
-                        @click="onStart"
-                >
-                    <v-ons-icon icon="md-gps-dot"></v-ons-icon>
-                </v-ons-fab>
-                <v-ons-fab
-                            v-show="!isWatch"
-                           position="bottom center"
-                           class="btn-btn"
-                           :visible="!isWatch"
-                           @click="onStart"
-                >
-                    <v-ons-icon icon="md-gps-dot"></v-ons-icon>
-                </v-ons-fab>
-                <v-ons-fab
-                        v-show="openFabInfo"
-                        position="bottom right"
-                        class="btn-btn"
-                        :visible="openFabInfo"
-                        @click="moreDetail"
+                </v-ons-popover>
 
-                >
-                    <v-ons-icon icon="fa-bars"></v-ons-icon>
-                </v-ons-fab>
+                {{watchLocation}}
+                {{totalDistance}}
+                <div class="addMarker">
+                    <div class="center-textbox">
+                        <search-result-scope v-if="isArray"
+                                             :style="{'margin-top': $ons.platform.isAndroidPhone() ? 5 + 'px' : 50 + 'px'}">
+                            <v-ons-list-item v-for="(search, index) in resultItem" :key="index" @click="onResult(search)">
+                                <div class="left">
+                                    <img style="object-fit: cover;" class="list-item__thumbnail" :src="search.photos | getPhoto">
+                                </div>
+                                <search-result :search="search"></search-result>
+                            </v-ons-list-item>
+                        </search-result-scope>
+                    </div>
+                </div>
+                <div class="addMarker"  style="bottom: 0">
+                    <div style="display: flex;justify-content: center; ">
+                        <v-ons-fab
+                                v-show="isWatch"
+                                position="bottom center"
+                                class="btn-stop"
+                                :visible="isWatch"
+                                @click="onStart"
+                        >
+                            <v-ons-icon icon="md-gps-dot"></v-ons-icon>
+                        </v-ons-fab>
+                        <v-ons-fab
+                                v-show="!isWatch"
+                                position="bottom center"
+                                class="btn-btn"
+                                :visible="!isWatch"
+                                @click="onStart"
+                        >
+                            <v-ons-icon icon="md-gps-dot"></v-ons-icon>
+                        </v-ons-fab>
+                        <v-ons-fab
+                                v-show="openFabInfo"
+                                position="bottom right"
+                                class="btn-btn"
+                                :visible="openFabInfo"
+                                @click="moreDetail"
 
-            </div>
+                        >
+                            <v-ons-icon icon="fa-bars"></v-ons-icon>
+                        </v-ons-fab>
 
-        </div>
-        <div id="map"></div>
-    </v-ons-page>
+                    </div>
+
+                </div>
+
+
+                <div id="map"></div>
+
+
+
+
+            </v-ons-page>
+        </template>
+        <v-ons-tab  icon ="fa-leaf" label = 'Repositories'
+                    @click="mapItem(1)"
+                    :active="stateFilter === 1"
+        ></v-ons-tab>
+        <v-ons-tab icon='fa-eye' label= 'My Sighting'
+                   @click="mapItem(0)"
+                   :active="stateFilter === 0"
+        ></v-ons-tab>
+    </v-ons-tabbar>
+
 </template>
 <style>
     .leaflet-popup-content {
@@ -105,7 +129,7 @@
 </style>
 <script>
     import {tileSet} from './TileSet'
-    import {moreDetail, change_view, PlantFound, userLocation, plantItem, gps_distance, PlantIndex} from './../Ajax/getData'
+    import {currentPageSwitcher,moreDetail, change_view, PlantFound, userLocation, plantItem, gps_distance, PlantIndex} from './../Ajax/getData'
     export default{
         name: 'plant-item-map-view',
         filters:{
@@ -121,6 +145,8 @@
         },
         data(){
             return {
+                onSearch: true,
+                plantItem,
                 openFabInfo: false,
                 visible: true,
                 keys: ['title'],
@@ -172,12 +198,16 @@
                 resultFuse: [],
                 result: null,
                 isWatch: false,
-                isOpen: false
+                isOpen: false,
+                stateFilter: 1,
+                markerX:[]
             }
         },
         mounted(){
             var vm = this
+
             this.onMounted()
+
         },
         activated (){
             var vm = this
@@ -186,7 +216,9 @@
             }
         },
         computed: {
+            stateFilterTab(){
 
+            },
             isArray(){
                 return _.isArray(this.resultItem)
             },
@@ -196,10 +228,13 @@
             },
             resultItem(){
                 var vm = this
-                if (vm.searchQuery.trim() === '')
-                    return null
-                else
-                    return vm.fuse.search(vm.searchQuery.trim()).splice(0, 3)
+                if(vm.fuse){
+                    if (vm.searchQuery.trim() === '')
+                        return null
+                    else
+                        return vm.fuse.search(vm.searchQuery.trim()).splice(0, 3)
+                }
+
             },
             getLocation(){
                 return _.uniqWith(this.coords, _.isEqual)
@@ -214,6 +249,9 @@
 
         },
         methods: {
+            mySigthing(){
+                currentPageSwitcher("plant-navigator", 'My Sighting', 0)
+            },
             moreDetail(){
                 moreDetail()
             },
@@ -232,17 +270,10 @@
                     zoomControl: true
                 })
                 vm.map.zoomControl.setPosition('bottomleft');
-                var options = {
-                    shouldSort: true,
-                    threshold: 0.6,
-                    location: 0,
-                    distance: 100,
-                    maxPatternLength: 32,
-                    minMatchCharLength: 1,
-                    keys: vm.keys
-                };
 
-                vm.fuse = new Fuse(vm.resultFuse, options);
+                var comp = new L.Control.Compass({autoActive: true});
+                vm.map.addControl(comp);
+
                 vm.map.locate({setView: true, maxZoom: 15});
                 vm.setTileSet(vm.selectedTileSet)
                 vm.map.on('locationfound', vm.onLocationFound);
@@ -304,6 +335,7 @@
                 vm.map.panTo([lat, lng], 20)
             },
             onResult(search){
+
                     var vm = this, plant = _.findIndex(this.markers, {options: {id: search.id}});
                     vm.searchQuery = ''
                     vm.markerFunction(plant)
@@ -452,29 +484,72 @@
             createPolyLine(floraLocation, userLocation){
                 return 'About ' + (floraLocation.distanceTo(userLocation) / 1000).toFixed(0) + 'km away from you.</p>';
             },
-            getGoogleData: function () {
-                var vm = this, userDistance = null
+            getSupportedPropertyName(properties) {
+                for (var i = 0; i < properties.length; i++) {
+                    if (typeof document.body.style[properties[i]] != "undefined") {
+                        return properties[i];
+                    }
+                }
+                return null;
+            },
+            mapItem(stateFilter){
+                var vm = this, userDistance = null;
+                var options = {
+                    shouldSort: true,
+                    threshold: 0.6,
+                    location: 0,
+                    distance: 100,
+                    maxPatternLength: 32,
+                    minMatchCharLength: 1,
+                    keys: vm.keys
+                };
 
-                _.forEach(plantItem.all, function (val, i) {
-                    vm.resultFuse.push(val)
-                    var photo = !_.isEmpty(val.photos) ? val.photos[0].file : 'http://placekitten.com/g/40/40'
-                    var floralocation = new L.LatLng(val.latitude, val.longitude);
-                    vm.userLocation ? userDistance = vm.createPolyLine(floralocation, vm.userLocation) : null;
-                    var markerX = L.marker([val.latitude, val.longitude], {
-                        id: val.id,
-                        title: val.title,
-                        name: val.title,
-                        content: val.description,
-                        image: photo,
-                        closeOnClick: true
-                    }).bindPopup('<div style="z-index: 402; max-width: 80vw; "><h2>' + val.title  + '</h2>' + userDistance  + val.description + '<img style="width: 100%;" src="images/' + photo + '"/>' + "</div>");
-                    markerX._id = val.id
-                    vm.markerClusters.addLayer(markerX);
-                    vm.markers.push(markerX);
-                    vm.map.setView(floralocation, 15);
-                    vm.map.addLayer(vm.markerClusters)
+                    vm.stateFilter = stateFilter
+                var transform = ["transform", "msTransform", "webkitTransform", "mozTransform", "oTransform"];
+
+                var item = document.querySelector(".tabbar__border");
+                var transformProperty = vm.getSupportedPropertyName(transform);
+
+                if(!_.isEmpty(vm.markerX)){
+                    vm.markerClusters.removeLayers(vm.markerX);
+                }
+
+                vm.markers = [];
+                vm.markerX = [];
+                vm.resultFuse = []
+
+                if(vm.stateFilter === 1){
+                    item.style[transformProperty] = 'translate3d(0%, 0, 0px)';
+
+                }else if(vm.stateFilter === 0){
+                    item.style[transformProperty] = 'translate3d(100%, 0, 0px)';
+                }
+
+                _.forEach(vm.plantItem.all, function (val, i) {
+                    if (val.latitude && val.longitude && val.published === stateFilter) {
+                        vm.resultFuse.push(val)
+                        var photo = !_.isEmpty(val.photos) ? val.photos[0].file : 'http://placekitten.com/g/40/40'
+                        var floralocation = new L.LatLng(val.latitude, val.longitude);
+                        vm.userLocation ? userDistance = vm.createPolyLine(floralocation, vm.userLocation) : null;
+                        var markerX = L.marker([val.latitude, val.longitude], {
+                            id: val.id,
+                            title: val.title,
+                            name: val.title,
+                            content: val.description,
+                            image: photo,
+                            closeOnClick: true
+                        }).bindPopup('<div style="z-index: 402; max-width: 80vw; "><h2>' + val.title + '</h2>' + userDistance + val.description + '<img style="width: 100%;" src="images/' + photo + '"/>' + "</div>");
+                        vm.markerX.push(markerX)
+                        markerX._id = val.id
+                        vm.markerClusters.addLayer(markerX);
+                        vm.markers.push(markerX);
+                        vm.map.setView(floralocation, 15);
+
+                    }
 
                 });
+                vm.map.addLayer(vm.markerClusters)
+                vm.fuse = new Fuse(vm.resultFuse, options);
                 if (vm.plantFound.index) {
                     vm.onResult(vm.plantFound.index)
                 }
@@ -485,6 +560,17 @@
                 if (vm.fuse) {
                     vm.resultFuse = null
                 }
+
+            },
+            getGoogleData: function () {
+                var vm = this, userDistance = null
+                if (vm.plantFound.index) {
+                    vm.mapItem( vm.plantFound.index.published)
+                }else{
+                    vm.mapItem(vm.stateFilter)
+                }
+
+
             },
         },
 

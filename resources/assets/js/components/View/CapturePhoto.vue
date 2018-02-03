@@ -47,7 +47,7 @@
                             </v-ons-list-item>
                             <v-ons-list-item>
                                 <div class="center" style="display: flex;justify-content: space-between;">
-                                    <v-ons-button @click="addBaseColor" class="btn" style="width:48%;">Add
+                                    <v-ons-button @click="addBaseColor" :disabled="disabledButton" class="btn-btn" style="width:48%;">Add
                                     </v-ons-button>
                                     <v-ons-button @click="removeImage" class="btn-stop" style="width:48%;">Remove
                                     </v-ons-button>
@@ -179,7 +179,8 @@
                     description: ''
                 },
                 urlFile: null,
-                baseColor: plantItem
+                baseColor: plantItem,
+                disabledButton: false
             }
         },
         components: {'virtual-list': virtualList },
@@ -257,8 +258,14 @@
             addBaseColor(){
                 var vm = this,
                     hexArray = vm.palletesConvertHex();
-
+                vm.disabledButton = true
                 FormDataPost(vm.image, hexArray, vm.location.latitude, vm.location.longitude, vm.location.altitude, vm.repositoryInfo.title, vm.repositoryInfo.description, vm.selectedPlant)
+                    .then(function (data) {
+                        console.log(data)
+                        vm.disabledButton = false
+                    }).catch(function () {
+                    vm.disabledButton = false
+                })
 
             },
             showPosition(position) {
@@ -270,6 +277,7 @@
             }
         },
         mounted(){
+
             var vm = this
             if (capturePhoto) {
                 vm.onFileChange(capturePhoto)

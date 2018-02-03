@@ -2,15 +2,17 @@
  * Created by Lorilla on 02/10/2017.
  */
 window.Vue = require('vue');
-import Plant from  './components/View/Plantv2.vue'
+import Plant from  './components/View/Plant.vue'
 import VirtualList from 'vue-virtual-scroll-list'
 import OfflineHandler from  './components/View/OfflineHandler.vue'
+import Pagination from  './components/Pagination.vue'
 import Setting from  './components/View/Setting.vue'
 import MySighting  from  './components/View/MySighting.vue'
 import PlantItem from  './components/View/PlantItem.vue'
 import PlantItemMapView from  './components/View/PlantMapView.vue'
 import PlantItemNavigator from  './components/View/PlantItemNavigator.vue'
 import Map from  './components/View/Maps.vue'
+import MapHandler from  './components/View/MapHandler.vue'
 import ChatView from  './components/View/Chat.vue'
 import Chat from  './components/View/ChatView.vue'
 import ChatManage from  './components/View/ChatManage.vue'
@@ -48,7 +50,13 @@ Vue.component('view-plant', function (resolve, reject) {
     setTimeout(function () {
         resolve(Plant)
     }, 100)
-});Vue.component('view-settings', function (resolve, reject) {
+});
+Vue.component('pagination', function (resolve, reject) {
+    setTimeout(function () {
+        resolve(Pagination)
+    }, 100)
+});
+Vue.component('view-settings', function (resolve, reject) {
     setTimeout(function () {
         resolve(Setting)
     }, 100)
@@ -61,6 +69,11 @@ Vue.component('plant-item', function (resolve, reject) {
 Vue.component('view-map', function (resolve, reject) {
     setTimeout(function () {
         resolve(Map)
+    }, 100)
+});
+Vue.component('maps-handler', function (resolve, reject) {
+    setTimeout(function () {
+        resolve(MapHandler)
     }, 100)
 });
 Vue.component('my-sightings', function (resolve, reject) {

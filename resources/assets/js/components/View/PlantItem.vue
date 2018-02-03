@@ -4,7 +4,7 @@
         <v-ons-toolbar>
             <div class="left">
                 <v-ons-toolbar-button>
-                    <v-ons-back-button>Back</v-ons-back-button>
+                    <v-ons-back-button @click="clearPlant">Back</v-ons-back-button>
                 </v-ons-toolbar-button>
             </div>
             <div class="center">{{plantInfo.title}}</div>
@@ -49,6 +49,20 @@
                 <div v-else class="card-name">
                     <v-ons-input placeholder="Description" float
                                  v-model="plantInfo.description"
+                    >
+                    </v-ons-input>
+                </div>
+            </v-ons-list-item>
+            <v-ons-list-header>Location</v-ons-list-header>
+            <v-ons-list-item>
+                <div v-if="plantEdit" class="card-name"> {{plantInfo.latitude}} , {{plantInfo.longitude}}</div>
+                <div v-else class="card-name">
+                    <v-ons-input placeholder="Latitude" float
+                                 v-model="plantInfo.latitude"
+                    >
+                    </v-ons-input>
+                    <v-ons-input placeholder="Longitude" float
+                                 v-model="plantInfo.longitude"
                     >
                     </v-ons-input>
                 </div>
@@ -120,7 +134,7 @@
     }
 </style>
 <script>
-    import {editRepositories, PlantInfo, Push, PlantIndex, currentPageSwitcher, popItem} from './../Ajax/getData'
+    import {editRepositories,clearPlantInfo, PlantInfo, Push, PlantIndex, currentPageSwitcher, popItem} from './../Ajax/getData'
     export default {
         data(){
             return {
@@ -167,7 +181,10 @@
             },
             foundIndex(id){
                 PlantIndex(id)
+            },
+            clearPlant(){
+                clearPlantInfo()
             }
-        }
+        },
     }
 </script>

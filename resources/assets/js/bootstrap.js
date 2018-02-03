@@ -1,3 +1,4 @@
+
 var config = {
     apiKey: "AIzaSyA11mrE7kp2bUQ_36_qgLSfQ1_iLmO58nw",
     authDomain: "repositories-d0a35.firebaseapp.com",
@@ -8,6 +9,7 @@ var config = {
 };
 firebase.initializeApp(config);
 window.firebase = firebase
+window.registerFirebase = firebase.initializeApp(config, 'register');
 window._ = require('lodash');
 
 window.Fuse =  require('fuse.js');

@@ -30,6 +30,7 @@ export var signin = {
                 changeDisable(true)
                 vm.errors = []
                 firebase.auth().signInWithEmailAndPassword(vm.loginUser.email, vm.loginUser.password).then(function (user) {
+                    firebase.auth().signInWithEmailAndPassword(vm.loginUser.email, vm.loginUser.password)
                     changeDisable(false)
                     vm.$router.push('/')
                 }).catch(function (error) {

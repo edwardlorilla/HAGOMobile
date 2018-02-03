@@ -73,7 +73,6 @@
 </template>
 <script>
     import {
-            onHoldHandler,
             onHold,
             toggleMySighting,
             isNearestMarkerSort,
@@ -102,7 +101,7 @@
                 nearestMarker: false,
                 isView: false,
                 selectedView: mySighting.marker.toString(),
-                viewUrls: ['My Sighting', 'Repositories of Plants'],
+                viewUrls: ['Gallery', 'Repositories of Plants'],
                 nearest,
                 user_id: firebase.auth().currentUser.displayName,
                 user_uid: firebase.auth().currentUser.uid,

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Repository;
+use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Image;
@@ -14,15 +15,20 @@ class RepositoryController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+
+    //createRepository -> repository/create/{firebase}
+
+
+
     public function index($firebase)
     {
         $user = Cache::rememberForever('user_repository:all', function () use ($firebase) {
-            return \App\User::with('repositories.photos', 'repositories.color', 'repositories.repository')->where('firebase_uid', $firebase)->first()['repositories'];
+            return \App\User::with('repositories.photos', 'repositories.color','repositories.distribution','repositories.category','repositories.family', 'repositories.repository')->where('firebase_uid', $firebase)->first()['repositories'];
 
         });
 
 
-        $repositories = Repository::with('photos', 'color', 'repository')
+        $repositories = \App\Repository::with('distribution','photos', 'color', 'repository', 'category', 'family')
             ->where('published', 1)
             ->orderBy('updated_at', 'desc')
             ->get();
@@ -38,9 +44,57 @@ class RepositoryController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function check($firebase)
     {
-        //
+        return 2 === \App\User::where('firebase_uid', $firebase)->first()->role_id;
+    }
+
+    public function createRepository(Request $request, $firebase)
+    {
+        if($this->check($firebase)){
+            $location = $request->location;
+            $repositoryInfo = $request->repositoryInfo;
+            $selected = $request->selected;
+            $user = \App\User::where('firebase_uid', $firebase)->first();
+
+            //photo
+            $imageData = $request->image;
+            $fileName = uniqid() . '.' . explode('/', explode(':', substr($imageData, 0, strpos($imageData, ';')))[1])[1];
+            $img = Image::make($request->image);
+
+            $img->save(public_path('images/') . $fileName);
+            $img->resize(60, 60, function ($constraint) {
+                $constraint->aspectRatio();
+            })->save(public_path('images/thumb_') . $fileName);
+            $photo = \App\Photo::create(['file' => $fileName]);
+
+            /*
+             * */
+
+            $color = $request->colors ? \App\Color::create([
+                'colors' => $request->colors
+            ]) : null;
+            $repository = new Repository([
+                'family_id' => $selected['family'],
+                'distribution_id' => $selected['distribution'],
+                'category_id' => $selected['category'],
+                'color_id' => $color->id,
+                'commonName'=> $repositoryInfo['commonName'] ,
+                'description'=> $repositoryInfo['description'],
+                'scientificName'=> $repositoryInfo['scientificName'],
+                'specie'=> $repositoryInfo['species'],
+                'title'=> $repositoryInfo['title'] ,
+                'economicImportance'=> $repositoryInfo['economicImportance'] ,
+                'estimatedDensity' => $selected['density'],
+                'latitude'=> $location['latitude'],
+                'altitude'=> $location['altitude'],
+                'longitude'=> $location['longitude']
+            ]);
+            $repositories = $user->repositories()->save($repository);
+            $repositories->vegetations()->attach([$selected['vegetation']]);
+            $repositories->photos()->attach($photo->id);
+        }
+        return $repository;
     }
 
     /**
@@ -102,7 +156,8 @@ class RepositoryController extends Controller
             'color' => [
                 'colors' => $request->colors ? $request->colors : null
             ],
-            "repository" => $repository_id
+            "repository" => $repository_id,
+            'published' => 0
 
         ]);
 

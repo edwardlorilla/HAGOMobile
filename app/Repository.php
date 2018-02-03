@@ -6,8 +6,10 @@ use Illuminate\Database\Eloquent\Model;
 
 class Repository extends Model
 {
-    protected $fillable =[
-      'title', 'description', 'scientificName', 'latitude', 'longitude', 'altitude', 'color_id', 'repository_id', 'classification_id', 'distribution_id'
+    protected $fillable = [
+        'title', 'specie', 'commonName', 'localName', 'location', 'economicImportance', 'estimatedDensity', 'threats',
+        'pathwaySpread', 'remarks', 'description', 'scientificName', 'latitude', 'longitude', 'altitude', 'color_id',
+        'repository_id', 'category_id', 'distribution_id', 'family_id'
     ];
 
     /**
@@ -17,6 +19,7 @@ class Repository extends Model
     {
         return $this->belongsToMany(Photo::class);
     }
+
     public function vegetations()
     {
         return $this->belongsToMany(Vegetation::class);
@@ -30,19 +33,27 @@ class Repository extends Model
     {
         return $this->belongsTo(User::class);
     }
-    public function classification()
+
+    public function category()
     {
-        return $this->belongsTo(Classification::class);
+        return $this->belongsTo(Category::class);
     }
+
     public function distribution()
     {
         return $this->belongsTo(Distribution::class);
+    }
+
+    public function family()
+    {
+        return $this->belongsTo(Family::class);
     }
 
     public function repository()
     {
         return $this->belongsTo(Repository::class);
     }
+
     /*
      * color assiciated with the repository
      */

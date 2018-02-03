@@ -16,9 +16,11 @@ class CreateRepositoriesTable extends Migration
         Schema::create('repositories', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('user_id')->unsigned()->index()->nullable();
+            $table->foreign('user_id')->references('id')->on('users');
             $table->integer('repository_id')->unsigned()->index()->nullable();
-            $table->integer('classification_id')->unsigned()->index()->nullable();
-            $table->integer('distribution_id')->unsigned()->index()->nullable()();
+            $table->foreign('repository_id')->references('id')->on('repositories');
+
+
             $table->boolean('published')->default(false);
             $table->string('title')->nullable();
             $table->text('description')->nullable();
@@ -27,7 +29,7 @@ class CreateRepositoriesTable extends Migration
             $table->string('commonName')->nullable();
             $table->string('localName')->nullable();
             $table->string('location')->nullable();
-            $table->string('estimatedDensity')->nullable();
+            $table->integer('estimatedDensity')->nullable();
             $table->string('pathwaySpread')->nullable();
             $table->text('threats')->nullable();
             $table->text('economicImportance')->nullable();
