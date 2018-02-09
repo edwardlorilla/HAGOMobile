@@ -29,14 +29,22 @@ export var signin = {
             if (vm.isFormValid()) {
                 changeDisable(true)
                 vm.errors = []
-                firebase.auth().signInWithEmailAndPassword(vm.loginUser.email, vm.loginUser.password).then(function (user) {
-                    firebase.auth().signInWithEmailAndPassword(vm.loginUser.email, vm.loginUser.password)
+                axios.post('api/user/check', {'name': vm.loginUser.email}).then(function (response) {
                     changeDisable(false)
-                    vm.$router.push('/')
-                }).catch(function (error) {
-                    changeDisable(false)
-                    vm.errors.push(error.message)
+                    if (response.data) {
+                        firebase.auth().signInWithEmailAndPassword(response.data, vm.loginUser.password).then(function (user) {
+
+                            changeDisable(false)
+                            vm.$router.push('/')
+                        }).catch(function (error) {
+                            changeDisable(false)
+                            vm.errors.push(error.message)
+                        })
+                    }else{
+                        changeDisable(false)
+                    }
                 })
+
             }
             /* var vm = this
              changeDisable(true)

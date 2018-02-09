@@ -20,6 +20,7 @@ import App from './components/AppHandler.vue';
 import DashBoard from './components/DashBoard.vue';
 import Repositories from './components/Repositories/index.vue';
 import RepositoryCreate from './components/Repositories/create.vue';
+import RepositoryEdit from './components/Repositories/edit.vue';
 import User from './components/User/index.vue';
 import UserEdit from './components/User/edit.vue';
 import loginForm from './components/View/LoginHandler.vue';
@@ -35,7 +36,6 @@ import Vue2Filters from 'vue2-filters'
 import VueHotkey from 'v-hotkey'
 import ElementUI from 'element-ui'
 import 'element-ui/lib/theme-chalk/index.css'
-
 Vue.use(ElementUI)
 
 Vue.use(VueHotkey)
@@ -88,8 +88,9 @@ const router = new VueRouter({
                 { path: '', component: DashBoard },
                 { path: 'users', component: User, title: 'Users'},
                 { path: 'users/:id', component: UserEdit },
-                { path:'repositories', component: Repositories},
-                { path:'repositories/create', component: RepositoryCreate},
+                { path:'repositories', name: 'repositories', component: Repositories},
+                { path:'repositories/create', name: 'create-repositories', component: RepositoryCreate},
+                { path:'repositories/edit', name: 'edit-repositories', component: RepositoryEdit},
             ],
             beforeEnter: (function (to, from, next) {
                 firebase.auth().onAuthStateChanged(function (user) {

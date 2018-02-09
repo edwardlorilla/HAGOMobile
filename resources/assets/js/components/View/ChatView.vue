@@ -7,7 +7,7 @@
             <div class="center">{{getChatInfo}}</div>
         </v-ons-toolbar>
         <virtual-list :size="50" :remain="10" class="list" :start="getStartIndex">
-            <div :class="send.uid === chatInfo.detail.uid ? 'receiver-text'  : 'sender-text'"
+            <div :class="send.to === currentUser? 'receiver-text'  : 'sender-text'"
                  v-for="(send, index) in messages"
                  :index="index"
                  :key="index">
@@ -256,7 +256,7 @@
     }
 </style>
 <script>
-    import {chatInfo} from  './../Ajax/getData'
+    import {chatInfo, chats, getCurrent} from  './../Ajax/getData'
 
     export default{
         computed: {
@@ -271,25 +271,29 @@
         },
         data(){
             return {
+                chats,
                 chatInfo,
                 chatRef: null,
-                currentUser: null,
+                getCurrent,
                 userId: null,
                 messages: [],
                 newMessage: '',
-                retryCount: 0
+                retryCount: 0,
+                currentUser: null
             }
         },
         mounted(){
             var vm = this
 
-            vm.userId = vm.chatInfo.detail.uid
-            vm.currentUser = firebase.auth().currentUser
+            vm.userId = vm.chats.users.id.toString()
+            vm.currentUser = vm.getCurrent.user.id.toString()
 
-            vm.chatRef = firebase.database().ref().child(`chats/${vm.userId}`)
+            vm.chatRef = firebase.database().ref().child(`chats/admin`)
             vm.chatRef.on('child_added', function (snapshot) {
-                if (snapshot.val().id === vm.userId || snapshot.val().id === vm.currentUser.uid) {
+                if ((snapshot.val().to === vm.userId && snapshot.val().from === vm.currentUser) || (snapshot.val().from === vm.userId && snapshot.val().to === vm.currentUser) ) {
                     vm.messages.push(snapshot.val())
+
+
                 }
             })
 /*
@@ -311,7 +315,8 @@
             send(){
                 var vm = this;
                 let data = {
-                    id: vm.currentUser.uid,
+                    from: vm.currentUser,
+                    to: vm.userId,
                     message: vm.newMessage
                 };
 

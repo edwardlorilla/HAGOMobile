@@ -12,34 +12,76 @@
 
             <form class="w3-container">
                 <div class="w3-section">
-                    <label>Name</label>
-                    <input class="w3-input w3-border w3-margin-bottom"
-                           type="text"
-                           v-model="name"
-                           placeholder="Enter Name"
-                           name="Name"
-                           required>
-                    <label><b>Email</b></label>
-                    <input class="w3-input w3-border"
-                           v-model="email"
-                           type="email"
-                           placeholder="Enter Email"
-                           name="email"
-                           required>
-                    <label><b>Password</b></label>
-                    <input class="w3-input w3-border"
-                           v-model="password"
-                           type="password"
-                           placeholder="Enter Password"
-                           name="psw"
-                           required>
-                    <label><b>Confirm Password</b></label>
-                    <input class="w3-input w3-border"
-                           v-model="password_confirmation"
-                           type="password"
-                           placeholder="Enter Password"
-                           name="psw"
-                           required>
+                    <div class="w3-row-padding">
+                        <div class="w3-half">
+                            <label>Username</label>
+                            <input class="w3-input w3-border w3-margin-bottom"
+                                   type="text"
+                                   v-model="name" placeholder="Enter Username"
+                                   name="Name"
+                                   required>
+                        </div>
+                        <div class="w3-half">
+                            <label><b>Email</b></label>
+                            <input class="w3-input w3-border"
+                                   v-model="email"
+                                   type="email"
+                                   placeholder="Enter Email"
+                                   name="email"
+                                   required>
+                        </div>
+                    </div>
+                    <div class="w3-row-padding">
+                        <div class="w3-half">
+                            <label><b>Password</b></label>
+                            <input class="w3-input w3-border"
+                                   v-model="password"
+                                   type="password"
+                                   placeholder="Enter Password"
+                                   name="psw"
+                                   required>
+                        </div>
+                        <div class="w3-half">
+                            <label><b>Confirm Password</b></label>
+                            <input class="w3-input w3-border"
+                                   v-model="password_confirmation"
+                                   type="password"
+                                   placeholder="Enter Password"
+                                   name="psw"
+                                   required>
+                        </div>
+                    </div>
+                    <div class="w3-row-padding">
+                        <div class="w3-third">
+                            <label><b>School</b></label>
+                            <input class="w3-input w3-border"
+                                   v-model="school"
+                                   type="text"
+                                   placeholder="Enter School"
+                                   name="school"
+                                   required>
+                        </div>
+                        <div class="w3-third">
+                            <label><b>Country</b></label>
+
+                            <select-input v-model="country" :select="country"></select-input>
+                        </div>
+                        <div class="w3-third">
+                            <label><b>Field of Study</b></label>
+                            <input class="w3-input w3-border"
+                                   v-model="field"
+                                   type="text"
+                                   placeholder="Enter Field of Study"
+                                   name="field"
+                                   required>
+                        </div>
+                    </div>
+
+
+
+
+
+
                     <ons-button v-if="!loading"
                                 @click="register"
                                 class="w3-button w3-block w3-green w3-section w3-padding"
@@ -60,10 +102,18 @@
 
 </template>
 <script>
+    import Select from './Select.vue'
+    import {insertUser} from './../Ajax/getData'
     export default{
+        components:{
+          'select-input' : Select
+        },
         data(){
             return{
                 showModal: 'block',
+                country: 'PH',
+                school: '',
+                field: '',
                 name: '',
                 email: '',
                 password: '',
@@ -104,28 +154,22 @@
                         name: vm.name,
                         email: vm.email,
                         password: vm.password,
-                        password_confirmation: vm.password_confirmation
+                        password_confirmation: vm.password_confirmation,
+                        country: vm.country,
+                        school: vm.school,
+                        field: vm.field,
+                        uid: firebase.auth().currentUser.uid
                     })
                         .then(function (response) {
-                            registerFirebase.auth().createUserWithEmailAndPassword(vm.email, vm.password)
-                                .then(function(user){
-                                    axios.put(`/api/user/${response.data.id}`, {firebase_uid: user.uid})
-
-                                    user.updateProfile({
-                                        displayName: response.data.id,
-                                        photoURL: `https://www.gravatar.com/avatar/${md5(user.email)}?d=identicon`,
-                                    }).then(function(){
-                                        vm.$emit('closeModal')
-                                        vm.saveUserToUsersRef(user).then(function(){
-                                            registerFirebase.auth().signOut();
-                                        })
-                                    }).catch(function(error){
-                                        vm.errors.push(error.message)
-                                    })
-                                }).catch(function(error) {
-                                var errorCode = error.code;
-                                vm.errors.push(error.message);
-                            });
+                            vm.loading = false
+                            vm.name = ''
+                            vm.email = ''
+                            vm.password = ''
+                            vm.password_confirmation = ''
+                            vm.country = ''
+                            vm.school = ''
+                            vm.field = ''
+                            insertUser(response.data)
                         })
                         .catch(function (error) {
                             vm.loading = false

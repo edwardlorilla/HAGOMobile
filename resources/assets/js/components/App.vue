@@ -28,9 +28,10 @@
 
         <v-ons-splitter-content>
             <v-ons-gesture-detector>
-            <!--<keep-alive exclude="plant-item-map-view">-->
+            <!--<keep-alive :exclude="isAlive.isWatch ?  null   :'plant-item-map-view'">-->
+            <keep-alive exclude="view-timeline">
                 <component :is="currentPage.url" :page-name="currentPage.name"></component>
-            <!--</keep-alive>-->
+            </keep-alive>
             </v-ons-gesture-detector>
         </v-ons-splitter-content>
 
@@ -38,7 +39,7 @@
 
 </template>
 <style scoped>
-
+/*
 
     .pulse {
         position: fixed;
@@ -125,11 +126,12 @@
             transform: scale(1);
             opacity: 1;
         }
-    }
-
+    }*/
 </style>
 <script>
     import {
+        chatUserView,
+        isAlive,
         onHoldHandler,
         isDisable,
         usersChat,
@@ -142,6 +144,7 @@
         isAuth,
         toggleAuth,
         user,
+        getCurrentUser,
         getData,
         storeUserDetail
     } from './Ajax/getData'
@@ -164,9 +167,13 @@
                         name: 'Gallery'
                     },
                     {
-                        url: 'view-map',
+                        url: 'navigation-map',
                         name: 'Map View'
                     },
+                   /* {
+                        url: 'navigation-timeline',
+                        name: 'Recent Searches'
+                    },*/
                     {
                         url: 'chat-manage',
                         name: 'Chat '
@@ -188,7 +195,8 @@
                 user: null,
                 currentUser: null,
                 userDetail: user,
-                userRef: null
+                userRef: null,
+                isAlive
             }
         },
         mounted(){
@@ -210,10 +218,15 @@
 
             })
             setTimeout(function(){
-                axios.get(`api/user/${vm.user.displayName}/${vm.user.uid}`).then(function (response) {
+                axios.get(`api/user/firebase/${vm.user.uid}`).then(function (response) {
                     vm.currentUser = response.data
+                    getCurrentUser(response.data)
                 })
             }, 3000);
+            //user/admin/chat'
+            axios.get(`api/user/admin/chat`).then(function (response) {
+                chatUserView(response.data)
+            })
             getData()
             document.addEventListener('hold', function (event) {
                 onHoldHandler()

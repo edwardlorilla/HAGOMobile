@@ -68,7 +68,7 @@
             </v-ons-lazy-repeat>
         </v-ons-list>
         </v-ons-gesture-detector>
-        <floating-action></floating-action>
+        <floating-action position="bottom center"></floating-action>
     </v-ons-page>
 </template>
 <script>
@@ -137,7 +137,7 @@
                                               </div>
                                               <div class="location">
                                                 <i class="fa fa-map-marker"></i>
-                                                {{plant.all[index].description.slice(0, 20)}}
+                                                {{plant.all[index].description != null ? plant.all[index].description.splice(0, 20) : null}}
                                               </div>
                                             </v-ons-col>
                                           </v-ons-row>

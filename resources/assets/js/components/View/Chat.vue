@@ -9,23 +9,24 @@
             </div>
             <div class="center">Lists</div>
         </v-ons-toolbar>
-        <v-ons-progress-bar v-if="!users.chat.length > 0" indeterminate></v-ons-progress-bar>
+        <v-ons-progress-bar v-if="!chats.users.length > 0" indeterminate></v-ons-progress-bar>
         <v-ons-list >
             <v-ons-lazy-repeat
-                    v-if="users.chat.length > 0"
+                    v-if="chats.users.length > 0"
                     :render-item="renderItem"
-                    :length="users.chat.length"
+                    :length="chats.users.length"
             >
             </v-ons-lazy-repeat>
         </v-ons-list>
     </v-ons-page>
 </template>
 <script>
-    import {users,ChatPush, change_view, getChatInfo}  from './../Ajax/getData'
+    import {chats,ChatPush, change_view, getChatInfo}  from './../Ajax/getData'
     export default{
         data(){
+
             return {
-                users,
+                chats,
                 renderItem(i)  {
                     return new Vue({
                         template: `
@@ -48,19 +49,19 @@
                         methods:{
                           chat(){
                               var vm = this
-                              getChatInfo(vm.users.chat[vm.index])
+                              getChatInfo(vm.chats.users[vm.index])
                               ChatPush('chat');
                           }
                         },
                         computed: {
                             getUser(){
                                 var vm = this
-                                return _.isEmpty(vm.users.chat[vm.index]) ? false : vm.users.chat[vm.index]
+                                return _.isEmpty(vm.chats.users[vm.index]) ? false : vm.chats.users[vm.index]
                             }
                         },
                         data() {
                             return {
-                                users,
+                                chats,
                                 index: i
                             };
                         }
@@ -72,6 +73,7 @@
         mounted()
         {
             var vm = this;
+
 
         },
         methods:{

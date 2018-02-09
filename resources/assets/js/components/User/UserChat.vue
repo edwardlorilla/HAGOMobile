@@ -229,16 +229,13 @@
             vm.userId = vm.user.id.toString()
 
 
-            vm.currentUser = firebase.auth().currentUser
+            vm.currentUser = firebase.auth().currentUser.displayName
             console.log(vm.userId, vm.currentUser)
 
             vm.chatRef = firebase.database().ref().child(`chats/admin`)
             vm.chatRef.on('child_added', function (snapshot) {
-                if ((snapshot.val().to === vm.userId || snapshot.val().from === vm.userId) &&
-                    (snapshot.val().to === vm.currentUser.displayName || snapshot.val().from === vm.currentUser.displayName)) {
+                if ((snapshot.val().to === vm.userId && snapshot.val().from === vm.currentUser) || (snapshot.val().from === vm.userId && snapshot.val().to === vm.currentUser)) {
                     vm.messages.push(snapshot.val())
-
-
                 }
             })
 
@@ -252,7 +249,7 @@
             send(){
                 var vm = this;
                 let data = {
-                    from: vm.currentUser.displayName,
+                    from: vm.currentUser,
                     to: vm.userId,
                     message: vm.newMessage
                 };

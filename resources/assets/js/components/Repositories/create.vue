@@ -110,10 +110,18 @@
                     <div class="w3-row-padding">
                         <div class="w3-half">
                             <label>Vegetation Type</label>
-                            <select class="w3-select w3-border" v-model="selected.vegetation"  name="option">
+                            <!--<select class="w3-select w3-border"  name="option">
                                 <option value="" disabled selected></option>
                                 <option v-for="vegetation in allId.vegetations" :value="vegetation.id">{{vegetation.name}}</option>
-                            </select>
+                            </select>-->
+                            <el-select v-model="selected.vegetation"  multiple clearable placeholder="Vegetation Type">
+                                <el-option
+                                        v-for="vegetation in allId.vegetations"
+                                        :key="vegetation.id"
+                                        :label="vegetation.name"
+                                        :value="vegetation.id">
+                                </el-option>
+                            </el-select>
                         </div>
                         <div class="w3-half">
                             <label>Estimated Density</label>
@@ -126,7 +134,9 @@
 
                     <div class="w3-container w3-center w3-margin-top">
                         <button class="w3-btn w3-ripple w3-large w3-green" @click="addBaseColor">Add</button>
-                        <button class="w3-btn w3-ripple w3-large w3-red">Cancel</button>
+                        <router-link to="../repositories" class="w3-btn w3-ripple w3-large w3-red" >
+                          Cancel
+                        </router-link>
                     </div>
 
                 </div>

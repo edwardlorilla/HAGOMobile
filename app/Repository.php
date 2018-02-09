@@ -9,7 +9,7 @@ class Repository extends Model
     protected $fillable = [
         'title', 'specie', 'commonName', 'localName', 'location', 'economicImportance', 'estimatedDensity', 'threats',
         'pathwaySpread', 'remarks', 'description', 'scientificName', 'latitude', 'longitude', 'altitude', 'color_id',
-        'repository_id', 'category_id', 'distribution_id', 'family_id'
+        'repository_id', 'category_id', 'distribution_id', 'family_id', 'published'
     ];
 
     /**

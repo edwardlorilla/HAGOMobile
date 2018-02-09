@@ -98,6 +98,7 @@
                 vm.errors = []
                 if(vm.isFormValid){
                     vm.loading = true
+
                     axios.post('/api/user', {
                         name: vm.name,
                         email: vm.email,
@@ -105,8 +106,12 @@
                         password_confirmation: vm.password_confirmation
                     })
                         .then(function (response) {
+
                             firebase.auth().createUserWithEmailAndPassword(vm.email, vm.password)
                                 .then(function(user){
+                                    firebase.database().ref().child(`usernames/${response.data.name}`).set({
+                                        'email': response.data.email
+                                    })
                                     axios.put(`/api/user/${response.data.id}`, {firebase_uid: user.uid})
 
                                     user.updateProfile({

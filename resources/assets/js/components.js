@@ -27,11 +27,16 @@ import LoginUser from  './components/View/Login.vue'
 import LoginBrowser from  './components/View/LoginBrowser.vue'
 import SearchResultMapScope from  './components/View/SearchResultMapScope.vue'
 import FloatingAction from  './components/FloatingActionBar.vue'
+import FloatingMap from  './components/View/floating-map.vue'
 import staggeredFade from  './components/Transition/staggered-fade.vue'
 import noModeTranslateFade from  './components/Transition/no-mode-translate-fade.vue'
 import App from './components/App.vue'
 import AppHandler from './components/AppHandler.vue'
 import AppBrowser from './components/AppBrowser.vue'
+import Timeline from './components/Timeline/Timeline.vue'
+import NavigatorTimeline from './components/Timeline/Navigation.vue'
+import MapNavigation from './components/View/MapNavigation.vue'
+import TimelineDetail from './components/Timeline/Detail.vue'
 Vue.component('plant-item-map-view', function (resolve, reject) {
         resolve(PlantItemMapView)
 });
@@ -64,6 +69,26 @@ Vue.component('view-settings', function (resolve, reject) {
 Vue.component('plant-item', function (resolve, reject) {
     setTimeout(function () {
         resolve(PlantItem)
+    }, 100)
+});
+Vue.component('view-timeline', function (resolve, reject) {
+    setTimeout(function () {
+        resolve(Timeline)
+    }, 100)
+});
+Vue.component('navigation-timeline', function (resolve, reject) {
+    setTimeout(function () {
+        resolve(NavigatorTimeline)
+    }, 100)
+});
+Vue.component('navigation-map', function (resolve, reject) {
+    setTimeout(function () {
+        resolve(MapNavigation)
+    }, 100)
+});
+Vue.component('timeline-detail', function (resolve, reject) {
+    setTimeout(function () {
+        resolve(TimelineDetail)
     }, 100)
 });
 Vue.component('view-map', function (resolve, reject) {
@@ -107,6 +132,9 @@ Vue.component('login-browser', function (resolve, reject) {
 });
 Vue.component('floating-action', function (resolve, reject) {
     resolve(FloatingAction)
+});
+Vue.component('floating-map', function (resolve, reject) {
+    resolve(FloatingMap)
 });
 Vue.component('capture-photo', function (resolve, reject) {
     resolve(CapturePhoto)

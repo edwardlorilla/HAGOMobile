@@ -1,6 +1,7 @@
 <template>
     <v-ons-fab
-            position="bottom center"
+            :position="position"
+
             :style="{ backgroundColor: $ons.platform.isIOS() ? '#4282cc' : null }"
             :visible="fabVisible"
             @click="capturePhoto"
@@ -21,6 +22,12 @@
 <script>
     import {Splice, Push, cameraInfo, capturePhoto, onHoldFalse} from './Ajax/getData'
     export default {
+
+        props:{
+          position:{
+              type: String
+          }
+        },
         data(){
             return{
                 fabVisible: true

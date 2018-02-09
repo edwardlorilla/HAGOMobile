@@ -5,9 +5,9 @@
                 <v-ons-icon icon="ion-android-arrow-back"></v-ons-icon>
 
             </v-ons-toolbar-button>
-            <v-ons-toolbar-button v-else @click="changeView">
-                <v-ons-icon icon="ion-navicon, material:md-menu"></v-ons-icon>
-            </v-ons-toolbar-button>
+                <v-ons-toolbar-button v-else @click="changeView">
+                    <v-ons-icon icon="ion-navicon, material:md-menu"></v-ons-icon>
+                </v-ons-toolbar-button>
             <!--v-ons-toolbar-button v-if="!isSearch" @click="isNearestMarkerSort"  >
                 <v-ons-icon :style="{'color': nearest.marker ? 'red' : ''}" icon="fa-street-view"></v-ons-icon>
             </v-ons-toolbar-button>-->

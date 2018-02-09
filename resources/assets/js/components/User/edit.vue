@@ -11,7 +11,7 @@
             </div>
 
             <form class="w3-container">
-                <div class="w3-section">
+                <!--<div class="w3-section">
                     <label>Name</label>
                     <input class="w3-input w3-border w3-margin-bottom"
                            type="text"
@@ -40,6 +40,79 @@
                            placeholder="Enter Password"
                            name="psw"
                            required>
+                </div>-->
+
+                    <div class="w3-section">
+                        <div class="w3-row-padding">
+                            <div class="w3-half">
+                                <label>Username</label>
+                                <input class="w3-input w3-border w3-margin-bottom"
+                                       type="text"
+                                       v-model="user.name" placeholder="Enter Username"
+                                       name="Name"
+                                       required>
+                            </div>
+                            <div class="w3-half">
+                                <label><b>Email</b></label>
+                                <input class="w3-input w3-border"
+                                       v-model="user.email"
+                                       type="email"
+                                       placeholder="Enter Email"
+                                       name="email"
+                                       required>
+                            </div>
+                        </div>
+                        <div class="w3-row-padding">
+                            <div class="w3-half">
+                                <label><b>Password</b></label>
+                                <input class="w3-input w3-border"
+                                       v-model="password"
+                                       type="password"
+                                       placeholder="Enter Password"
+                                       name="psw"
+                                       required>
+                            </div>
+                            <div class="w3-half">
+                                <label><b>Confirm Password</b></label>
+                                <input class="w3-input w3-border"
+                                       v-model="password_confirmation"
+                                       type="password"
+                                       placeholder="Enter Password"
+                                       name="psw"
+                                       required>
+                            </div>
+                        </div>
+                        <div class="w3-row-padding">
+                            <div class="w3-third">
+                                <label><b>School</b></label>
+                                <input class="w3-input w3-border"
+                                       v-model="user.school"
+                                       type="text"
+                                       placeholder="Enter School"
+                                       name="school"
+                                       required>
+                            </div>
+                            <div class="w3-third">
+                                <label><b>Country</b></label>
+
+                                <select-input v-model="user.country" :selected="user.country"></select-input>
+                            </div>
+                            <div class="w3-third">
+                                <label><b>Field of Study</b></label>
+                                <input class="w3-input w3-border"
+                                       v-model="user.field"
+                                       type="text"
+                                       placeholder="Enter Field of Study"
+                                       name="field"
+                                       required>
+                            </div>
+                        </div>
+
+                    </div>
+
+
+
+
                     <ons-button v-if="!loading"
                                 @click="updateUser"
                                 class="w3-button w3-block w3-teal w3-section w3-padding"
@@ -49,7 +122,7 @@
                         <v-ons-progress-circular indeterminate></v-ons-progress-circular>
                     </ons-button>
 
-                </div>
+
             </form>
 
             <div class="w3-container w3-border-top w3-padding-16 w3-light-grey">
@@ -64,8 +137,12 @@
 <style>
 </style>
 <script>
+    import Select from './Select.vue'
     import {updateUser} from './../Ajax/getData'
     export default{
+        components:{
+            'select-input' : Select
+        },
         props: ['user'],
         data(){
             return {
@@ -95,7 +172,7 @@
                  })*/
                 //api/user/{user}
                // updateUser(vm.user)
-                axios.put(`api/user/${vm.user.id}/update`, vm.user).then(function () {
+                axios.put(`api/user/${vm.user.id}/update/${firebase.auth().currentUser.uid}`, vm.user).then(function () {
 
                 })
                 vm.$emit('close', vm.user)

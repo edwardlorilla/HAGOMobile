@@ -1,6 +1,8 @@
 <template>
    <div>
-       <component v-bind:is="currentView"></component>
+
+           <component v-bind:is="currentView"></component>
+
    </div>
 </template>
 <style>

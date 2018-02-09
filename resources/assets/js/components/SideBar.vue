@@ -1,13 +1,13 @@
 <template>
     <div class="w3-bar-block">
         <a class="w3-bar-item w3-button w3-padding-16 w3-hide-large w3-dark-grey w3-hover-black" onclick="w3_close()" title="close menu"><i class="fa fa-remove fa-fw"></i>&nbsp; Close Menu</a>
-        <router-link :to="{ path: '/'}" class="w3-bar-item w3-button w3-padding">
+        <router-link to="/" class="w3-bar-item w3-button w3-padding">
             <i class="fa fa-eye fa-fw"></i>&nbsp; Overview
         </router-link>
-        <router-link :to="{ path: 'users'}" class="w3-bar-item w3-button w3-padding" >
+        <router-link to="../users" class="w3-bar-item w3-button w3-padding" >
             <i class="fa fa-users fa-fw"></i>&nbsp; Users
         </router-link>
-        <router-link :to="{ path: 'repositories'}" class="w3-bar-item w3-button w3-padding" >
+        <router-link to="../repositories" class="w3-bar-item w3-button w3-padding" >
             <i class="fa fa-leaf" aria-hidden="true"></i>&nbsp; Repositories
         </router-link>
         <a class="w3-bar-item w3-button w3-padding"><i class="fa fa-bullseye fa-fw"></i>&nbsp; Geo</a>

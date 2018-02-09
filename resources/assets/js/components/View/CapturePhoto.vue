@@ -26,7 +26,7 @@
                     </div>
                     <div v-else>
                         <v-ons-list tappable >
-                            <v-ons-list-item modifier="nodivider">
+                            <!--<v-ons-list-item modifier="nodivider">
                                 <div class="center">
                                     <v-ons-input placeholder="Title" float
                                                  v-model="repositoryInfo.title"
@@ -44,7 +44,7 @@
                                     >
                                     </v-ons-input>
                                 </div>
-                            </v-ons-list-item>
+                            </v-ons-list-item>-->
                             <v-ons-list-item>
                                 <div class="center" style="display: flex;justify-content: space-between;">
                                     <v-ons-button @click="addBaseColor" :disabled="disabledButton" class="btn-btn" style="width:48%;">Add
@@ -70,7 +70,7 @@
                                             </v-ons-radio>
 
                                         </div>
-                                        <div class="right">
+                                        <div class="center">
                                             <clazy-load :src="getPhoto(near.photo)">
                                                 <transition name="fade" slot="image">
                                                     <img class="thumbnail"
@@ -84,9 +84,9 @@
                                                 </transition>
                                             </clazy-load>
                                         </div>
-                                        <div :for="'radio-' + index" class="center">
+                                       <!-- <div :for="'radio-' + index" class="center">
                                             <span class="list-item__title">{{near.hexValue}}</span><span class="list-item__subtitle">{{near.description}}</span>
-                                        </div>
+                                        </div>-->
                                     </v-ons-list-item>
 
                                 </div>
@@ -260,7 +260,7 @@
                     hexArray = vm.palletesConvertHex();
                 vm.disabledButton = true
                 FormDataPost(vm.image, hexArray, vm.location.latitude, vm.location.longitude, vm.location.altitude, vm.repositoryInfo.title, vm.repositoryInfo.description, vm.selectedPlant)
-                    .then(function (data) {
+                    .then(function () {
                         console.log(data)
                         vm.disabledButton = false
                     }).catch(function () {

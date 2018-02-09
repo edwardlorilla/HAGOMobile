@@ -32,9 +32,9 @@
 
                     vm.$emit('close')
 
-                    firebase.database().ref(`users/${vm.user.firebase_uid}`).remove().then(function () {
+                   /* firebase.database().ref(`users/${vm.user.firebase_uid}`).remove().then(function () {
                         console.log('Remove Successfully!')
-                    })
+                    })*/
                 });
 
             },

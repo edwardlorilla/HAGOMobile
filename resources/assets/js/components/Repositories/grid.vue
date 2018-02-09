@@ -2,39 +2,43 @@
     <div>
         <!-- Header -->
         <header id="portfolio">
-            <a href="#"><img src="/w3images/avatar_g2.jpg" style="width:65px;"
-                             class="w3-circle w3-right w3-margin w3-hide-large w3-hover-opacity"></a>
-            <span class="w3-button w3-hide-large w3-xxlarge w3-hover-text-grey" onclick="w3_open()"><i
-                    class="fa fa-bars"></i></span>
-            <div class="w3-container">
-                <h1><b>My Portfolio</b></h1>
-                <div class="w3-section w3-bottombar w3-padding-16">
-                    <span class="w3-margin-right">Filter:</span>
 
-                    <el-select v-model="distributions" multiple clearable placeholder="Filter Distributions">
-                        <el-option
-                                v-for="item in pluckDistributions"
-                                :key="item"
-                                :label="item"
-                                :value="item">
-                        </el-option>
-                    </el-select>
-                    <el-select v-model="categories" multiple clearable placeholder="Categories">
-                        <el-option
-                                v-for="item in pluckCategories"
-                                :key="item"
-                                :label="item"
-                                :value="item">
-                        </el-option>
-                    </el-select>
-                    <el-select v-model="families" multiple clearable placeholder="Families">
-                        <el-option
-                                v-for="item in pluckFamilies"
-                                :key="item"
-                                :label="item"
-                                :value="item">
-                        </el-option>
-                    </el-select>
+            <div class="w3-container">
+                <h1><b>Repositories of plants</b></h1>
+                <div class="w3-section w3-padding-8">
+                    <router-link class="w3-button w3-green"  to="repositories/create">Add Repositories</router-link>
+                </div>
+
+                <div class="w3-section w3-bottombar w3-padding-16">
+
+                    <span class="w3-margin-right">Filter:</span>
+                    <el-form>
+                        <el-select v-model="distributions" multiple clearable placeholder="Filter Distributions">
+                            <el-option
+                                    v-for="item in pluckDistributions"
+                                    :key="item"
+                                    :label="item"
+                                    :value="item">
+                            </el-option>
+                        </el-select>
+                        <el-select v-model="categories" multiple clearable placeholder="Categories">
+                            <el-option
+                                    v-for="item in pluckCategories"
+                                    :key="item"
+                                    :label="item"
+                                    :value="item">
+                            </el-option>
+                        </el-select>
+                        <el-select v-model="families" multiple clearable placeholder="Families">
+                            <el-option
+                                    v-for="item in pluckFamilies"
+                                    :key="item"
+                                    :label="item"
+                                    :value="item">
+                            </el-option>
+                        </el-select>
+                    </el-form>
+
                     <!--<button class="w3-button w3-white"><i class="fa fa-diamond w3-margin-right"></i>Design</button>
                     <button class="w3-button w3-white w3-hide-small"><i class="fa fa-photo w3-margin-right"></i>Photos
                     </button>
@@ -46,8 +50,8 @@
 
         <!-- First Photo Grid-->
         <div class="w3-row-padding" v-for="items in chunkItems">
-            <div v-for="item in items" class="w3-third w3-container w3-margin-bottom">
-                <img :src=" item.photos[0].file ? 'images/thumb_' + item.photos[0].file : null" :alt="item.title"
+            <div  v-for="(item, index) in items"  @click="editRepository(item)" :key="index" class="w3-third w3-container w3-margin-bottom">
+                <img :src=" item.photos[0] ? 'images/thumb_' + item.photos[0].file : null" :alt="item.title"
                      style="width:100%" class="w3-hover-opacity">
                 <div class="w3-container w3-white">
                     <p><b>{{item.title}}</b></p>
@@ -88,11 +92,23 @@
 <style>
 </style>
 <script>
-
+    import EditView from './edit.vue'
+    import {changeRepository, editRepository}  from './../Ajax/getData'
     export default{
+        methods:{
+          editRepository(item){
+              var vm = this
+              editRepository(item)
+              vm.$router.push({name: 'edit-repositories'})
+          }
+        },
         props: ['items'],
+        components:{
+            EditView
+        },
         data(){
             return {
+                changeRepository,
                 distributions: [],
                 categories: [],
                 families: []
@@ -111,12 +127,14 @@
                         || (select.category ? select.category.name ? categories.indexOf(select.category.name) != -1 : select.category.name : null)
                 });
 
-                if (_.isEmpty(distributions)) {
+                if (_.isEmpty(distributions) && _.isEmpty(categories) &&_.isEmpty(families)) {
                     selectedDistributions = vm.items
                 } else {
                     selectedDistributions = selectedFilter
                 }
-                return selectedDistributions
+                return _.filter(selectedDistributions, function(select){
+                  return select.published === 1
+                })
             },
             pluckDistributions(){
                 var distributions = this.items

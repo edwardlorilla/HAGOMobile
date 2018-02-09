@@ -23,12 +23,12 @@ class RepositoryController extends Controller
     public function index($firebase)
     {
         $user = Cache::rememberForever('user_repository:all', function () use ($firebase) {
-            return \App\User::with('repositories.photos', 'repositories.color','repositories.distribution','repositories.category','repositories.family', 'repositories.repository')->where('firebase_uid', $firebase)->first()['repositories'];
+            return \App\User::with('repositories.photos', 'repositories.color','repositories.distribution','repositories.category','repositories.family', 'repositories.repository', 'repositories.vegetations')->where('firebase_uid', $firebase)->first()['repositories'];
 
         });
 
 
-        $repositories = \App\Repository::with('distribution','photos', 'color', 'repository', 'category', 'family')
+        $repositories = \App\Repository::with('distribution','photos', 'color', 'repository', 'category', 'family', 'vegetations')
             ->where('published', 1)
             ->orderBy('updated_at', 'desc')
             ->get();
@@ -88,13 +88,18 @@ class RepositoryController extends Controller
                 'estimatedDensity' => $selected['density'],
                 'latitude'=> $location['latitude'],
                 'altitude'=> $location['altitude'],
-                'longitude'=> $location['longitude']
+                'longitude'=> $location['longitude'],
+                'published' => 1,
+                'photos' => $photo
             ]);
             $repositories = $user->repositories()->save($repository);
-            $repositories->vegetations()->attach([$selected['vegetation']]);
+            $repositories->vegetations()->attach($selected['vegetation']);
             $repositories->photos()->attach($photo->id);
         }
-        return $repository;
+        $repository_ = \App\Repository::with('distribution','photos', 'color', 'repository', 'category', 'family')
+            ->where('id',  $repository->id)->get()[0];
+        Cache::forget('user_repository:all');
+        return response()->json($repository_);
     }
 
     /**
@@ -232,7 +237,28 @@ class RepositoryController extends Controller
     {
         //
     }
+    public function updateRepository(Request $request, $firebase){
 
+        $updateRepository = [
+            'image' => $request->image,
+            'palletes' => $request->palletes,
+            'title' => $request->title,
+            'economicImportance' => $request->economicImportance,
+            'description' => $request->description,
+            'species' => $request->species,
+            'commonName' => $request->commonName,
+            'scientificName' => $request->scientificName,
+            'latitude' => $request->latitude,
+            'longitude' => $request->longitude,
+            'altitude' => $request->altitude,
+            'estimatedDensity' => $request->estimatedDensity,
+            'family' => $request->family,
+            'category' => $request->category,
+            'distribution' => $request->distribution,
+            'vegetation' => $request->vegetation
+        ];
+        \App\Repository::update($updateRepository);
+    }
     /**
      * Update the specified resource in storage.
      *

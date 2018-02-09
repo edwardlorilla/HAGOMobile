@@ -20,7 +20,7 @@ class RoleTableSeeder extends Seeder
     {
         DB::statement('SET FOREIGN_KEY_CHECKS=0;');
         DB::table('roles')->truncate();
-        DB::table('users')->truncate();
+//        DB::table('users')->truncate();
         DB::table('distributions')->truncate();
         DB::table('categories')->truncate();
         DB::table('vegetations')->truncate();
@@ -212,14 +212,14 @@ class RoleTableSeeder extends Seeder
             'name' => 'User',
             'description' => 'A standard user that can have a licence assigned to them. No administrative features.'
         ]);
-        User::create([
+        /*User::create([
             'name' => 'Edward Lance Lorilla',
             'email' => 'edward@io.com',
             'password' => bcrypt('edward'),
             'role_id' => 2,
             'firebase_uid' => 'dsK5esUN6tXKiCpl8kbkQtZmXYD3',
             'remember_token' => str_random(10),
-        ]);
+        ]);*/
 
     }
 }

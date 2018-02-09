@@ -64,9 +64,14 @@ export function plantSelected() {
 }
 export var tileSet = {
     all: [
+
         {
             name: 'Streets ',
             tileLayer: 'https://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}'
+        },{
+            name: 'Statkart ',
+            tileLayer: 'http://opencache.statkart.no/gatekeeper/gk/gk.open_gmaps?layers=norges_grunnkart&zoom={z}&x={x}&y={y}',
+            attribution: '&copy; <a href="http://kartverket.no/">Kartverket</a>'
         },
         {
             name: 'Hybrid',
@@ -147,14 +152,60 @@ export var options = {
     minMatchCharLength: 1,
     keys: keys
 }
+
+export var isAlive = {
+    isWatch: false
+}
+
+export function isWatch(totalDistance ){
+    console.log(totalDistance)
+    isAlive.isWatch = !isAlive.isWatch
+    var photo = PlantInfo ? PlantInfo.photos : null
+    var timelinePhoto = !_.isEmpty(photo) ? 'images/thumb_' + photo[0].file : photo
+    var getTimeline = { coords: coordinateMap.coords,plantInfo: timelinePhoto,  id: timeline.get.length,started_at: moment().format() , stopped_at: 0, duration: null, mile: totalDistance}
+    if(isAlive.isWatch){
+        writeData('timeline', getTimeline).then(function (data) {
+            writeTimeline(data)
+        })
+    }else{
+        var duration = moment.duration(moment(moment().format()).diff(moment(timeline.get[timeline.get.length - 1].started_at)))
+
+        var get = {
+            coords: coordinateMap.coords,
+            plantInfo: timelinePhoto,
+            id: timeline.get.length - 1,
+            started_at: moment(timeline.get[timeline.get.length - 1].started_at).format("MM-DD-YYYY"),
+            stopped_at: moment().format("MMM-DD-YYYY"),
+            duration_at: duration.get("hours").toString().padStart(2, '0') + ":" + duration.get("minutes").toString().padStart(2, '0') + ":" + duration.get("seconds").toString().padStart(2, '0'),
+            mile: totalDistance
+        }
+        updateItem('timeline', get)
+        timeline.get[timeline.get.length - 1] = get
+    }
+}
+export var coordinateMap = {
+    coords: []
+}
+export var navigation = {
+    page: ['view-timeline']
+}
+export var timelineItem = {
+    item: null
+}
+export function timelineChanger(){
+
+    navigation.page.push('timeline-detail')
+}
 export var currentPage = {
     url: 'plant-navigator',
     name: 'Repositories of Plants'
 }
 export function currentPageSwitcher(url, name) {
     if (name === 'Gallery') {
+        listView.view = false
         toggleMySighting('0')
     } else if (name === 'Repositories of Plants') {
+        listView.view = true
         toggleMySighting('1')
     }
     new Promise((resolve, reject) => {
@@ -180,11 +231,23 @@ export var Stack = {
     page: ['view-plant']
 }
 export var Chat = {
-    page: ['chat-view']
+    page: ['chat']
 }
+
+
+
+
+
 export var chatInfo = {
     detail: null
 }
+export var getCurrent = {
+    user: null
+}
+export function getCurrentUser(current){
+    getCurrent.user = current
+}
+
 export function getChatInfo(chat){
     chatInfo.detail = chat
 }
@@ -426,19 +489,69 @@ export function updateUser(user){
     var userIndex = _.findIndex(list.users, ['id', user.id]);
     list.users[userIndex] = user;
 }
+export function insertUser(user){
+    list.users.push(user)
+}
 export function listUser(user){
     list.users = user
 }
+
+export var repositoryEdit = {
+    edit: null
+}
+export var changeRepository = {
+    view: 'edit'
+}
+export function editRepository(repository){
+    changeRepository.view = ''
+    repositoryEdit.edit = repository
+}
+
+
+export function updateRepository(repository, selected, uid){
+    var updateRepository = {
+        'image' : repository.image,
+        'palletes' : repository.palletes,
+        'title' : repository.title,
+        'economicImportance' : repository.economicImportance,
+        'description' : repository.description,
+        'species' : repository.species,
+        'commonName' : repository.commonName,
+        'scientificName' : repository.scientificName,
+        'latitude' : repository.latitude,
+        'longitude' : repository.longitude,
+        'altitude' : repository.altitude,
+        'estimatedDensity' : repository.estimatedDensity,
+        'family': selected.family,
+        'category': selected.category,
+        'distribution': selected.distribution,
+        'vegetation': selected.vegetation
+    }
+
+    axios.put(`../api/repository/admin/update/${uid}`, updateRepository).then(function(response){
+
+    })
+}
+
 export function addRepository(image, colors, location, repositoryInfo, selected){
     var user = firebase.auth().currentUser ;
     var url = `../api/repository/create/${user.uid}`;
     if (typeof url !== 'string') {
         throw new TypeError(`Expected a string, got ${typeof url}`);
     }
-    return axios.post(url, {'image': image, 'colors': colors.toString(), 'location': location, 'repositoryInfo': repositoryInfo, 'selected': selected })
+    return axios.post(url, {'image': image, 'colors': colors.toString(), 'location': location, 'repositoryInfo': repositoryInfo, 'selected': selected }).then(function(response){
+        plantItem.all.push(response.data)
+    })
 }
 export function usersChat(user){
     users.chat = user
+}
+
+export var chats = {
+    users:[]
+}
+export function chatUserView(admin){
+    chats.users = admin
 }
 
 
@@ -455,7 +568,7 @@ export function getData() {
             plantItem.repositories = []
             plantItem.sighting = []
             var data = response.data
-            allRepositories = data
+            var allRepositories = data
             plantItem.all = allRepositories
             getResults.all = allRepositories
             plantItem.count = allRepositories.length
@@ -559,7 +672,8 @@ export function FormDataPost(file, payload, latitude, longitude, altitude, title
                 writeData('posts', response.data).then(function () {
                     readAllData('posts')
                         .then(function (data) {
-                            allRepositories = data
+
+                            var allRepositories = data
                             plantItem.all = allRepositories
                             getResults.all = allRepositories
                             plantItem.count = allRepositories.length
@@ -567,7 +681,7 @@ export function FormDataPost(file, payload, latitude, longitude, altitude, title
                 })
                 //getData()
 
-                Stack.page.pop();
+               // Stack.page.pop();
 
                 return response.data
             })
@@ -592,7 +706,7 @@ export function FormDataPost(file, payload, latitude, longitude, altitude, title
                         if ('indexedDB' in window) {
                             readAllData('posts')
                                 .then(function (data) {
-                                    allRepositories = data
+                                    var allRepositories = data
                                     plantItem.all = allRepositories
                                     getResults.all = allRepositories
                                     plantItem.count = allRepositories.length
@@ -607,14 +721,25 @@ if ('indexedDB' in window) {
         .then(function(data) {
             if (!networkDataReceived) {
                 console.log('indexed')
-                allRepositories = data
+                var allRepositories = data
                 plantItem.all = allRepositories
                 getResults.all = allRepositories
                 plantItem.count = allRepositories.length
             }
         });
+    readAllData('timeline')
+        .then(function(data) {
+                timeline.get = data
+            });
 }
-
+export var timeline = {
+    get:[],
+    length: 0
+}
+export function writeTimeline(data) {
+    timeline.get.push(data)
+    timeline.length = data.id + 1
+}
 export var all = {
     repositories: []
 }
@@ -669,11 +794,54 @@ export function change_view() {
 const LoadingComponent = {
     name: 'loading-component',
     template: `
-        <div class="pulse">
-          <span></span>
-          H
+        <div class="logo-area">
+          <div class="icon-container">
+            <div class="icon">
+              <div class="shadow-point top one triangle"></div>
+              <div class="shadow-point top two triangle"></div>
+              <div class="shadow-point bottom one triangle"></div>
+              <div class="shadow-point bottom two triangle"></div>
+              <div class="shadow-point left one triangle"></div>
+              <div class="shadow-point left two triangle"></div>
+              <div class="shadow-point right one triangle"></div>
+              <div class="shadow-point right two triangle"></div>
+              <div class="outer-rim"></div>
+              <div class="first-shadow"></div>
+              <div class="inner-rim"></div>
+              <div class="inner-circle"></div>
+              <div class="big-point top one triangle"></div>
+              <div class="big-point top two triangle"></div>
+              <div class="big-point bottom one triangle"></div>
+              <div class="big-point bottom two triangle"></div>
+              <div class="big-point left one triangle"></div>
+              <div class="big-point left two triangle"></div>
+              <div class="big-point right one triangle"></div>
+              <div class="big-point right two triangle"></div>
+              <div class="small-point top-left one triangle"></div>
+              <div class="small-point top-left two triangle"></div>
+              <div class="small-point top-right one triangle"></div>
+              <div class="small-point top-right two triangle"></div>
+              <div class="small-point bottom-left one triangle"></div>
+              <div class="small-point bottom-left two triangle"></div>
+              <div class="small-point bottom-right one triangle"></div>
+              <div class="small-point bottom-right two triangle"></div>
+              
+              <div class="second-shadow"></div>
+        
+              <!-- spinner -->
+              <div class="spinner">
+                <div class="arrow triangle one"></div>
+                <div class="arrow triangle two"></div>
+                <div class="arrow triangle three"></div>
+                <div class="arrow triangle four"></div>
+              </div>
+        
+        
+              <div class="middle-circle"></div>
+            </div>
+          </div>
         </div>
-`,
+        `,
 }
 
 export var userLocation = {
@@ -767,3 +935,10 @@ export function deletePlants(plants) {
 
 }
 
+export var navigationMap = {
+    stack: ['view-map']
+}
+
+export function mapNavigation(){
+    navigationMap.stack.push('capture-photo')
+}

@@ -21,10 +21,10 @@
                 </h5>
             </header>
 
-            <edit v-if="currentView  && currentView != 'create'"
+            <edit v-if="currentView == 'edit'  && currentView != 'create'"
                   @close="currentView = ''; userInfo = null; updateUser($event)" :user="userInfo"></edit>
 
-            <delete v-else-if="currentView  && currentView != 'create'"
+            <delete v-else-if="currentView == 'delete'  && currentView != 'create'"
                     @close="currentView = ''; userInfo = null;" :user="userInfo"></delete>
 
             <create v-else-if="currentView && currentView === 'create'" @close="currentView = ''"></create>
